@@ -69,11 +69,8 @@ export async function analyzeCompetitor(url: string) {
         "X-Title": "Competitor SEO Analyzer",
       },
       body: JSON.stringify({
-        model: "anthropic/claude-3.5-sonnet",
+        model: "google/gemini-2.0-flash-lite-preview-02-05:free",
         messages: [{ role: "user", content: prompt }],
-        // Removing response_format as it's sometimes flaky with specific providers on OpenRouter
-        // unless strictly supported. Claude 3.5 Sonnet supports it, but the prompt 
-        // "Provide ONLY the raw JSON" is often more reliable across the OpenRouter relay.
       }),
     });
 
