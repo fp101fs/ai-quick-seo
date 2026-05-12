@@ -65,11 +65,11 @@ export async function analyzeCompetitor(url: string) {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://github.com/fp101fs/ai-quick-seo",
+        "HTTP-Referer": "https://ai-quick-seo.vercel.app",
         "X-Title": "Competitor SEO Analyzer",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.0-flash-lite-preview-02-05:free",
+        model: "openrouter/free",
         messages: [{ role: "user", content: prompt }],
       }),
     });
