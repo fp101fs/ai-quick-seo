@@ -18,6 +18,7 @@ import {
   SITEMAP_COOKIE,
 } from "@/lib/services/context";
 import { crawlSitemap } from "@/lib/services/crawler";
+import { cacheDelete } from "@/lib/services/store";
 import { getConnectionStatus, getSelectedProperty, isDemoMode } from "@/lib/services/session";
 import { generateDailyTasks } from "@/lib/services/tasks";
 
@@ -95,6 +96,18 @@ export async function getPropertyBaseUrl(): Promise<string | null> {
 
 export async function getLastCrawl(): Promise<CrawlResult | null> {
   return getCachedCrawl();
+}
+
+export async function clearSnapshotCache(): Promise<void> {
+  const property = await getSelectedProperty();
+  if (!property) return;
+  cacheDelete(`gsc:${property}`);
+  try {
+    const { deleteCachedSnapshot } = await import("@/lib/db");
+    await deleteCachedSnapshot(property);
+  } catch {
+    // DB unavailable — in-memory clear is sufficient
+  }
 }
 
 export async function refreshContent(url: string): Promise<ContentRefreshResult> {

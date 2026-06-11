@@ -29,7 +29,7 @@ import { ConnectGate } from "@/components/connect-gate";
 import { PageHeader } from "@/components/page-header";
 import { AiLoading } from "@/components/ai-loading";
 import { TaskCard } from "@/components/task-card";
-import { getDashboardData, type DashboardData } from "@/app/actions/seo";
+import { clearSnapshotCache, getDashboardData, type DashboardData } from "@/app/actions/seo";
 import { DashboardUserChip } from "@/components/dashboard-user-chip";
 import type { Opportunity } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -143,6 +143,12 @@ export default function DashboardPage() {
     fetchData();
   }, [fetchData]);
 
+  const hardRefresh = useCallback(async () => {
+    setLoading(true);
+    await clearSnapshotCache().catch(() => {});
+    fetchData();
+  }, [fetchData]);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("connected")) toast.success("Google Search Console connected!");
@@ -223,7 +229,7 @@ export default function DashboardPage() {
         description={`Daily briefing for ${data.status.property?.replace(/^sc-domain:/, "").replace(/^https?:\/\//, "").replace(/\/$/, "") ?? "your site"}`}
         action={
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={load} className="border-slate-200">
+            <Button variant="outline" onClick={hardRefresh} className="border-slate-200">
               <RefreshCw className="w-4 h-4" />
               Refresh
             </Button>
