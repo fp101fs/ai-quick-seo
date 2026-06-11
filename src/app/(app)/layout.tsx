@@ -38,6 +38,7 @@ export default async function AppLayout({
     <AppShell
       status={status}
       user={user}
+      isSignedIn={userId !== null}
       spentUsd={spentUsd}
       capUsd={capUsd}
       isPro={isPro}

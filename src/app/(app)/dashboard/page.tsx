@@ -30,6 +30,7 @@ import { PageHeader } from "@/components/page-header";
 import { AiLoading } from "@/components/ai-loading";
 import { TaskCard } from "@/components/task-card";
 import { getDashboardData, type DashboardData } from "@/app/actions/seo";
+import { DashboardUserChip } from "@/components/dashboard-user-chip";
 import type { Opportunity } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -152,7 +153,10 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-10 w-64 rounded-lg" />
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-10 w-64 rounded-lg" />
+          <DashboardUserChip />
+        </div>
         {/* Big, visible AI loading animation in the main area */}
         <div className="bg-white rounded-2xl ring-1 ring-slate-200 shadow-sm">
           <AiLoading
@@ -195,6 +199,7 @@ export default function DashboardPage() {
         <PageHeader
           title="Dashboard"
           description="Your AI employee's daily SEO briefing."
+          action={<DashboardUserChip />}
         />
         {errorBanner}
         <ConnectGate status={data.status} onReady={load} />
@@ -217,10 +222,13 @@ export default function DashboardPage() {
         title="Dashboard"
         description={`Daily briefing for ${data.status.property?.replace(/^sc-domain:/, "").replace(/^https?:\/\//, "").replace(/\/$/, "") ?? "your site"}`}
         action={
-          <Button variant="outline" onClick={load} className="border-slate-200">
-            <RefreshCw className="w-4 h-4" />
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={load} className="border-slate-200">
+              <RefreshCw className="w-4 h-4" />
+              Refresh
+            </Button>
+            <DashboardUserChip />
+          </div>
         }
       />
 

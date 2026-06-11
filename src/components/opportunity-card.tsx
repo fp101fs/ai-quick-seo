@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   TrendingDown,
   Eye,
@@ -6,6 +9,8 @@ import {
   Lightbulb,
   Wrench,
   BarChart3,
+  ClipboardCopy,
+  Check,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,9 +53,52 @@ const impactConfig = {
   low: "bg-slate-100 text-slate-600",
 };
 
+function buildClaudePrompt(o: Opportunity): string {
+  const typeLabels: Record<OpportunityType, string> = {
+    "declining-clicks": "declining organic clicks",
+    "declining-impressions": "declining search impressions",
+    "quick-win": "a quick SEO win opportunity",
+    "low-ctr": "a low click-through rate issue",
+  };
+
+  const metricsLines: string[] = [];
+  if (o.metrics.clicks !== undefined) metricsLines.push(`- Clicks: ${o.metrics.clicks}`);
+  if (o.metrics.impressions !== undefined) metricsLines.push(`- Impressions: ${o.metrics.impressions}`);
+  if (o.metrics.ctr !== undefined) metricsLines.push(`- CTR: ${(o.metrics.ctr * 100).toFixed(2)}%`);
+  if (o.metrics.position !== undefined) metricsLines.push(`- Avg position: ${o.metrics.position.toFixed(1)}`);
+  if (o.metrics.clicksDelta !== undefined) metricsLines.push(`- Clicks change: ${o.metrics.clicksDelta > 0 ? "+" : ""}${o.metrics.clicksDelta}`);
+  if (o.metrics.impressionsDelta !== undefined) metricsLines.push(`- Impressions change: ${o.metrics.impressionsDelta > 0 ? "+" : ""}${o.metrics.impressionsDelta}`);
+
+  return `I have an SEO issue I need your help fixing. Here's the context:
+
+**Issue type:** ${typeLabels[o.type]} (${o.impact} impact)
+${o.page ? `**Page:** ${o.page}` : ""}
+${o.query ? `**Query:** ${o.query}` : ""}
+
+**What's happening:** ${o.issue}
+
+**Why it matters:** ${o.whyItMatters}
+
+**Current metrics:**
+${metricsLines.join("\n") || "No metrics available"}
+
+**Recommended action:** ${o.recommendedAction}
+
+**Expected impact if fixed:** ${o.estimatedImpact}
+
+Please help me implement the recommended action step by step. Be specific and practical — give me the exact changes to make, the copy to write, or the technical steps to take. Focus only on fixing this specific issue.`;
+}
+
 export function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
+  const [copied, setCopied] = useState(false);
   const config = typeConfig[opportunity.type];
   const Icon = config.icon;
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(buildClaudePrompt(opportunity));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <Card className="bg-white border-none shadow-sm ring-slate-200 hover:ring-indigo-200 transition-all">
@@ -84,6 +132,28 @@ export function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
           <BarChart3 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
           <p className="text-sm text-slate-600">{opportunity.estimatedImpact}</p>
         </div>
+
+        <button
+          onClick={handleCopy}
+          className={cn(
+            "w-full flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all border",
+            copied
+              ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+              : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-700"
+          )}
+        >
+          {copied ? (
+            <>
+              <Check className="w-3.5 h-3.5" />
+              Copied!
+            </>
+          ) : (
+            <>
+              <ClipboardCopy className="w-3.5 h-3.5" />
+              Copy Claude Prompt
+            </>
+          )}
+        </button>
       </CardContent>
     </Card>
   );

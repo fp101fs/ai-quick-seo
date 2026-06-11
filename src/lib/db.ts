@@ -42,6 +42,15 @@ export async function runMigrations() {
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS gsc_snapshots (
+      id SERIAL PRIMARY KEY,
+      property TEXT NOT NULL UNIQUE,
+      snapshot JSONB NOT NULL,
+      fetched_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
 }
 
 // ---------- Users ----------
@@ -156,3 +165,34 @@ export async function getMonthlyUsageCost(userId: number): Promise<number> {
 
 export const FREE_CAP_USD = 0.10;
 export const PRO_CAP_USD = Infinity;
+
+// ---------- GSC Snapshot Cache ----------
+
+const SNAPSHOT_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+export async function getCachedSnapshot(property: string): Promise<unknown | null> {
+  try {
+    const result = await sql`
+      SELECT snapshot, fetched_at FROM gsc_snapshots
+      WHERE property = ${property}
+        AND fetched_at > NOW() - INTERVAL '30 minutes'
+    `;
+    return result.rows[0]?.snapshot ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function setCachedSnapshot(property: string, snapshot: unknown): Promise<void> {
+  try {
+    await sql`
+      INSERT INTO gsc_snapshots (property, snapshot)
+      VALUES (${property}, ${JSON.stringify(snapshot)})
+      ON CONFLICT (property) DO UPDATE SET
+        snapshot = EXCLUDED.snapshot,
+        fetched_at = NOW()
+    `;
+  } catch {
+    // Silently fail — in-memory cache is the fallback
+  }
+}

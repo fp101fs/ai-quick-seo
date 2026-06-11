@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import type { ConnectionStatus } from "@/lib/types";
 import type { DbUser } from "@/lib/db";
 import { UsageMeter } from "@/components/usage-meter";
+import { PropertySelector } from "@/components/property-selector";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -87,6 +88,7 @@ function ConnectionChip({ status }: { status: ConnectionStatus }) {
 export function AppShell({
   status,
   user,
+  isSignedIn,
   spentUsd,
   capUsd,
   isPro,
@@ -94,6 +96,7 @@ export function AppShell({
 }: {
   status: ConnectionStatus;
   user: DbUser | null;
+  isSignedIn: boolean;
   spentUsd: number;
   capUsd: number;
   isPro: boolean;
@@ -147,7 +150,10 @@ export function AppShell({
           <span className="font-bold tracking-tight">AI SEO</span>
         </Link>
 
-        <div className="flex-1 overflow-y-auto p-3">{nav("vertical")}</div>
+        <div className="flex-1 overflow-y-auto p-3">
+          <PropertySelector status={status} />
+          {nav("vertical")}
+        </div>
 
         <div className="p-3 border-t border-slate-100 space-y-3">
           {/* Usage meter */}
@@ -169,9 +175,9 @@ export function AppShell({
           <ConnectionChip status={status} />
 
           {/* User section */}
-          {user ? (
+          {isSignedIn ? (
             <div className="flex items-center gap-2 px-1">
-              {user.picture ? (
+              {user?.picture ? (
                 <img
                   src={user.picture}
                   alt={user.name ?? user.email}
@@ -180,13 +186,13 @@ export function AppShell({
               ) : (
                 <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
                   <span className="text-xs font-semibold text-indigo-600">
-                    {(user.name ?? user.email)[0].toUpperCase()}
+                    {(user?.name ?? user?.email ?? "U")[0].toUpperCase()}
                   </span>
                 </div>
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-slate-700 truncate">
-                  {user.name ?? user.email}
+                  {user?.name ?? user?.email ?? "Signed in"}
                 </p>
                 {isPro && (
                   <p className="text-xs text-indigo-500 font-medium">Pro plan</p>
@@ -240,9 +246,9 @@ export function AppShell({
             <span className="font-bold tracking-tight text-sm">AI SEO</span>
           </Link>
           <div className="flex items-center gap-2">
-            {user ? (
+            {isSignedIn ? (
               <div className="flex items-center gap-2">
-                {user.picture ? (
+                {user?.picture ? (
                   <img
                     src={user.picture}
                     alt={user.name ?? user.email}
@@ -251,7 +257,7 @@ export function AppShell({
                 ) : (
                   <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center">
                     <span className="text-xs font-semibold text-indigo-600">
-                      {(user.name ?? user.email)[0].toUpperCase()}
+                      {(user?.name ?? user?.email ?? "U")[0].toUpperCase()}
                     </span>
                   </div>
                 )}

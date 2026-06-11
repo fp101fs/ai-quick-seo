@@ -8,6 +8,7 @@ import { getValidAccessToken } from "@/lib/services/google-auth";
 import { detectOpportunities, getSnapshot } from "@/lib/services/gsc";
 import { getSelectedProperty, getTokens, isDemoMode } from "@/lib/services/session";
 import { cacheGet } from "@/lib/services/store";
+import { getCachedSnapshot, setCachedSnapshot } from "@/lib/db";
 
 export const SITEMAP_COOKIE = "sitemap_url";
 
@@ -17,8 +18,19 @@ export async function getCurrentSnapshot(): Promise<GscSnapshot | null> {
   const [tokens, property] = await Promise.all([getTokens(), getSelectedProperty()]);
   if (!tokens || !property) return null;
 
+  // Try DB cache first (survives cold starts and property re-selection)
+  const cached = await getCachedSnapshot(property);
+  if (cached) return cached as GscSnapshot;
+
   const accessToken = await getValidAccessToken();
-  return getSnapshot(accessToken, property);
+  const snapshot = await getSnapshot(accessToken, property);
+
+  // Persist to DB for future re-selections
+  if (snapshot) {
+    setCachedSnapshot(property, snapshot).catch(() => {});
+  }
+
+  return snapshot;
 }
 
 export async function getCurrentOpportunities(): Promise<{
