@@ -1,241 +1,215 @@
-"use client";
-
-import { useState, useRef } from "react";
-import { Search, Download, Loader2, Globe, TrendingUp, BookOpen, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import {
+  Bot,
+  ArrowRight,
+  Target,
+  Link2,
+  RefreshCw,
+  MessageSquare,
+  ListChecks,
+  Search,
+  Crown,
+  Sparkles,
+  Gauge,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Toaster } from "@/components/ui/sonner";
-import { toast } from "sonner";
-import { analyzeCompetitor } from "./actions/analyze";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import { Button } from "@/components/ui/button";
 
-export default function SEOAnalyzer() {
-  const [url, setUrl] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [report, setReport] = useState<any>(null);
-  const reportRef = useRef<HTMLDivElement>(null);
+const features = [
+  {
+    icon: Target,
+    title: "SEO Opportunities",
+    description:
+      "Connects to Google Search Console and finds pages losing clicks, queries stuck on page 2, and snippets nobody clicks.",
+  },
+  {
+    icon: ListChecks,
+    title: "Daily Task List",
+    description:
+      "Every day, a prioritized plan: what to fix, why it matters, and the expected traffic impact — highest impact first.",
+  },
+  {
+    icon: Link2,
+    title: "Internal Link Finder",
+    description:
+      "Crawls your sitemap, finds orphan pages, and suggests exactly where to link from, with ready-to-use anchor text.",
+  },
+  {
+    icon: RefreshCw,
+    title: "Content Refresh",
+    description:
+      "AI drafts better titles, meta descriptions, new H2 sections, and FAQs for any page — informed by its real search data.",
+  },
+  {
+    icon: MessageSquare,
+    title: "AI SEO Coach",
+    description:
+      "Ask why traffic dropped or what to work on first. The coach answers with your actual pages, queries, and numbers.",
+  },
+  {
+    icon: Search,
+    title: "Competitor Spy",
+    description:
+      "Point it at any competitor to extract their target keywords, content gaps, and quick-win blog ideas.",
+  },
+];
 
-  const handleAnalyze = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!url) {
-      toast.error("Please enter a URL");
-      return;
-    }
-
-    setLoading(true);
-    setReport(null);
-    try {
-      const data = await analyzeCompetitor(url);
-      setReport(data);
-      toast.success("Analysis complete!");
-    } catch (error: any) {
-      toast.error(error.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const exportToPDF = async () => {
-    if (!reportRef.current) return;
-    
-    toast.info("Generating PDF...");
-    const canvas = await html2canvas(reportRef.current, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-    });
-    
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-    
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`SEO-Report-${report.siteName.replace(/\s+/g, "-")}.pdf`);
-    toast.success("PDF exported!");
-  };
-
+export default function LandingPage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
-      <Toaster />
-      
-      {/* Hero Section */}
-      <header className="bg-white border-b border-slate-200 py-12 px-4 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <Badge className="mb-4 bg-indigo-100 text-indigo-700 hover:bg-indigo-100 border-none px-3 py-1">
-            SEO Insight Engine v1.0
-          </Badge>
-          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl mb-6">
-            Decode Your <span className="text-indigo-600">Competitors</span>
-          </h1>
-          <p className="text-lg text-slate-600 mb-8 max-w-2xl mx-auto">
-            Enter a competitor's URL to extract keywords, identify content gaps, and get 
-            actionable blog ideas in seconds.
-          </p>
-          
-          <form onSubmit={handleAnalyze} className="relative max-w-2xl mx-auto">
-            <div className="relative">
-              <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-              <Input
-                type="url"
-                placeholder="https://competitor.com"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                className="pl-12 pr-32 h-14 text-lg rounded-full border-slate-200 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
-                required
-              />
-              <Button 
-                type="submit" 
-                disabled={loading}
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-10 rounded-full bg-indigo-600 hover:bg-indigo-700 px-6 font-medium transition-all"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Analyzing
-                  </>
-                ) : (
-                  <>
-                    <Search className="mr-2 h-4 w-4" />
-                    Analyze
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
+      {/* Nav */}
+      <header className="bg-white/80 backdrop-blur border-b border-slate-200 sticky top-0 z-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5">
+            <span className="flex w-8 h-8 items-center justify-center rounded-lg bg-indigo-600">
+              <Bot className="w-5 h-5 text-white" />
+            </span>
+            <span className="font-bold tracking-tight">AI SEO Employee</span>
+          </Link>
+          <Button
+            className="bg-indigo-600 hover:bg-indigo-700 rounded-full px-5"
+            render={<Link href="/dashboard" />}
+            nativeButton={false}
+          >
+            Open dashboard
+            <ArrowRight className="w-4 h-4" />
+          </Button>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto py-12 px-4">
-        {loading && (
-          <div className="space-y-8">
-            <Skeleton className="h-40 w-full rounded-xl" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <Skeleton className="h-64 rounded-xl" />
-              <Skeleton className="h-64 rounded-xl" />
-            </div>
+      {/* Hero */}
+      <section className="py-20 sm:py-28 px-4 text-center relative overflow-hidden">
+        <div
+          className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_oklch(0.93_0.04_280),_transparent_60%)]"
+          aria-hidden
+        />
+        <div className="max-w-3xl mx-auto">
+          <Badge className="mb-6 bg-indigo-100 text-indigo-700 hover:bg-indigo-100 border-none px-3 py-1">
+            <Sparkles className="w-3 h-3" />
+            Your first AI hire
+          </Badge>
+          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6">
+            What&apos;s the highest-impact SEO
+            <br className="hidden sm:block" /> action{" "}
+            <span className="text-indigo-600">to take today?</span>
+          </h1>
+          <p className="text-lg text-slate-600 mb-10 max-w-2xl mx-auto">
+            AI SEO Employee analyzes your Search Console data, crawls your site, and hands
+            you a prioritized daily plan — declining pages to rescue, page-2 keywords to
+            push, links to add, and content drafted for you.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button
+              size="lg"
+              className="bg-indigo-600 hover:bg-indigo-700 rounded-full px-8 h-12 text-base"
+              render={<Link href="/dashboard" />}
+              nativeButton={false}
+            >
+              <Crown className="w-4 h-4" />
+              Get today&apos;s top task
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="rounded-full px-8 h-12 text-base border-slate-200 bg-white"
+              render={<Link href="/coach" />}
+              nativeButton={false}
+            >
+              <MessageSquare className="w-4 h-4" />
+              Ask the AI coach
+            </Button>
           </div>
-        )}
+          <p className="text-sm text-slate-400 mt-6">
+            No credit card. Works with demo data before you connect anything.
+          </p>
+        </div>
+      </section>
 
-        {report && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex justify-between items-center mb-8">
-              <div>
-                <h2 className="text-2xl font-bold text-slate-900">{report.siteName} Report</h2>
-                <p className="text-slate-500">Generated on {new Date().toLocaleDateString()}</p>
+      {/* Feature grid */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
+            Everything an SEO hire would do on day one
+          </h2>
+          <p className="text-slate-500 max-w-xl mx-auto">
+            No keyword databases, no enterprise pricing — just your real data turned into
+            specific, actionable work.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {features.map((feature) => (
+            <div
+              key={feature.title}
+              className="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-slate-200 hover:ring-indigo-200 hover:shadow-md transition-all"
+            >
+              <span className="flex w-10 h-10 items-center justify-center rounded-xl bg-indigo-50 mb-4">
+                <feature.icon className="w-5 h-5 text-indigo-600" />
+              </span>
+              <h3 className="font-semibold text-slate-900 mb-1.5">{feature.title}</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="bg-white border-y border-slate-200 py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-center mb-12">
+            Three steps to your daily plan
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            {[
+              {
+                step: "1",
+                title: "Connect",
+                description: "Link Google Search Console (read-only) and pick a property — or start with demo data.",
+              },
+              {
+                step: "2",
+                title: "Analyze",
+                description: "Your employee imports performance data, crawls your sitemap, and detects opportunities.",
+              },
+              {
+                step: "3",
+                title: "Execute",
+                description: "Work the prioritized list. Each task includes the why, the how, and the expected impact.",
+              },
+            ].map((item) => (
+              <div key={item.step} className="text-center">
+                <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-indigo-600 text-white font-bold mb-4">
+                  {item.step}
+                </span>
+                <h3 className="font-semibold text-slate-900 mb-1.5">{item.title}</h3>
+                <p className="text-sm text-slate-500">{item.description}</p>
               </div>
-              <Button variant="outline" onClick={exportToPDF} className="border-slate-200">
-                <Download className="mr-2 h-4 w-4" />
-                Export PDF
-              </Button>
-            </div>
-
-            <div ref={reportRef} className="space-y-8 bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-              {/* Summary Section */}
-              <section>
-                <div className="flex items-center gap-2 mb-4">
-                  <Globe className="w-5 h-5 text-indigo-600" />
-                  <h3 className="font-bold text-xl uppercase tracking-wider text-slate-500 text-sm">Overview</h3>
-                </div>
-                <p className="text-lg leading-relaxed text-slate-700">
-                  {report.summary}
-                </p>
-              </section>
-
-              <hr className="border-slate-100" />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                {/* Keywords */}
-                <section>
-                  <div className="flex items-center gap-2 mb-4">
-                    <TrendingUp className="w-5 h-5 text-emerald-600" />
-                    <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500">Target Keywords</h3>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {report.keywords.map((kw: string) => (
-                      <Badge key={kw} variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-100 px-3 py-1 text-sm font-medium">
-                        {kw}
-                      </Badge>
-                    ))}
-                  </div>
-                </section>
-
-                {/* Strategy */}
-                <section>
-                  <div className="flex items-center gap-2 mb-4">
-                    <AlertCircle className="w-5 h-5 text-amber-600" />
-                    <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500">SEO Strategy</h3>
-                  </div>
-                  <p className="text-slate-700 text-sm leading-relaxed italic">
-                    {report.seoStrategy}
-                  </p>
-                </section>
-              </div>
-
-              <hr className="border-slate-100" />
-
-              {/* Content Gaps */}
-              <section>
-                <div className="flex items-center gap-2 mb-6">
-                  <BookOpen className="w-5 h-5 text-indigo-600" />
-                  <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500">Content Opportunities (Gaps)</h3>
-                </div>
-                <div className="grid grid-cols-1 gap-4">
-                  {report.contentGaps.map((gap: any, i: number) => (
-                    <Card key={i} className="bg-slate-50 border-none shadow-none">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-base text-slate-900">{gap.topic}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-slate-600">{gap.description}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </section>
-
-              {/* Suggested Blog Titles */}
-              <section>
-                <div className="flex items-center gap-2 mb-6">
-                  <Search className="w-5 h-5 text-indigo-600" />
-                  <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500">Quick-Win Blog Titles</h3>
-                </div>
-                <ul className="space-y-3">
-                  {report.suggestedBlogTitles.map((title: string, i: number) => (
-                    <li key={i} className="flex items-start gap-3 text-slate-700 group">
-                      <span className="flex-none w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold">
-                        {i + 1}
-                      </span>
-                      <span className="group-hover:text-indigo-600 transition-colors cursor-default">
-                        {title}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            </div>
+            ))}
           </div>
-        )}
+        </div>
+      </section>
 
-        {!report && !loading && (
-          <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-slate-200">
-            <div className="mx-auto w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-              <Search className="w-8 h-8 text-slate-300" />
-            </div>
-            <h3 className="text-lg font-semibold text-slate-900 mb-1">No Analysis Yet</h3>
-            <p className="text-slate-500">Enter a URL above to start dissecting your competition.</p>
-          </div>
-        )}
-      </main>
-      
-      <footer className="text-center py-12 border-t border-slate-200 mt-12">
+      {/* CTA */}
+      <section className="py-20 px-4 text-center">
+        <div className="max-w-2xl mx-auto">
+          <Gauge className="w-10 h-10 text-indigo-600 mx-auto mb-5" />
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-4">
+            Stop guessing. Start with the highest-impact task.
+          </h2>
+          <Button
+            size="lg"
+            className="bg-indigo-600 hover:bg-indigo-700 rounded-full px-8 h-12 text-base"
+            render={<Link href="/dashboard" />}
+            nativeButton={false}
+          >
+            Open your dashboard
+            <ArrowRight className="w-4 h-4" />
+          </Button>
+        </div>
+      </section>
+
+      <footer className="text-center py-10 border-t border-slate-200">
         <p className="text-slate-400 text-sm">
-          Built with Next.js 15 + Claude 3.5 Sonnet
+          AI SEO Employee — powered by Google Search Console + OpenRouter
         </p>
       </footer>
     </div>

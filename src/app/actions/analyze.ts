@@ -88,12 +88,16 @@ export async function analyzeCompetitor(url: string) {
     
     try {
       return JSON.parse(content);
-    } catch (parseError) {
+    } catch {
       console.error("Failed to parse AI response as JSON:", content);
       throw new Error("The AI returned an invalid response format. Please try again.");
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error("Analysis Exception:", error);
-    throw new Error(error.message || "An unexpected error occurred during analysis");
+    throw new Error(
+      error instanceof Error && error.message
+        ? error.message
+        : "An unexpected error occurred during analysis"
+    );
   }
 }
