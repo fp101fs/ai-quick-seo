@@ -66,14 +66,28 @@ export default function LandingPage() {
             </span>
             <span className="font-bold tracking-tight">AI SEO Employee</span>
           </Link>
-          <Button
-            className="bg-indigo-600 hover:bg-indigo-700 rounded-full px-5"
-            render={<Link href="/dashboard" />}
-            nativeButton={false}
-          >
-            Open dashboard
-            <ArrowRight className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/pricing"
+              className="text-sm text-slate-500 hover:text-slate-900 transition-colors"
+            >
+              Pricing
+            </Link>
+            <Link
+              href="/api/auth/google"
+              className="flex items-center gap-2 text-sm font-medium text-slate-700 border border-slate-200 hover:border-indigo-300 bg-white hover:bg-indigo-50 px-4 py-2 rounded-full transition-colors"
+            >
+              Sign in
+            </Link>
+            <Button
+              className="bg-indigo-600 hover:bg-indigo-700 rounded-full px-5"
+              render={<Link href="/dashboard" />}
+              nativeButton={false}
+            >
+              Open dashboard
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -208,9 +222,20 @@ export default function LandingPage() {
       </section>
 
       <footer className="text-center py-10 border-t border-slate-200">
-        <p className="text-slate-400 text-sm">
-          AI SEO Employee — powered by Google Search Console + OpenRouter
+        <p className="text-slate-400 text-sm mb-3">
+          AI SEO — powered by Google Search Console + OpenRouter
         </p>
+        <div className="flex items-center justify-center gap-4 text-sm">
+          <Link href="/pricing" className="text-slate-400 hover:text-slate-600 transition-colors">
+            Pricing
+          </Link>
+          <Link href="/privacy" className="text-slate-400 hover:text-slate-600 transition-colors">
+            Privacy
+          </Link>
+          <Link href="/terms" className="text-slate-400 hover:text-slate-600 transition-colors">
+            Terms
+          </Link>
+        </div>
       </footer>
     </div>
   );
