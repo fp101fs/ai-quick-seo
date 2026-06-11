@@ -1,7 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Loader2, Globe, FlaskConical, ArrowRight, ShieldCheck } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import {
+  Loader2,
+  Globe,
+  FlaskConical,
+  ArrowRight,
+  ShieldCheck,
+  AlertTriangle,
+  RefreshCw,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -20,15 +28,25 @@ export function ConnectGate({
   onReady: () => void;
 }) {
   const [properties, setProperties] = useState<GscProperty[] | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const needsProperty = status.connected && !status.property;
 
+  const loadProperties = useCallback(
+    () =>
+      getProperties()
+        .then((props) => {
+          setProperties(props);
+          setLoadError(null);
+        })
+        .catch((error: Error) => setLoadError(error.message)),
+    []
+  );
+
   useEffect(() => {
     if (!needsProperty) return;
-    getProperties()
-      .then(setProperties)
-      .catch((error: Error) => toast.error(error.message));
-  }, [needsProperty]);
+    loadProperties();
+  }, [needsProperty, loadProperties]);
 
   const handleDemo = async () => {
     setBusy(true);
@@ -65,12 +83,71 @@ export function ConnectGate({
               Pick the Search Console property you want your AI employee to work on.
             </p>
           </div>
-          {properties === null ? (
+          {loadError ? (
+            <div className="space-y-4">
+              <div className="flex gap-2.5 text-left rounded-lg bg-rose-50 border border-rose-200 px-4 py-3">
+                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                <p className="text-sm text-rose-700">{loadError}</p>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center">
+                <Button
+                  variant="outline"
+                  className="rounded-full border-slate-200"
+                  onClick={() => {
+                    setLoadError(null);
+                    loadProperties();
+                  }}
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Try again
+                </Button>
+                <Button
+                  variant="outline"
+                  className="rounded-full border-slate-200"
+                  render={<a href="/api/auth/google" />}
+                  nativeButton={false}
+                >
+                  <Globe className="w-4 h-4" />
+                  Reconnect Google
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="rounded-full text-slate-500"
+                  disabled={busy}
+                  onClick={handleDemo}
+                >
+                  <FlaskConical className="w-4 h-4" />
+                  Use demo data
+                </Button>
+              </div>
+            </div>
+          ) : properties === null ? (
             <Loader2 className="w-5 h-5 animate-spin text-slate-400 mx-auto" />
           ) : properties.length === 0 ? (
-            <p className="text-sm text-slate-500">
-              No verified properties found on this Google account.
-            </p>
+            <div className="space-y-3">
+              <p className="text-sm text-slate-500">
+                No verified Search Console properties were found on this Google account.
+                Verify your site at{" "}
+                <a
+                  href="https://search.google.com/search-console"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-indigo-600 underline underline-offset-2"
+                >
+                  search.google.com/search-console
+                </a>{" "}
+                or reconnect with a different account.
+              </p>
+              <Button
+                variant="outline"
+                className="rounded-full border-slate-200"
+                render={<a href="/api/auth/google" />}
+                nativeButton={false}
+              >
+                <Globe className="w-4 h-4" />
+                Reconnect with another account
+              </Button>
+            </div>
           ) : (
             <div className="space-y-2 text-left">
               {properties.map((p) => (

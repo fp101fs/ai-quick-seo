@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   ArrowDownRight,
   ArrowRight,
@@ -16,6 +17,8 @@ import {
   ListChecks,
   Gauge,
   MessageSquare,
+  AlertTriangle,
+  X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -93,9 +96,36 @@ function MiniOpportunity({ opportunity }: { opportunity: Opportunity }) {
   );
 }
 
+const oauthErrorMessages: Record<string, string> = {
+  state_mismatch:
+    "The sign-in session expired or cookies were blocked before Google redirected back. Please try connecting again.",
+  missing_code: "Google didn't return an authorization code. Please try connecting again.",
+  token_exchange:
+    "Google sign-in succeeded but the token exchange failed — this usually means the GOOGLE_CLIENT_SECRET is wrong or the redirect URI doesn't exactly match the one registered in Google Cloud. Check the server logs for the exact Google error, then try again.",
+  access_denied: "You declined the Google permission request, so Search Console wasn't connected.",
+};
+
+function oauthErrorFromParams(params: { get(name: string): string | null }): string | null {
+  if (params.get("error") === "oauth_failed") {
+    const reason = params.get("reason") ?? "";
+    return (
+      oauthErrorMessages[reason] ??
+      `Google connection failed${reason ? ` (${reason})` : ""}. Please try again.`
+    );
+  }
+  if (params.get("error") === "google_not_configured") {
+    return "Google OAuth is not configured on this deployment (GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET are missing). You can explore with demo data instead.";
+  }
+  return null;
+}
+
 export default function DashboardPage() {
+  const searchParams = useSearchParams();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [connectError, setConnectError] = useState<string | null>(() =>
+    oauthErrorFromParams(searchParams)
+  );
 
   const fetchData = useCallback(
     () =>
@@ -114,9 +144,6 @@ export default function DashboardPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("connected")) toast.success("Google Search Console connected!");
-    if (params.get("error") === "oauth_failed") toast.error("Google connection failed. Please try again.");
-    if (params.get("error") === "google_not_configured")
-      toast.error("Google OAuth is not configured. Try demo mode instead.");
     if (params.size > 0) window.history.replaceState(null, "", "/dashboard");
     fetchData();
   }, [fetchData]);
@@ -138,13 +165,30 @@ export default function DashboardPage() {
 
   if (!data) return null;
 
-  if (!data.status.connected && !data.status.demo) {
+  const errorBanner = connectError ? (
+    <div className="flex items-start gap-3 rounded-xl bg-rose-50 border border-rose-200 px-4 py-3 mb-6">
+      <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+      <p className="text-sm text-rose-700 flex-1">{connectError}</p>
+      <button
+        onClick={() => setConnectError(null)}
+        className="text-rose-400 hover:text-rose-600"
+        aria-label="Dismiss"
+      >
+        <X className="w-4 h-4" />
+      </button>
+    </div>
+  ) : null;
+
+  // Gate until fully set up: needs a connection AND a selected property
+  // (demo mode counts as both).
+  if (!data.status.demo && (!data.status.connected || !data.status.property)) {
     return (
       <>
         <PageHeader
           title="Dashboard"
           description="Your AI employee's daily SEO briefing."
         />
+        {errorBanner}
         <ConnectGate status={data.status} onReady={load} />
       </>
     );
@@ -171,6 +215,8 @@ export default function DashboardPage() {
           </Button>
         }
       />
+
+      {errorBanner}
 
       {/* Today's highest impact task */}
       {topTask ? (

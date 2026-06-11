@@ -13,8 +13,17 @@ export async function GET(request: NextRequest) {
     return response;
   };
 
-  if (!code || !state || state !== storedState) {
-    return redirect("/dashboard?error=oauth_failed");
+  if (url.searchParams.get("error")) {
+    // User canceled or Google refused the request before issuing a code.
+    return redirect(
+      `/dashboard?error=oauth_failed&reason=${encodeURIComponent(url.searchParams.get("error")!)}`
+    );
+  }
+  if (!code) {
+    return redirect("/dashboard?error=oauth_failed&reason=missing_code");
+  }
+  if (!state || state !== storedState) {
+    return redirect("/dashboard?error=oauth_failed&reason=state_mismatch");
   }
 
   try {
@@ -31,6 +40,6 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("OAuth callback failed:", error);
-    return redirect("/dashboard?error=oauth_failed");
+    return redirect("/dashboard?error=oauth_failed&reason=token_exchange");
   }
 }
