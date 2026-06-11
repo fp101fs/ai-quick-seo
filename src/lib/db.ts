@@ -196,3 +196,11 @@ export async function setCachedSnapshot(property: string, snapshot: unknown): Pr
     // Silently fail — in-memory cache is the fallback
   }
 }
+
+export async function deleteCachedSnapshot(property: string): Promise<void> {
+  try {
+    await sql`DELETE FROM gsc_snapshots WHERE property = ${property}`;
+  } catch {
+    // Silently fail
+  }
+}

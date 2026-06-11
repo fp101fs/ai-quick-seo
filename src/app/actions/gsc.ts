@@ -3,9 +3,11 @@
 import type { ConnectionStatus, GscProperty } from "@/lib/types";
 import { getValidAccessToken } from "@/lib/services/google-auth";
 import { listProperties } from "@/lib/services/gsc";
+import { cacheDelete } from "@/lib/services/store";
 import {
   clearSession,
   getConnectionStatus,
+  getSelectedProperty,
   setDemoMode,
   setSelectedProperty,
 } from "@/lib/services/session";
@@ -27,6 +29,23 @@ export async function getProperties(): Promise<{ properties: GscProperty[]; erro
 
 export async function selectProperty(siteUrl: string): Promise<ConnectionStatus> {
   if (!siteUrl) throw new Error("Property is required");
+
+  // Clear in-memory snapshot cache for both old and new property
+  const prev = await getSelectedProperty();
+  if (prev) cacheDelete(`gsc:${prev}`);
+  cacheDelete(`gsc:${siteUrl}`);
+
+  // Clear DB-backed snapshot cache so next fetch is fresh from GSC API
+  try {
+    const { deleteCachedSnapshot } = await import("@/lib/db");
+    await Promise.all([
+      prev ? deleteCachedSnapshot(prev) : Promise.resolve(),
+      deleteCachedSnapshot(siteUrl),
+    ]);
+  } catch {
+    // DB unavailable — in-memory clear above is sufficient
+  }
+
   await setSelectedProperty(siteUrl);
   await setDemoMode(false);
   return getConnectionStatus();
