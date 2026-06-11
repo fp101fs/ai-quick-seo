@@ -51,6 +51,20 @@ function ConnectionChip({ status }: { status: ConnectionStatus }) {
       </div>
     );
   }
+  if (status.connected) {
+    return (
+      <Link
+        href="/dashboard"
+        className="flex items-center gap-2 rounded-lg bg-indigo-50 border border-indigo-200 px-3 py-2 hover:border-indigo-300 transition-colors"
+      >
+        <Globe className="w-4 h-4 text-indigo-600 shrink-0" />
+        <div className="min-w-0">
+          <p className="text-xs font-semibold text-indigo-800">Google connected</p>
+          <p className="text-xs text-indigo-500 truncate">Choose a property</p>
+        </div>
+      </Link>
+    );
+  }
   return (
     <Link
       href="/dashboard"

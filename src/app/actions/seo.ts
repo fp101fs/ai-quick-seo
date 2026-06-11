@@ -31,7 +31,7 @@ export interface DashboardData {
 
 export async function getDashboardData(): Promise<DashboardData> {
   const status = await getConnectionStatus();
-  if (!status.connected && !status.demo) {
+  if (!status.demo && (!status.connected || !status.property)) {
     return { status, snapshot: null, opportunities: [], tasks: [], crawl: null };
   }
 
@@ -55,7 +55,7 @@ export async function getOpportunities(): Promise<{
   opportunities: Opportunity[];
 }> {
   const status = await getConnectionStatus();
-  if (!status.connected && !status.demo) {
+  if (!status.demo && (!status.connected || !status.property)) {
     return { status, snapshot: null, opportunities: [] };
   }
   const { snapshot, opportunities } = await getCurrentOpportunities();

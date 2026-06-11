@@ -25,8 +25,25 @@ export async function listProperties(accessToken: string): Promise<GscProperty[]
   });
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("GSC sites list failed:", errorText);
-    throw new Error("Failed to load Search Console properties");
+    console.error("GSC sites list failed:", response.status, errorText);
+    let detail = "";
+    try {
+      detail = JSON.parse(errorText)?.error?.message ?? "";
+    } catch {
+      // Non-JSON error body; status code alone is enough.
+    }
+    if (response.status === 403) {
+      throw new Error(
+        `Google denied access to Search Console (403${detail ? `: ${detail}` : ""}). ` +
+          'Make sure the "Google Search Console API" is enabled for your Google Cloud project, then reconnect.'
+      );
+    }
+    if (response.status === 401) {
+      throw new Error("Your Google session is no longer valid. Please reconnect your account.");
+    }
+    throw new Error(
+      `Failed to load Search Console properties (${response.status}${detail ? `: ${detail}` : ""}).`
+    );
   }
   const data = await response.json();
   return (data.siteEntry ?? [])

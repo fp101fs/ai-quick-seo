@@ -71,7 +71,7 @@ export default function OpportunitiesPage() {
             <Skeleton key={i} className="h-56 rounded-xl" />
           ))}
         </div>
-      ) : status && !status.connected && !status.demo ? (
+      ) : status && !status.demo && (!status.connected || !status.property) ? (
         <ConnectGate status={status} onReady={load} />
       ) : (
         <>
