@@ -102,6 +102,9 @@ export async function clearSnapshotCache(): Promise<void> {
   const property = await getSelectedProperty();
   if (!property) return;
   cacheDelete(`gsc:${property}`);
+  // Also bust the AI-generated tasks cache so new task URLs are regenerated
+  const day = new Date().toISOString().slice(0, 10);
+  cacheDelete(`tasks:${property}:${day}`);
   try {
     const { deleteCachedSnapshot } = await import("@/lib/db");
     await deleteCachedSnapshot(property);

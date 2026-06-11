@@ -9,7 +9,7 @@ export function buildDailyTasksPrompt(
     .slice(0, 15)
     .map(
       (o) =>
-        `- [${o.type}] ${o.issue}\n  Suggested fix: ${o.recommendedAction}\n  Estimated impact: ${o.estimatedImpact}`
+        `- [${o.type}] ${o.issue}\n  Page: ${o.page ?? "site-wide"}\n  Suggested fix: ${o.recommendedAction}\n  Estimated impact: ${o.estimatedImpact}`
     )
     .join("\n");
 
@@ -29,29 +29,7 @@ export function buildDailyTasksPrompt(
     },
     {
       role: "user",
-      content: `Based on this site's current SEO situation, generate today's prioritized task list.
-
-SEO opportunities detected:
-${opportunityBlock}
-
-Internal link suggestions:
-${linkBlock}
-
-Respond with ONLY a JSON object in this exact format, no markdown fences or preamble:
-{
-  "tasks": [
-    {
-      "title": "short imperative task title naming the specific page or query",
-      "page": "https://... (the URL this task concerns, if any)",
-      "category": "content" | "links" | "metadata" | "technical",
-      "impact": 1-10,
-      "difficulty": 1-10,
-      "explanation": "2-3 sentences: why this task, what to do, what result to expect"
-    }
-  ]
-}
-
-Generate 5-8 tasks sorted by impact (highest first). Merge overlapping opportunities into a single task. Make the first task the single highest-impact action for today.`,
+      content: `Based on this site's current SEO situation, generate today's prioritized task list.\n\nSEO opportunities detected:\n${opportunityBlock}\n\nInternal link suggestions:\n${linkBlock}\n\nRespond with ONLY a JSON object in this exact format, no markdown fences or preamble:\n{\n  "tasks": [\n    {\n      "title": "short imperative task title naming the specific page or query",\n      "page": "copy the exact URL from the opportunity's Page field above — never invent a URL",\n      "category": "content" | "links" | "metadata" | "technical",\n      "impact": 1-10,\n      "difficulty": 1-10,\n      "explanation": "2-3 sentences: why this task, what to do, what result to expect"\n    }\n  ]\n}\n\nGenerate 5-8 tasks sorted by impact (highest first). Merge overlapping opportunities into a single task. Make the first task the single highest-impact action for today.`,
     },
   ];
 }
