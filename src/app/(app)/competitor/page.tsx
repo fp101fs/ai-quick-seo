@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
+import { AiLoading } from "@/components/ai-loading";
 import { analyzeCompetitor } from "@/app/actions/analyze";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -112,12 +113,8 @@ export default function CompetitorPage() {
       </form>
 
       {loading && (
-        <div className="space-y-8">
-          <Skeleton className="h-40 w-full rounded-xl" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Skeleton className="h-64 rounded-xl" />
-            <Skeleton className="h-64 rounded-xl" />
-          </div>
+        <div className="bg-white rounded-2xl ring-1 ring-slate-200 shadow-sm">
+          <AiLoading message="Analyzing competitor site…" size="lg" className="py-20" />
         </div>
       )}
 

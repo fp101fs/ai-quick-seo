@@ -117,15 +117,16 @@ export default function CoachPage() {
 
         {thinking && (
           <div className="flex gap-3">
-            <span className="flex w-8 h-8 shrink-0 items-center justify-center rounded-full bg-indigo-600">
-              <Bot className="w-4 h-4 text-white" />
+            <span className="relative flex w-8 h-8 shrink-0 items-center justify-center rounded-full bg-indigo-600">
+              <span className="absolute inset-0 rounded-full bg-indigo-400 opacity-40 animate-ping" />
+              <Bot className="w-4 h-4 text-white animate-pulse relative" />
             </span>
             <div className="rounded-2xl rounded-tl-sm px-4 py-3 bg-white shadow-sm ring-1 ring-slate-200">
               <span className="flex gap-1.5 items-center h-5">
                 {[0, 150, 300].map((delay) => (
                   <span
                     key={delay}
-                    className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce"
+                    className="w-2 h-2 rounded-full bg-indigo-400 animate-bounce"
                     style={{ animationDelay: `${delay}ms` }}
                   />
                 ))}

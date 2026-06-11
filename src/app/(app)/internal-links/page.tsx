@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
+import { AiLoading } from "@/components/ai-loading";
 import { getLastCrawl, runCrawl } from "@/app/actions/seo";
 import type { CrawlResult } from "@/lib/types";
 
@@ -125,13 +126,12 @@ export default function InternalLinksPage() {
       </form>
 
       {loading || crawling ? (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[0, 1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-20 rounded-xl" />
-            ))}
-          </div>
-          <Skeleton className="h-64 rounded-xl" />
+        <div className="bg-white rounded-2xl ring-1 ring-slate-200 shadow-sm">
+          <AiLoading
+            message={crawling ? "Crawling your sitemap…" : "Loading crawl data…"}
+            size="lg"
+            className="py-20"
+          />
         </div>
       ) : !result ? (
         <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-slate-200">

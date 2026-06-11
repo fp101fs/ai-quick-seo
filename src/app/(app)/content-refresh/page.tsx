@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
+import { AiLoading } from "@/components/ai-loading";
 import { refreshContent } from "@/app/actions/seo";
 import type { ContentRefreshResult } from "@/lib/types";
 
@@ -186,10 +187,8 @@ export default function ContentRefreshPage() {
       </form>
 
       {loading && (
-        <div className="space-y-4">
-          <Skeleton className="h-32 rounded-xl" />
-          <Skeleton className="h-48 rounded-xl" />
-          <Skeleton className="h-48 rounded-xl" />
+        <div className="bg-white rounded-2xl ring-1 ring-slate-200 shadow-sm">
+          <AiLoading message="Drafting content improvements…" size="lg" className="py-20" />
         </div>
       )}
 

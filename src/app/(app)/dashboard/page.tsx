@@ -27,6 +27,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { ConnectGate } from "@/components/connect-gate";
 import { PageHeader } from "@/components/page-header";
+import { AiLoading } from "@/components/ai-loading";
 import { TaskCard } from "@/components/task-card";
 import { getDashboardData, type DashboardData } from "@/app/actions/seo";
 import type { Opportunity } from "@/lib/types";
@@ -152,13 +153,20 @@ export default function DashboardPage() {
     return (
       <div className="space-y-6">
         <Skeleton className="h-10 w-64 rounded-lg" />
-        <Skeleton className="h-44 w-full rounded-xl" />
+        {/* Big, visible AI loading animation in the main area */}
+        <div className="bg-white rounded-2xl ring-1 ring-slate-200 shadow-sm">
+          <AiLoading
+            message="Analyzing your SEO data…"
+            size="lg"
+            className="py-20"
+          />
+        </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[0, 1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-24 rounded-xl" />
           ))}
         </div>
-        <Skeleton className="h-64 w-full rounded-xl" />
+        <Skeleton className="h-32 w-full rounded-xl" />
       </div>
     );
   }
