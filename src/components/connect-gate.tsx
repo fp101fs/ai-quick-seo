@@ -35,11 +35,19 @@ export function ConnectGate({
   const loadProperties = useCallback(
     () =>
       getProperties()
-        .then((props) => {
-          setProperties(props);
-          setLoadError(null);
+        .then(({ properties, error }) => {
+          if (error) {
+            setLoadError(error);
+          } else {
+            setProperties(properties);
+            setLoadError(null);
+          }
         })
-        .catch((error: Error) => setLoadError(error.message)),
+        .catch((err: unknown) => {
+          setLoadError(
+            err instanceof Error ? err.message : "Failed to load properties. Please try again."
+          );
+        }),
     []
   );
 
