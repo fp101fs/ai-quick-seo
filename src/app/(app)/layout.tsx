@@ -1,7 +1,6 @@
 import { Toaster } from "@/components/ui/sonner";
 import { AppShell } from "@/components/app-shell";
 import { getConnectionStatus, getUserId } from "@/lib/services/session";
-import { getUserById, getMonthlyUsageCost, getUserSubscription, FREE_CAP_USD } from "@/lib/db";
 
 export default async function AppLayout({
   children,
@@ -16,23 +15,24 @@ export default async function AppLayout({
   let user = null;
   let spentUsd = 0;
   let isPro = false;
+  let capUsd = 0.10;
 
   if (userId) {
     try {
+      const db = await import("@/lib/db");
       const [dbUser, spent, sub] = await Promise.all([
-        getUserById(userId),
-        getMonthlyUsageCost(userId),
-        getUserSubscription(userId),
+        db.getUserById(userId),
+        db.getMonthlyUsageCost(userId),
+        db.getUserSubscription(userId),
       ]);
       user = dbUser;
       spentUsd = spent;
       isPro = sub !== null;
+      capUsd = isPro ? 10 : db.FREE_CAP_USD;
     } catch {
-      // DB not yet migrated or unavailable — degrade gracefully
+      // DB unavailable or not yet migrated — degrade gracefully
     }
   }
-
-  const capUsd = isPro ? 10 : FREE_CAP_USD;
 
   return (
     <AppShell

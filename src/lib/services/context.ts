@@ -8,9 +8,28 @@ import { getValidAccessToken } from "@/lib/services/google-auth";
 import { detectOpportunities, getSnapshot } from "@/lib/services/gsc";
 import { getSelectedProperty, getTokens, isDemoMode } from "@/lib/services/session";
 import { cacheGet } from "@/lib/services/store";
-import { getCachedSnapshot, setCachedSnapshot } from "@/lib/db";
 
 export const SITEMAP_COOKIE = "sitemap_url";
+
+// Lazy DB helpers — dynamic import so a missing POSTGRES_URL never breaks GSC
+async function tryGetCachedSnapshot(property: string): Promise<GscSnapshot | null> {
+  try {
+    const { getCachedSnapshot } = await import("@/lib/db");
+    const cached = await getCachedSnapshot(property);
+    return cached as GscSnapshot | null;
+  } catch {
+    return null;
+  }
+}
+
+async function trySaveCachedSnapshot(property: string, snapshot: GscSnapshot): Promise<void> {
+  try {
+    const { setCachedSnapshot } = await import("@/lib/db");
+    await setCachedSnapshot(property, snapshot);
+  } catch {
+    // Silently ignore — in-memory cache is the fallback
+  }
+}
 
 export async function getCurrentSnapshot(): Promise<GscSnapshot | null> {
   if (await isDemoMode()) return getDemoSnapshot();
@@ -19,15 +38,15 @@ export async function getCurrentSnapshot(): Promise<GscSnapshot | null> {
   if (!tokens || !property) return null;
 
   // Try DB cache first (survives cold starts and property re-selection)
-  const cached = await getCachedSnapshot(property);
-  if (cached) return cached as GscSnapshot;
+  const cached = await tryGetCachedSnapshot(property);
+  if (cached) return cached;
 
   const accessToken = await getValidAccessToken();
   const snapshot = await getSnapshot(accessToken, property);
 
-  // Persist to DB for future re-selections
+  // Persist to DB for future re-selections (fire and forget)
   if (snapshot) {
-    setCachedSnapshot(property, snapshot).catch(() => {});
+    trySaveCachedSnapshot(property, snapshot);
   }
 
   return snapshot;
