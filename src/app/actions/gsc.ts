@@ -14,9 +14,15 @@ export async function getStatus(): Promise<ConnectionStatus> {
   return getConnectionStatus();
 }
 
-export async function getProperties(): Promise<GscProperty[]> {
-  const accessToken = await getValidAccessToken();
-  return listProperties(accessToken);
+export async function getProperties(): Promise<{ properties: GscProperty[]; error: string | null }> {
+  try {
+    const accessToken = await getValidAccessToken();
+    const properties = await listProperties(accessToken);
+    return { properties, error: null };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to load Search Console properties.";
+    return { properties: [], error: message };
+  }
 }
 
 export async function selectProperty(siteUrl: string): Promise<ConnectionStatus> {
