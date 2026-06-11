@@ -22,7 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { AiLoading } from "@/components/ai-loading";
-import { refreshContent } from "@/app/actions/seo";
+import { refreshContent, getPropertyBaseUrl } from "@/app/actions/seo";
 import type { ContentRefreshResult } from "@/lib/types";
 
 function CopyButton({ text }: { text: string }) {
@@ -118,9 +118,14 @@ function Comparison({
 export default function ContentRefreshPage() {
   const prefill = useSearchParams().get("url");
   const [url, setUrl] = useState(prefill ?? "");
+  const [baseUrl, setBaseUrl] = useState<string | null>(null);
   const [result, setResult] = useState<ContentRefreshResult | null>(null);
   const [loading, setLoading] = useState(Boolean(prefill));
   const ranPrefill = useRef(false);
+
+  useEffect(() => {
+    getPropertyBaseUrl().then(setBaseUrl).catch(() => {});
+  }, []);
 
   const doRefresh = useCallback(
     (target: string) =>
@@ -160,30 +165,39 @@ export default function ContentRefreshPage() {
         description="AI-drafted improvements for any page: titles, sections, FAQs, and missing topics."
       />
 
-      <form onSubmit={handleSubmit} className="relative max-w-2xl mb-8">
-        <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-        <Input
-          type="text"
-          placeholder="https://yoursite.com/page-to-refresh"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          className="pl-12 pr-36 h-13 rounded-full border-slate-200 bg-white shadow-sm"
-        />
-        <Button
-          type="submit"
-          disabled={loading}
-          className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full bg-indigo-600 hover:bg-indigo-700 px-5"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" /> Analyzing
-            </>
-          ) : (
-            <>
-              <RefreshCw className="w-4 h-4" /> Refresh
-            </>
-          )}
-        </Button>
+      <form onSubmit={handleSubmit} className="space-y-2 max-w-2xl mb-8">
+        <div className="relative">
+          <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+          <Input
+            type="text"
+            placeholder={baseUrl ? `${baseUrl}/your-page-path` : "https://yoursite.com/page-to-refresh"}
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            className="pl-12 pr-36 h-13 rounded-full border-slate-200 bg-white shadow-sm"
+          />
+          <Button
+            type="submit"
+            disabled={loading}
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full bg-indigo-600 hover:bg-indigo-700 px-5"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> Analyzing
+              </>
+            ) : (
+              <>
+                <RefreshCw className="w-4 h-4" /> Refresh
+              </>
+            )}
+          </Button>
+        </div>
+        {baseUrl && url && !url.startsWith("http") && (
+          <p className="text-xs text-slate-500 pl-4">
+            Will fetch: <span className="font-mono text-indigo-600">
+              {url.startsWith("/") ? `${baseUrl}${url}` : `${baseUrl}/${url}`}
+            </span>
+          </p>
+        )}
       </form>
 
       {loading && (

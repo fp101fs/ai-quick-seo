@@ -18,7 +18,7 @@ import {
   SITEMAP_COOKIE,
 } from "@/lib/services/context";
 import { crawlSitemap } from "@/lib/services/crawler";
-import { getConnectionStatus, isDemoMode } from "@/lib/services/session";
+import { getConnectionStatus, getSelectedProperty, isDemoMode } from "@/lib/services/session";
 import { generateDailyTasks } from "@/lib/services/tasks";
 
 export interface DashboardData {
@@ -84,6 +84,15 @@ export async function runCrawl(sitemapUrl: string): Promise<CrawlResult> {
   return result;
 }
 
+export async function getPropertyBaseUrl(): Promise<string | null> {
+  const property = await getSelectedProperty();
+  if (!property) return null;
+  if (property.startsWith("sc-domain:")) {
+    return `https://${property.replace("sc-domain:", "")}`;
+  }
+  return property.replace(/\/$/, "");
+}
+
 export async function getLastCrawl(): Promise<CrawlResult | null> {
   return getCachedCrawl();
 }
@@ -91,8 +100,22 @@ export async function getLastCrawl(): Promise<CrawlResult | null> {
 export async function refreshContent(url: string): Promise<ContentRefreshResult> {
   if (!url) throw new Error("URL is required");
   let target = url.trim();
+
+  // Resolve relative paths against the connected property domain
   if (!target.startsWith("http://") && !target.startsWith("https://")) {
-    target = `https://${target}`;
+    const property = await getSelectedProperty();
+    const base = property && !property.startsWith("sc-domain:")
+      ? property.replace(/\/$/, "")
+      : null;
+
+    if (base) {
+      target = target.startsWith("/") ? `${base}${target}` : `${base}/${target}`;
+    } else if (property?.startsWith("sc-domain:")) {
+      const domain = property.replace("sc-domain:", "");
+      target = target.startsWith("/") ? `https://${domain}${target}` : `https://${domain}/${target}`;
+    } else {
+      target = `https://${target}`;
+    }
   }
 
   const snapshot = await getCurrentSnapshot().catch(() => null);
