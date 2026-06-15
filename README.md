@@ -86,11 +86,17 @@ cookies on the user's browser — nothing is persisted server-side.
 
 Notes:
 
-- There is **no database**. Search Console snapshots, crawl results, and the
-  daily task plan are cached in memory per serverless instance (10 min / 30
-  min / 12 h TTLs) and recomputed on demand after cold starts. This is
-  intentional for the MVP; swap `src/lib/services/store.ts` for Redis/KV when
-  persistence is needed.
+- **Database required.** Connect a Neon Postgres database via the Vercel
+  Marketplace (or set `POSTGRES_URL` manually). After first deploy, run:
+  ```
+  curl -X POST https://YOUR-DOMAIN/api/migrate \
+    -H "x-migrate-secret: YOUR_MIGRATE_SECRET"
+  ```
+  This creates the `users`, `subscriptions`, `ai_usage`, and `gsc_snapshots`
+  tables. Set `MIGRATE_SECRET` in your environment variables.
+- Search Console snapshots, crawl results, and the daily task plan are also
+  cached in-memory per serverless instance (10 min / 30 min / 12 h TTLs) and
+  refreshed from Postgres on cold starts.
 - The sitemap crawler caps at 30 pages per crawl to stay within serverless
   execution limits.
 

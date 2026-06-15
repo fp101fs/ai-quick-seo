@@ -155,6 +155,27 @@ export interface ChatMessage {
   content: string;
 }
 
+// ---------- Article Ideas ----------
+
+export type SearchIntent = "informational" | "commercial" | "navigational" | "transactional";
+
+export interface ArticleIdea {
+  rank: number;
+  title: string;
+  targetKeyword: string;
+  intent: SearchIntent;
+  reasoning: string;
+  estimatedOpportunity: "high" | "medium" | "low";
+}
+
+export interface ArticleIdeasResult {
+  niche: string;
+  existingTopics: string[];
+  ideas: ArticleIdea[];
+  generatedAt: number;
+  demo?: boolean;
+}
+
 // ---------- Connection state ----------
 
 export interface ConnectionStatus {

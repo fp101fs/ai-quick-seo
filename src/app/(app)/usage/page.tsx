@@ -9,6 +9,7 @@ import {
   sql,
 } from "@/lib/db";
 import { Crown, ArrowLeft } from "lucide-react";
+import { BillingPortalButton } from "@/components/billing-portal-button";
 
 export default async function UsagePage() {
   const userId = await getUserId();
@@ -97,16 +98,7 @@ export default async function UsagePage() {
               Upgrade to Pro
             </Link>
           )}
-          {isPro && (
-            <form action="/api/stripe/portal" method="POST">
-              <button
-                type="submit"
-                className="text-sm text-slate-500 hover:text-indigo-600 border border-slate-200 hover:border-indigo-300 px-4 py-2 rounded-xl transition-colors"
-              >
-                Manage billing →
-              </button>
-            </form>
-          )}
+          {isPro && <BillingPortalButton />}
         </div>
 
         {/* Usage bar */}

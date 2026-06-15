@@ -2,12 +2,14 @@
 // live in httpOnly cookies so no persistence layer is needed.
 
 import { cookies } from "next/headers";
+import { createHmac } from "node:crypto";
 import type { ConnectionStatus, GscTokens } from "@/lib/types";
 
 const TOKENS_COOKIE = "gsc_tokens";
 const PROPERTY_COOKIE = "gsc_property";
 const DEMO_COOKIE = "seo_demo";
 const USER_ID_COOKIE = "seo_user_id";
+const HMAC_SECRET = () => process.env.SESSION_SECRET ?? "dev-secret-change-in-prod";
 
 export async function getTokens(): Promise<GscTokens | null> {
   const store = await cookies();
@@ -42,13 +44,25 @@ export async function getUserId(): Promise<number | null> {
   const store = await cookies();
   const raw = store.get(USER_ID_COOKIE)?.value;
   if (!raw) return null;
-  const id = parseInt(raw, 10);
-  return isNaN(id) ? null : id;
+  const dot = raw.lastIndexOf(".");
+  if (dot === -1) return null;
+  const idPart = raw.slice(0, dot);
+  const sigPart = raw.slice(dot + 1);
+  if (!idPart || !sigPart) return null;
+  const id = parseInt(idPart, 10);
+  if (isNaN(id)) return null;
+  const expected = createHmac("sha256", HMAC_SECRET())
+    .update(idPart)
+    .digest("hex");
+  if (sigPart !== expected) return null;
+  return id;
 }
 
 export async function setUserId(id: number): Promise<void> {
   const store = await cookies();
-  store.set(USER_ID_COOKIE, String(id), {
+  const idStr = String(id);
+  const sig = createHmac("sha256", HMAC_SECRET()).update(idStr).digest("hex");
+  store.set(USER_ID_COOKIE, `${idStr}.${sig}`, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

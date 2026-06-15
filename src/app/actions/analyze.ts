@@ -1,7 +1,14 @@
 "use server";
 
+import { getUsageStatus } from "@/lib/services/usage";
+
 export async function analyzeCompetitor(url: string) {
   if (!url) throw new Error("URL is required");
+
+  const usage = await getUsageStatus();
+  if (usage.blocked) {
+    throw new Error("You've reached the free AI limit ($0.10/mo). Upgrade to Pro for unlimited access.");
+  }
 
   // Ensure URL has a protocol
   let targetUrl = url;

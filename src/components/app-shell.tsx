@@ -16,7 +16,9 @@ import {
   LogOut,
   Crown,
   BarChart3,
+  Lightbulb,
 } from "lucide-react";
+import { InfoTooltip } from "@/components/info-tooltip";
 import { cn } from "@/lib/utils";
 import type { ConnectionStatus } from "@/lib/types";
 import type { DbUser } from "@/lib/db";
@@ -24,12 +26,48 @@ import { UsageMeter } from "@/components/usage-meter";
 import { PropertySelector } from "@/components/property-selector";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/opportunities", label: "Opportunities", icon: Target },
-  { href: "/internal-links", label: "Internal Links", icon: Link2 },
-  { href: "/content-refresh", label: "Content Refresh", icon: RefreshCw },
-  { href: "/coach", label: "AI Coach", icon: MessageSquare },
-  { href: "/competitor", label: "Competitor Spy", icon: Search },
+  {
+    href: "/dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    tooltip: "Daily SEO briefing: traffic overview, quick wins, and your AI-prioritized task list.",
+  },
+  {
+    href: "/opportunities",
+    label: "Opportunities",
+    icon: Target,
+    tooltip: "Pages losing clicks, queries near page 1, low CTR issues — ranked by impact.",
+  },
+  {
+    href: "/article-ideas",
+    label: "Article Ideas",
+    icon: Lightbulb,
+    tooltip: "AI-generated article titles for keyword gaps your site isn't covering yet.",
+  },
+  {
+    href: "/internal-links",
+    label: "Internal Links",
+    icon: Link2,
+    tooltip: "Crawls your sitemap to find orphan pages and suggest where to add internal links.",
+  },
+  {
+    href: "/content-refresh",
+    label: "Content Refresh",
+    icon: RefreshCw,
+    tooltip: "AI-drafted title, meta description, new H2 sections, and FAQs for any existing page.",
+  },
+  {
+    href: "/coach",
+    label: "AI Coach",
+    icon: MessageSquare,
+    tooltip: "Chat with an AI that knows your site's data — ask why traffic dropped, what to fix, etc.",
+  },
+  {
+    href: "/competitor",
+    label: "Competitor Spy",
+    icon: Search,
+    tooltip: "Enter a competitor URL to extract their target keywords, content gaps, and blog ideas.",
+  },
 ];
 
 function ConnectionChip({ status }: { status: ConnectionStatus }) {
@@ -108,7 +146,7 @@ export function AppShell({
     <nav
       className={cn(
         orientation === "vertical"
-          ? "flex flex-col gap-1"
+          ? "flex flex-col gap-0.5"
           : "flex gap-1 overflow-x-auto px-4 pb-2"
       )}
     >
@@ -116,21 +154,27 @@ export function AppShell({
         const active = pathname.startsWith(item.href);
         const Icon = item.icon;
         return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap",
-              active
-                ? "bg-indigo-50 text-indigo-700"
-                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          <div key={item.href} className="flex items-center gap-1 group/nav">
+            <Link
+              href={item.href}
+              className={cn(
+                "flex-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors whitespace-nowrap",
+                active
+                  ? "bg-indigo-50 text-indigo-700"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+              )}
+            >
+              <Icon
+                className={cn("w-4 h-4 shrink-0", active ? "text-indigo-600" : "text-slate-400")}
+              />
+              {item.label}
+            </Link>
+            {orientation === "vertical" && item.tooltip && (
+              <span className="opacity-0 group-hover/nav:opacity-100 transition-opacity pr-1">
+                <InfoTooltip text={item.tooltip} side="right" />
+              </span>
             )}
-          >
-            <Icon
-              className={cn("w-4 h-4 shrink-0", active ? "text-indigo-600" : "text-slate-400")}
-            />
-            {item.label}
-          </Link>
+          </div>
         );
       })}
     </nav>

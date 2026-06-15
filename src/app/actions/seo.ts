@@ -115,6 +115,12 @@ export async function clearSnapshotCache(): Promise<void> {
 
 export async function refreshContent(url: string): Promise<ContentRefreshResult> {
   if (!url) throw new Error("URL is required");
+
+  const { getUsageStatus } = await import("@/lib/services/usage");
+  const usage = await getUsageStatus();
+  if (usage.blocked) {
+    throw new Error("You've reached the free AI limit ($0.10/mo). Upgrade to Pro for unlimited access.");
+  }
   let target = url.trim();
 
   // Resolve relative paths against the connected property domain

@@ -1,0 +1,14 @@
+<svg viewBox="0 0 180 180" width="180" height="180" xmlns="http://www.w3.org/2000/svg">
+  <!-- Indigo rounded square background -->
+  <rect width="180" height="180" rx="40" fill="#4f46e5"/>
+  <!-- Bot head (rounded rect) -->
+  <rect x="45" y="62" width="90" height="68" rx="16" fill="white"/>
+  <!-- Antenna -->
+  <rect x="85" y="34" width="10" height="28" rx="5" fill="white"/>
+  <circle cx="90" cy="30" r="12" fill="white"/>
+  <!-- Eyes -->
+  <circle cx="70" cy="96" r="12" fill="#4f46e5"/>
+  <circle cx="110" cy="96" r="12" fill="#4f46e5"/>
+  <!-- Mouth -->
+  <rect x="68" y="114" width="44" height="8" rx="4" fill="#4f46e5"/>
+</svg>

@@ -4,12 +4,18 @@ import type { ChatMessage } from "@/lib/types";
 import { buildCoachSystemPrompt } from "@/lib/prompts/coach";
 import { chatCompletion } from "@/lib/services/openrouter";
 import { getCachedCrawl, getCurrentOpportunities } from "@/lib/services/context";
+import { getUsageStatus } from "@/lib/services/usage";
 
 const MAX_HISTORY = 12;
 
 export async function askCoach(messages: ChatMessage[]): Promise<string> {
   if (!messages.length || messages[messages.length - 1].role !== "user") {
     throw new Error("A question is required");
+  }
+
+  const usage = await getUsageStatus();
+  if (usage.blocked) {
+    throw new Error("You've reached the free AI limit ($0.10/mo). Upgrade to Pro for unlimited access.");
   }
 
   const [{ snapshot, opportunities }, crawl] = await Promise.all([
@@ -23,5 +29,9 @@ export async function askCoach(messages: ChatMessage[]): Promise<string> {
     content: m.content.slice(0, 4000),
   }));
 
-  return chatCompletion([systemPrompt, ...history], { temperature: 0.5 });
+  return chatCompletion([systemPrompt, ...history], {
+    temperature: 0.5,
+    userId: usage.userId ?? undefined,
+    feature: "coach",
+  });
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { X, Crown } from "lucide-react";
+import { BillingPortalButton } from "@/components/billing-portal-button";
 import Link from "next/link";
 
 const ARC = {
@@ -147,14 +148,9 @@ function PlanUsageModal({
           )}
 
           {isPro && (
-            <form action="/api/stripe/portal" method="POST" className="mt-5 w-full">
-              <button
-                type="submit"
-                className="w-full text-sm text-slate-500 hover:text-indigo-600 transition-colors"
-              >
-                Manage billing →
-              </button>
-            </form>
+            <div className="mt-5 w-full flex justify-center">
+              <BillingPortalButton />
+            </div>
           )}
         </div>
       </div>

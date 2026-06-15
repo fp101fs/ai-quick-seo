@@ -97,6 +97,7 @@ export default function InternalLinksPage() {
       <PageHeader
         title="Internal Link Opportunities"
         description="Crawl your sitemap to find orphan pages and get AI-suggested link placements."
+        help="Orphan pages have zero internal links — Google may never find them. Weakly linked pages get little authority. This tool maps your link graph and tells you exactly where to add links."
       />
 
       <form onSubmit={handleCrawl} className="relative max-w-2xl mb-8">

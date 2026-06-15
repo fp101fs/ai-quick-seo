@@ -83,6 +83,7 @@ export default function CompetitorPage() {
       <PageHeader
         title="Competitor Spy"
         description="Decode a competitor's SEO strategy: keywords, content gaps, and quick-win blog ideas."
+        help="Enter any competitor URL. The AI reads their site content, extracts the keywords they're targeting, identifies gaps you could exploit, and suggests specific blog titles to outrank them."
       />
 
       <form onSubmit={handleAnalyze} className="relative max-w-2xl mb-8">

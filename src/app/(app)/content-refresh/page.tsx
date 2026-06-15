@@ -163,6 +163,7 @@ export default function ContentRefreshPage() {
       <PageHeader
         title="Content Refresh"
         description="AI-drafted improvements for any page: titles, sections, FAQs, and missing topics."
+        help="The AI fetches your page, reads it alongside your Search Console queries, then drafts a better title tag, meta description, new H2 sections, and FAQ content you can copy-paste in."
       />
 
       <form onSubmit={handleSubmit} className="space-y-2 max-w-2xl mb-8">
