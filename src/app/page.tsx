@@ -70,12 +70,12 @@ export default function LandingPage() {
             >
               Pricing
             </Link>
-            <Link
-              href="/api/auth/google" prefetch={false}
+            <a
+              href="/api/auth/google"
               className="flex items-center gap-2 text-sm font-medium text-slate-700 border border-slate-200 hover:border-indigo-300 bg-white hover:bg-indigo-50 px-4 py-2 rounded-full transition-colors"
             >
               Sign in
-            </Link>
+            </a>
             <Button
               className="bg-indigo-600 hover:bg-indigo-700 rounded-full px-5"
               render={<Link href="/dashboard" />}
@@ -122,7 +122,7 @@ export default function LandingPage() {
               size="lg"
               variant="outline"
               className="rounded-full px-8 h-12 text-base border-slate-200 bg-white"
-              render={<Link href="/api/auth/google" prefetch={false} />}
+              render={<a href="/api/auth/google" />}
               nativeButton={false}
             >
               <ArrowRight className="w-4 h-4" />
