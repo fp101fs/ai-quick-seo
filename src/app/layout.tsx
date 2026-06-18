@@ -21,25 +21,27 @@ const GA_ID = GA_ID_RAW && /^G-[A-Z0-9]+$/.test(GA_ID_RAW) ? GA_ID_RAW : null;
 
 export const metadata: Metadata = {
   title: {
-    default: "AI SEO Employee — Your highest-impact SEO action, every day",
-    template: "%s | AI SEO Employee",
+    default: "SerpClerk — Your daily SEO action plan, powered by AI",
+    template: "%s | SerpClerk",
   },
   description:
-    "An AI-powered SEO assistant that analyzes your Search Console data, crawls your site, and hands you a prioritized daily action plan.",
+    "Connects to your Google Search Console and tells you exactly which SEO task to do today — ranked by traffic impact.",
   metadataBase: new URL(SITE_URL),
   openGraph: {
     type: "website",
     url: SITE_URL,
-    title: "AI SEO Employee — Your highest-impact SEO action, every day",
+    title: "SerpClerk — Your daily SEO action plan, powered by AI",
     description:
-      "AI-powered SEO assistant: connects to Google Search Console, crawls your site, and hands you a prioritized daily action plan.",
-    siteName: "AI SEO Employee",
+      "Connects to your Google Search Console and tells you exactly which SEO task to do today — ranked by traffic impact.",
+    siteName: "SerpClerk",
+    images: [{ url: "/serpdo-og-1200x630-chatgpt.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI SEO Employee — Your highest-impact SEO action, every day",
+    title: "SerpClerk — Your daily SEO action plan, powered by AI",
     description:
-      "AI-powered SEO assistant: connects to Google Search Console, crawls your site, and hands you a prioritized daily action plan.",
+      "Connects to your Google Search Console and tells you exactly which SEO task to do today — ranked by traffic impact.",
+    images: ["/serpdo-og-1200x630-chatgpt.png"],
   },
 };
 

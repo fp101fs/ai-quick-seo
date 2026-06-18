@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bot, Check, Crown, ArrowLeft, Zap } from "lucide-react";
+import { Check, Crown, ArrowLeft, Zap } from "lucide-react";
 import { useState } from "react";
 
 const freeFeatures = [
@@ -60,10 +60,8 @@ export default function PricingPage() {
       <header className="bg-white/80 backdrop-blur border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex w-8 h-8 items-center justify-center rounded-lg bg-indigo-600">
-              <Bot className="w-5 h-5 text-white" />
-            </span>
-            <span className="font-bold tracking-tight">AI SEO</span>
+            <img src="/icon-512.png" className="w-8 h-8 rounded-lg" alt="SerpClerk" />
+            <span className="font-bold tracking-tight">SerpClerk</span>
           </Link>
           <Link
             href="/dashboard"

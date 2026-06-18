@@ -51,7 +51,7 @@ export async function chatCompletion(
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
       "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL ?? "https://ai-quick-seo.vercel.app",
-      "X-Title": "AI SEO",
+      "X-Title": "SerpClerk",
     },
     body: JSON.stringify({
       model,

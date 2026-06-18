@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Bot,
   LayoutDashboard,
   Target,
   Link2,
@@ -188,10 +187,8 @@ export function AppShell({
           href="/"
           className="flex items-center gap-2.5 px-5 h-16 border-b border-slate-100"
         >
-          <span className="flex w-8 h-8 items-center justify-center rounded-lg bg-indigo-600">
-            <Bot className="w-5 h-5 text-white" />
-          </span>
-          <span className="font-bold tracking-tight">AI SEO</span>
+          <img src="/icon-512.png" className="w-8 h-8 rounded-lg" alt="SerpClerk" />
+          <span className="font-bold tracking-tight">SerpClerk</span>
         </Link>
 
         <div className="flex-1 overflow-y-auto p-3">
@@ -284,10 +281,8 @@ export function AppShell({
       <header className="lg:hidden sticky top-0 z-20 bg-white border-b border-slate-200">
         <div className="flex items-center justify-between px-4 h-14">
           <Link href="/" className="flex items-center gap-2">
-            <span className="flex w-7 h-7 items-center justify-center rounded-lg bg-indigo-600">
-              <Bot className="w-4 h-4 text-white" />
-            </span>
-            <span className="font-bold tracking-tight text-sm">AI SEO</span>
+            <img src="/icon-512.png" className="w-7 h-7 rounded-lg" alt="SerpClerk" />
+            <span className="font-bold tracking-tight text-sm">SerpClerk</span>
           </Link>
           <div className="flex items-center gap-2">
             {isSignedIn ? (

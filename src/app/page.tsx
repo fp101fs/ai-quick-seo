@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  Bot,
   ArrowRight,
   Target,
   Link2,
@@ -61,10 +60,8 @@ export default function LandingPage() {
       <header className="bg-white/80 backdrop-blur border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex w-8 h-8 items-center justify-center rounded-lg bg-indigo-600">
-              <Bot className="w-5 h-5 text-white" />
-            </span>
-            <span className="font-bold tracking-tight">AI SEO Employee</span>
+            <img src="/icon-512.png" className="w-8 h-8 rounded-lg" alt="SerpClerk" />
+            <span className="font-bold tracking-tight">SerpClerk</span>
           </Link>
           <div className="flex items-center gap-3">
             <Link
@@ -108,7 +105,7 @@ export default function LandingPage() {
             <span className="text-indigo-600">to take today?</span>
           </h1>
           <p className="text-lg text-slate-600 mb-10 max-w-2xl mx-auto">
-            AI SEO Employee analyzes your Search Console data, crawls your site, and hands
+            SerpClerk analyzes your Search Console data, crawls your site, and hands
             you a prioritized daily plan — declining pages to rescue, page-2 keywords to
             push, links to add, and content drafted for you.
           </p>
@@ -223,7 +220,7 @@ export default function LandingPage() {
 
       <footer className="text-center py-10 border-t border-slate-200">
         <p className="text-slate-400 text-sm mb-3">
-          AI SEO — powered by Google Search Console + OpenRouter
+          SerpClerk — powered by Google Search Console + OpenRouter
         </p>
         <div className="flex items-center justify-center gap-4 text-sm">
           <Link href="/pricing" className="text-slate-400 hover:text-slate-600 transition-colors">
