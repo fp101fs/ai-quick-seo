@@ -21,6 +21,7 @@ import {
   X,
   History,
   DatabaseZap,
+  Copy,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -398,21 +399,43 @@ export default function DashboardPage() {
               <Badge className="bg-white/15 text-white border-none backdrop-blur">
                 Difficulty {topTask.difficulty}/10
               </Badge>
-              {topTask.page && (
+              <div className="ml-auto flex items-center gap-2 flex-wrap">
                 <Button
                   size="sm"
-                  className="bg-white text-indigo-700 hover:bg-indigo-50 rounded-full ml-auto"
-                  render={
-                    <Link
-                      href={`/content-refresh?url=${encodeURIComponent(topTask.page)}`}
-                    />
-                  }
-                  nativeButton={false}
+                  className="bg-orange-500 hover:bg-orange-600 text-white rounded-full"
+                  onClick={() => {
+                    const prompt = [
+                      "You are an SEO expert. Help me fix this issue on my website.",
+                      "",
+                      `Task: ${topTask.title}`,
+                      topTask.page ? `Page: ${topTask.page}` : "",
+                      "",
+                      topTask.explanation,
+                    ].filter(Boolean).join("\n");
+                    navigator.clipboard.writeText(prompt).then(() =>
+                      toast.success("Prompt copied — paste into Claude")
+                    );
+                  }}
                 >
-                  Start with Content Refresh
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <Copy className="w-3.5 h-3.5" />
+                  Fix with Claude
                 </Button>
-              )}
+                {topTask.page && (
+                  <Button
+                    size="sm"
+                    className="bg-white text-indigo-700 hover:bg-indigo-50 rounded-full"
+                    render={
+                      <Link
+                        href={`/content-refresh?url=${encodeURIComponent(topTask.page)}`}
+                      />
+                    }
+                    nativeButton={false}
+                  >
+                    Start with Content Refresh
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Button>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
