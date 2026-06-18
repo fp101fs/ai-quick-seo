@@ -126,7 +126,7 @@ export default function LandingPage() {
               size="lg"
               variant="outline"
               className="rounded-full px-8 h-12 text-base border-slate-200 bg-white"
-              render={<Link href="/coach" />}
+              render={<Link href="/dashboard" />}
               nativeButton={false}
             >
               <MessageSquare className="w-4 h-4" />

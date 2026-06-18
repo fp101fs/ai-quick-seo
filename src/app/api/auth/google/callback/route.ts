@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createHmac } from "node:crypto";
 import { exchangeCode, fetchGoogleUserInfo } from "@/lib/services/google-auth";
-import { setUserId } from "@/lib/services/session";
 import { upsertUser } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
@@ -54,7 +54,11 @@ export async function GET(request: NextRequest) {
       maxAge: 60 * 60 * 24 * 30,
     });
     if (dbUserId !== null) {
-      response.cookies.set("seo_user_id", String(dbUserId), {
+      const idStr = String(dbUserId);
+      const sig = createHmac("sha256", process.env.SESSION_SECRET ?? "dev-secret-change-in-prod")
+        .update(idStr)
+        .digest("hex");
+      response.cookies.set("seo_user_id", `${idStr}.${sig}`, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
