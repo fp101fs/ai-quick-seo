@@ -6,46 +6,46 @@ import { jsonCompletion } from "@/lib/services/openrouter";
 
 export async function suggestCompetitors(): Promise<string[]> {
   const [status, userId] = await Promise.all([getConnectionStatus(), getUserId()]);
-  const { getCachedSnapshot, getLatestAnalysis } = await import("@/lib/db");
+  const { getCachedSnapshot } = await import("@/lib/db");
 
-  let niche = "";
   let topQueries: string[] = [];
 
   if (status.demo || status.property) {
     const property = status.demo ? "demo" : status.property!;
-    const [snap, analysis] = await Promise.all([
-      getCachedSnapshot(property).catch(() => null),
-      userId ? getLatestAnalysis(userId, property).catch(() => null) : null,
-    ]);
+    const snap = await getCachedSnapshot(property).catch(() => null);
     if (snap) {
-      // ponytail: grab top 10 queries by clicks for niche context
       topQueries = (snap as { pages?: Array<{ queries?: Array<{ query: string; clicks: number }> }> })
         .pages?.flatMap((p) => p.queries ?? [])
         .sort((a, b) => b.clicks - a.clicks)
-        .slice(0, 10)
+        .slice(0, 5)
         .map((q) => q.query) ?? [];
-    }
-    if (analysis) {
-      const tasks = analysis.tasks as Array<{ title: string }> | null;
-      niche = tasks?.[0]?.title ?? "";
     }
   }
 
-  if (!topQueries.length && !niche) {
+  if (!topQueries.length) {
     throw new Error("Connect Google Search Console first to get competitor suggestions.");
   }
+
+  const searchQuery = topQueries.join(" ");
+  const jinaUrl = `https://r.jina.ai/https://duckduckgo.com/?q=${encodeURIComponent(searchQuery)}`;
+
+  const jinaRes = await fetch(jinaUrl, {
+    headers: { "X-Return-Format": "markdown" },
+    signal: AbortSignal.timeout(20000),
+  });
+  if (!jinaRes.ok) throw new Error("Could not fetch search results. Try again.");
+  const markdown = await jinaRes.text();
 
   const result = await jsonCompletion<{ competitors: string[] }>(
     [
       {
         role: "user",
-        content: `You are an SEO expert. Based on this site's top search queries and niche context, suggest 5 real competitor websites to analyze.
+        content: `Extract 5 real competitor website URLs from these DuckDuckGo search results. Return only external domains (not duckduckgo.com itself). Return full URLs with https://.
 
-Top queries: ${topQueries.join(", ")}
-Niche context: ${niche}
+Search results:
+${markdown.slice(0, 8000)}
 
-Return ONLY a JSON object: {"competitors": ["https://example.com", ...]}
-Return real, specific competitor domains — not generic examples. Return full URLs with https://.`,
+Return ONLY a JSON object: {"competitors": ["https://example.com", ...]}`,
       },
     ],
     { userId: userId ?? undefined, feature: "competitor-suggest" }
