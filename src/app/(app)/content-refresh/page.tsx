@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 
 import { useSearchParams } from "next/navigation";
 import {
@@ -116,7 +116,7 @@ function Comparison({
   );
 }
 
-export default function ContentRefreshPage() {
+function ContentRefreshInner() {
   const prefill = useSearchParams().get("url");
   const [url, setUrl] = useState(prefill ?? "");
   const [baseUrl, setBaseUrl] = useState<string | null>(null);
@@ -328,5 +328,13 @@ export default function ContentRefreshPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ContentRefreshPage() {
+  return (
+    <Suspense>
+      <ContentRefreshInner />
+    </Suspense>
   );
 }

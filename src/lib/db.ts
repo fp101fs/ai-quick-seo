@@ -299,6 +299,15 @@ export async function saveArticleIdeas(
   result: unknown
 ): Promise<void> {
   await sql`
+    CREATE TABLE IF NOT EXISTS article_ideas (
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      property TEXT NOT NULL,
+      result JSONB NOT NULL,
+      generated_at TIMESTAMPTZ DEFAULT NOW(),
+      PRIMARY KEY (user_id, property)
+    )
+  `;
+  await sql`
     INSERT INTO article_ideas (user_id, property, result, generated_at)
     VALUES (${userId}, ${property}, ${JSON.stringify(result)}, NOW())
     ON CONFLICT (user_id, property) DO UPDATE
