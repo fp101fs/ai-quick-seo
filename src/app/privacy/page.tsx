@@ -6,8 +6,8 @@ export default function PrivacyPage() {
       <header className="border-b border-slate-200">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <img src="/icon-512.png" className="w-8 h-8 rounded-lg" alt="SerpClerk" />
-            <span className="font-bold tracking-tight">SerpClerk</span>
+            <img src="/icon-512.png" className="w-8 h-8 rounded-lg" alt="SerpDo" />
+            <span className="font-bold tracking-tight">SerpDo</span>
           </Link>
         </div>
       </header>

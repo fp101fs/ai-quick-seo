@@ -21,8 +21,8 @@ const GA_ID = GA_ID_RAW && /^G-[A-Z0-9]+$/.test(GA_ID_RAW) ? GA_ID_RAW : null;
 
 export const metadata: Metadata = {
   title: {
-    default: "SerpClerk — Your daily SEO action plan, powered by AI",
-    template: "%s | SerpClerk",
+    default: "SerpDo — Your daily SEO action plan, powered by AI",
+    template: "%s | SerpDo",
   },
   description:
     "Connects to your Google Search Console and tells you exactly which SEO task to do today — ranked by traffic impact.",
@@ -30,15 +30,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: SITE_URL,
-    title: "SerpClerk — Your daily SEO action plan, powered by AI",
+    title: "SerpDo — Your daily SEO action plan, powered by AI",
     description:
       "Connects to your Google Search Console and tells you exactly which SEO task to do today — ranked by traffic impact.",
-    siteName: "SerpClerk",
+    siteName: "SerpDo",
     images: [{ url: "/serpdo-og-1200x630-chatgpt.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SerpClerk — Your daily SEO action plan, powered by AI",
+    title: "SerpDo — Your daily SEO action plan, powered by AI",
     description:
       "Connects to your Google Search Console and tells you exactly which SEO task to do today — ranked by traffic impact.",
     images: ["/serpdo-og-1200x630-chatgpt.png"],
