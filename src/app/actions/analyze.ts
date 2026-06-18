@@ -5,56 +5,58 @@ import { getConnectionStatus, getUserId } from "@/lib/services/session";
 import { jsonCompletion } from "@/lib/services/openrouter";
 
 export async function suggestCompetitors(): Promise<string[]> {
-  const [status, userId] = await Promise.all([getConnectionStatus(), getUserId()]);
-  const { getCachedSnapshot } = await import("@/lib/db");
-
-  let topQueries: string[] = [];
-
-  if (status.demo || status.property) {
-    const property = status.demo ? "demo" : status.property!;
-    const snap = await getCachedSnapshot(property).catch(() => null);
-    if (snap) {
-      topQueries = (snap as { pages?: Array<{ queries?: Array<{ query: string; clicks: number }> }> })
-        .pages?.flatMap((p) => p.queries ?? [])
-        .sort((a, b) => b.clicks - a.clicks)
-        .slice(0, 5)
-        .map((q) => q.query) ?? [];
-    }
-  }
-
-  if (!topQueries.length) {
-    throw new Error("Connect Google Search Console first to get competitor suggestions.");
-  }
-
-  const searchQuery = topQueries.join(" ");
-
-  // ponytail: html.duckduckgo.com/html is server-rendered; duckduckgo.com needs JS
-  let markdown = "";
   try {
-    const jinaUrl = `https://r.jina.ai/https://html.duckduckgo.com/html/?q=${encodeURIComponent(searchQuery)}`;
-    const jinaRes = await fetch(jinaUrl, { headers: { "X-Return-Format": "markdown" } });
-    if (jinaRes.ok) markdown = await jinaRes.text();
-  } catch {
-    // Jina unavailable — fall through to AI-only
-  }
+    const [status, userId] = await Promise.all([getConnectionStatus(), getUserId()]);
+    const { getCachedSnapshot } = await import("@/lib/db");
 
-  const prompt = markdown.length > 200
-    ? `Extract 5 real competitor website URLs from these search results. Exclude duckduckgo.com. Return full https:// URLs.
+    let topQueries: string[] = [];
+
+    if (status.demo || status.property) {
+      const property = status.demo ? "demo" : status.property!;
+      const snap = await getCachedSnapshot(property).catch(() => null);
+      if (snap) {
+        topQueries = (snap as { pages?: Array<{ queries?: Array<{ query: string; clicks: number }> }> })
+          .pages?.flatMap((p) => p.queries ?? [])
+          .sort((a, b) => b.clicks - a.clicks)
+          .slice(0, 5)
+          .map((q) => q.query) ?? [];
+      }
+    }
+
+    if (!topQueries.length) return [];
+
+    const searchQuery = topQueries.join(" ");
+
+    // ponytail: html.duckduckgo.com/html is server-rendered; duckduckgo.com needs JS
+    let markdown = "";
+    try {
+      const jinaUrl = `https://r.jina.ai/https://html.duckduckgo.com/html/?q=${encodeURIComponent(searchQuery)}`;
+      const jinaRes = await fetch(jinaUrl, { headers: { "X-Return-Format": "markdown" } });
+      if (jinaRes.ok) markdown = await jinaRes.text();
+    } catch {
+      // Jina unavailable — fall through to AI-only
+    }
+
+    const prompt = markdown.length > 200
+      ? `Extract 5 real competitor website URLs from these search results. Exclude duckduckgo.com. Return full https:// URLs.
 
 Search results:
 ${markdown.slice(0, 8000)}
 
 Return ONLY: {"competitors": ["https://example.com", ...]}`
-    : `Suggest 5 real competitor websites for a site whose top search queries are: ${topQueries.join(", ")}
+      : `Suggest 5 real competitor websites for a site whose top search queries are: ${topQueries.join(", ")}
 
 Return ONLY: {"competitors": ["https://example.com", ...]}`;
 
-  const result = await jsonCompletion<{ competitors: string[] }>(
-    [{ role: "user", content: prompt }],
-    { userId: userId ?? undefined, feature: "competitor-suggest" }
-  );
+    const result = await jsonCompletion<{ competitors: string[] }>(
+      [{ role: "user", content: prompt }],
+      { userId: userId ?? undefined, feature: "competitor-suggest" }
+    );
 
-  return (result.competitors ?? []).slice(0, 5);
+    return (result.competitors ?? []).slice(0, 5);
+  } catch {
+    return [];
+  }
 }
 
 export async function analyzeCompetitor(url: string) {
