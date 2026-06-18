@@ -23,7 +23,7 @@ function extractLocs(xml: string): string[] {
 async function fetchText(url: string): Promise<string> {
   const response = await fetch(url, {
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-    headers: { "User-Agent": "AISEOEmployee/1.0 (+https://ai-quick-seo.vercel.app)" },
+    headers: { "User-Agent": "SerpDo/1.0 (+https://serpdo.com)" },
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return response.text();

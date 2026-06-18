@@ -1,104 +1,113 @@
-# AI SEO Employee
-
-An AI-powered SEO assistant that answers one question every day:
+# SerpDo
 
 > **"What is the highest-impact SEO action I should take today?"**
 
-It connects to Google Search Console, crawls your sitemap, and turns the data
-into a prioritized daily action plan — no keyword databases, no paid SEO APIs,
-no persistence layer to manage.
+SerpDo connects to Google Search Console, crawls your sitemap, and turns real traffic data into a prioritized daily action plan. No keyword databases, no enterprise pricing — just your actual data turned into specific work.
 
-Built with Next.js (App Router), React, TypeScript, Tailwind, and shadcn-style
-components. Deploys to Vercel as-is.
+**Live:** [serpdo.com](https://serpdo.com)
 
-## Features
+---
 
-| Page | What it does |
-| --- | --- |
-| `/dashboard` | Today's highest-impact task, performance stats, traffic declines, quick wins |
-| `/opportunities` | Opportunity cards from Search Console: declining pages, page-2 keywords, low-CTR snippets |
-| `/internal-links` | Sitemap crawler that finds orphan pages and suggests link placements with anchor text |
-| `/content-refresh` | AI-drafted titles, meta descriptions, H2s, FAQs, and content additions for any URL |
-| `/coach` | Chat with an AI coach that knows your real pages, queries, and numbers |
-| `/competitor` | Competitor analysis: keywords, content gaps, blog ideas (the original AI Quick SEO tool) |
+## What it does
 
-**Demo mode:** click "Explore with demo data" on the dashboard to use the full
-product with a realistic sample site — no credentials required.
+| Feature | Description |
+|---------|-------------|
+| **Dashboard** | Daily briefing: top task, traffic overview, quick wins, AI-prioritized action list |
+| **Opportunities** | Declining pages, page-2 keywords, low-CTR snippets — ranked by traffic impact |
+| **Article Ideas** | AI-generated article titles for keyword gaps your site isn't covering |
+| **Internal Links** | Sitemap crawler that finds orphan pages and suggests link placements with anchor text |
+| **Content Refresh** | AI-drafted titles, meta descriptions, new H2s, and FAQs for any existing page |
+| **AI Coach** | Chat with an SEO coach that knows your real pages, queries, and numbers |
+| **Competitor Spy** | Analyze any competitor URL: keywords, content gaps, blog ideas |
 
-## Quick start
+**Demo mode:** works without a Google account — click "Explore with demo data" on the dashboard.
+
+---
+
+## Stack
+
+- **Next.js 16** (App Router, React 19, TypeScript)
+- **Tailwind CSS v4** + shadcn-style components
+- **Vercel** (hosting, Postgres via Neon, Analytics)
+- **OpenRouter** (AI inference — model-agnostic)
+- **Google OAuth + Search Console API** (read-only)
+- **Stripe** (subscriptions)
+
+---
+
+## Local development
 
 ```bash
 npm install
-cp .env.example .env.local   # then fill in keys (see below)
+cp .env.example .env.local   # fill in keys (see below)
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). Demo mode works immediately — no keys required.
+
+---
 
 ## Environment variables
 
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `OPENROUTER_API_KEY` | For AI features | Content refresh, task prioritization, link suggestions, coach |
-| `OPENROUTER_MODEL` | No | Override the model (default: `openrouter/free`) |
-| `GOOGLE_CLIENT_ID` | For real GSC data | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | For real GSC data | Google OAuth client secret |
+All variables are documented in `.env.example`.
 
-Without Google credentials the app runs in demo mode. Without an OpenRouter
-key, opportunity detection and crawling still work (they're deterministic);
-AI features show a clear error.
+| Variable | Required for | Notes |
+|----------|-------------|-------|
+| `OPENROUTER_API_KEY` | AI features | Get at openrouter.ai/keys |
+| `OPENROUTER_MODEL` | AI quality | Recommended: `deepseek/deepseek-v4-flash`. Default: `openrouter/free` (low quality, rotates) |
+| `GOOGLE_CLIENT_ID` | Real GSC data | From Google Cloud Console |
+| `GOOGLE_CLIENT_SECRET` | Real GSC data | From Google Cloud Console |
+| `POSTGRES_URL` | User accounts, billing | Auto-set by Vercel when Neon DB is connected |
+| `MIGRATE_SECRET` | DB init | Any secret string; used to authorize `/api/migrate` |
+| `STRIPE_SECRET_KEY` | Payments | From Stripe dashboard |
+| `STRIPE_PUBLISHABLE_KEY` | Payments | From Stripe dashboard |
+| `STRIPE_PRICE_ID` | Payments | The monthly Pro plan price ID |
+| `STRIPE_WEBHOOK_SECRET` | Payments | From Stripe webhook endpoint config |
+| `SESSION_SECRET` | Auth security | Strong random string; signs user ID cookies |
+| `NEXT_PUBLIC_SITE_URL` | URLs, OG tags | e.g. `https://serpdo.com` |
+| `NEXT_PUBLIC_GA_ID` | Analytics | Optional. Format: `G-XXXXXXXXXX` |
 
-## OpenRouter setup
+---
 
-1. Create an account at [openrouter.ai](https://openrouter.ai).
-2. Generate a key at [openrouter.ai/keys](https://openrouter.ai/keys).
-3. Set `OPENROUTER_API_KEY` in `.env.local` (and in Vercel project settings).
+## Google OAuth setup
 
-The free default model works out of the box; set `OPENROUTER_MODEL` to any
-OpenRouter model ID for higher quality.
+1. Go to [Google Cloud Console](https://console.cloud.google.com/) → create or select a project
+2. **Enable API:** APIs & Services → Library → "Google Search Console API" → Enable
+3. **OAuth consent screen:** External is fine; add scope `https://www.googleapis.com/auth/webmasters.readonly`; add your Google account as a test user while unverified
+4. **Create credentials:** APIs & Services → Credentials → OAuth client ID → Web application
+   - Add redirect URI: `http://localhost:3000/api/auth/google/callback` (dev)
+   - Add redirect URI: `https://YOUR-DOMAIN/api/auth/google/callback` (prod)
+5. Copy client ID + secret into env vars
 
-## Google Search Console setup
+Access is **read-only**. Tokens stored in httpOnly cookies — nothing persisted server-side.
 
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/) and
-   create (or select) a project.
-2. **Enable the API:** APIs & Services → Library → search "Google Search
-   Console API" → Enable.
-3. **Configure the OAuth consent screen:** APIs & Services → OAuth consent
-   screen. External is fine; add the scope
-   `https://www.googleapis.com/auth/webmasters.readonly` and add your Google
-   account as a test user while the app is unverified.
-4. **Create credentials:** APIs & Services → Credentials → Create Credentials
-   → OAuth client ID → Web application. Add authorized redirect URIs:
-   - `http://localhost:3000/api/auth/google/callback` (development)
-   - `https://YOUR-DOMAIN.vercel.app/api/auth/google/callback` (production)
-5. Copy the client ID and secret into `GOOGLE_CLIENT_ID` /
-   `GOOGLE_CLIENT_SECRET`.
+---
 
-Access is **read-only** (`webmasters.readonly`). Tokens are stored in httpOnly
-cookies on the user's browser — nothing is persisted server-side.
+## Stripe setup
+
+1. Create a product in Stripe dashboard → add a recurring price → copy the Price ID → set `STRIPE_PRICE_ID`
+2. Create a webhook endpoint pointing to `https://YOUR-DOMAIN/api/stripe/webhook`
+   - Events to listen for: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
+3. Copy the webhook signing secret → set `STRIPE_WEBHOOK_SECRET`
+
+---
 
 ## Vercel deployment
 
-1. Push the repo and import it in Vercel (defaults work — no config needed).
-2. Add the environment variables above in Project → Settings → Environment
-   Variables.
-3. Add the production callback URL to your Google OAuth client (step 4 above).
+1. Push repo → import in Vercel (framework auto-detected as Next.js, no config needed)
+2. Add all env vars in Project → Settings → Environment Variables
+3. Connect a **Neon Postgres** database via Vercel Marketplace (auto-sets `POSTGRES_URL`)
+4. Add production callback URL to your Google OAuth client
+5. **Initialize the database** — run once after first deploy:
+   ```bash
+   curl -X POST https://YOUR-DOMAIN/api/migrate \
+     -H "x-migrate-secret: YOUR_MIGRATE_SECRET"
+   ```
+   Creates tables: `users`, `subscriptions`, `ai_usage`, `gsc_snapshots`
 
-Notes:
+> **Order matters:** set env vars → deploy → run migrate → test auth → test Stripe webhook
 
-- **Database required.** Connect a Neon Postgres database via the Vercel
-  Marketplace (or set `POSTGRES_URL` manually). After first deploy, run:
-  ```
-  curl -X POST https://YOUR-DOMAIN/api/migrate \
-    -H "x-migrate-secret: YOUR_MIGRATE_SECRET"
-  ```
-  This creates the `users`, `subscriptions`, `ai_usage`, and `gsc_snapshots`
-  tables. Set `MIGRATE_SECRET` in your environment variables.
-- Search Console snapshots, crawl results, and the daily task plan are also
-  cached in-memory per serverless instance (10 min / 30 min / 12 h TTLs) and
-  refreshed from Postgres on cold starts.
-- The sitemap crawler caps at 30 pages per crawl to stay within serverless
-  execution limits.
+---
 
 ## Architecture
 
@@ -106,34 +115,85 @@ Notes:
 src/
 ├── app/
 │   ├── page.tsx                    # Marketing landing page
-│   ├── (app)/                      # Product pages (shared sidebar shell)
-│   │   ├── layout.tsx
-│   │   ├── dashboard/
-│   │   ├── opportunities/
-│   │   ├── internal-links/
-│   │   ├── content-refresh/
-│   │   ├── coach/
-│   │   └── competitor/
-│   ├── actions/                    # Server actions (the "API layer")
-│   │   ├── analyze.ts              # Competitor analysis (original tool)
-│   │   ├── gsc.ts                  # Connection/property management
-│   │   ├── seo.ts                  # Dashboard, opportunities, crawl, refresh
-│   │   └── coach.ts                # Coach chat
-│   └── api/auth/google/            # OAuth route handlers
-├── components/                     # App shell + feature components
-│   └── ui/                         # shadcn-style primitives
+│   ├── pricing/                    # Pricing page
+│   ├── privacy/                    # Privacy policy
+│   ├── terms/                      # Terms of service
+│   ├── layout.tsx                  # Root layout (metadata, analytics)
+│   ├── sitemap.ts                  # /sitemap.xml
+│   ├── robots.ts                   # /robots.txt
+│   ├── (app)/                      # Authenticated product pages
+│   │   ├── layout.tsx              # App shell (sidebar, session, usage)
+│   │   ├── dashboard/              # Daily briefing + task list
+│   │   ├── opportunities/          # GSC opportunity cards
+│   │   ├── article-ideas/          # AI keyword gap ideas
+│   │   ├── internal-links/         # Sitemap crawler + link suggestions
+│   │   ├── content-refresh/        # AI content drafts
+│   │   ├── coach/                  # AI chat
+│   │   ├── competitor/             # Competitor analysis
+│   │   └── usage/                  # Usage & billing
+│   ├── actions/                    # Next.js server actions (the API layer)
+│   │   ├── analyze.ts              # Competitor analysis
+│   │   ├── article-ideas.ts        # Article idea generation
+│   │   ├── coach.ts                # Coach chat
+│   │   ├── gsc.ts                  # GSC connection + property management
+│   │   └── seo.ts                  # Dashboard, opportunities, crawl, refresh
+│   └── api/
+│       ├── auth/google/            # OAuth flow (initiate + callback + logout)
+│       ├── stripe/                 # Checkout, portal, webhook
+│       ├── migrate/                # DB schema init (run once)
+│       └── usage/                  # Usage data endpoint
+├── components/
+│   ├── app-shell.tsx               # Sidebar + mobile nav + user chip
+│   ├── property-selector.tsx       # GSC property switcher
+│   ├── usage-meter.tsx             # Free/Pro usage bar
+│   ├── connect-gate.tsx            # Gate for unauthenticated users
+│   ├── task-card.tsx               # Daily task card
+│   ├── opportunity-card.tsx        # Opportunity card
+│   └── ui/                         # Primitive components (button, card, etc.)
 └── lib/
-    ├── types.ts                    # Shared domain types
+    ├── db.ts                       # Postgres queries + schema migrations
+    ├── stripe.ts                   # Stripe client
+    ├── types.ts                    # Shared TypeScript types
     ├── demo-data.ts                # Demo dataset (trailgearhub.com)
-    ├── prompts/                    # All AI prompt templates
-    └── services/                   # Isolated, reusable SEO logic
-        ├── gsc.ts                  # GSC import + opportunity detection
-        ├── crawler.ts              # Sitemap crawl + link graph
-        ├── content-refresh.ts      # Page fetch + AI refresh plan
-        ├── tasks.ts                # Daily task generation
-        ├── openrouter.ts           # AI client
-        ├── google-auth.ts          # OAuth helpers
-        ├── session.ts              # Cookie-backed session
-        ├── context.ts              # Resolves current site context
-        └── store.ts                # In-memory TTL cache
+    ├── prompts/                    # AI prompt templates (one file per feature)
+    └── services/
+        ├── gsc.ts                  # GSC data import + opportunity detection
+        ├── crawler.ts              # Sitemap fetch + page crawl (max 30 pages)
+        ├── content-refresh.ts      # Fetch page HTML + build AI refresh plan
+        ├── tasks.ts                # Daily task prioritization
+        ├── usage.ts                # Usage enforcement (free cap $0.10/mo)
+        ├── openrouter.ts           # AI client (model-agnostic, usage tracking)
+        ├── google-auth.ts          # OAuth token exchange + userinfo fetch
+        ├── session.ts              # HMAC-signed cookie session
+        ├── context.ts              # Resolves current site context (live vs demo)
+        └── store.ts                # In-memory TTL cache (per serverless instance)
 ```
+
+### Data flow
+
+```
+User request
+  → session.ts (read signed cookie → userId)
+  → context.ts (live GSC or demo data)
+  → gsc.ts / crawler.ts (fetch + cache data)
+  → prompts/ + openrouter.ts (AI analysis)
+  → Server action returns result to client component
+```
+
+### Caching layers
+
+| Layer | TTL | Scope |
+|-------|-----|-------|
+| In-memory store | 10–720 min (per feature) | Per serverless instance |
+| Postgres `gsc_snapshots` | 30 min | Global |
+
+---
+
+## Pricing
+
+| Plan | Price | AI budget |
+|------|-------|-----------|
+| Free | $0/mo | $0.10/mo of AI usage |
+| Pro | $10/mo | $10/mo of AI usage |
+
+Free plan supports demo mode and GSC connection. AI features (coach, content refresh, internal links, article ideas) consume the usage budget and are blocked when the cap is hit.

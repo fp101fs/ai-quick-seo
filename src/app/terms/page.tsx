@@ -22,7 +22,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-3">1. Acceptance</h2>
             <p>
-              By using AI SEO ("Service"), you agree to these Terms of Service. If you do not
+              By using SerpDo ("Service"), you agree to these Terms of Service. If you do not
               agree, do not use the Service.
             </p>
           </section>
@@ -30,7 +30,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-3">2. Description of service</h2>
             <p>
-              AI SEO is a web application that connects to Google Search Console (read-only),
+              SerpDo is a web application that connects to Google Search Console (read-only),
               analyzes your SEO data, and provides AI-generated recommendations, content drafts,
               and prioritized task lists.
             </p>
@@ -102,7 +102,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-3">10. Limitation of liability</h2>
             <p>
-              To the maximum extent permitted by law, AI SEO shall not be liable for any indirect,
+              To the maximum extent permitted by law, SerpDo shall not be liable for any indirect,
               incidental, or consequential damages arising from use of the Service.
             </p>
           </section>

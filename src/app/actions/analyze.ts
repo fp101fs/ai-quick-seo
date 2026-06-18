@@ -72,7 +72,7 @@ export async function analyzeCompetitor(url: string) {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://ai-quick-seo.vercel.app",
+        "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL ?? "https://serpdo.com",
         "X-Title": "Competitor SEO Analyzer",
       },
       body: JSON.stringify({

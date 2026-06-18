@@ -22,7 +22,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-3">1. Who we are</h2>
             <p>
-              AI SEO ("we", "our", "us") is a web application that helps website owners analyze
+              SerpDo ("we", "our", "us") is a web application that helps website owners analyze
               their Google Search Console data and take AI-powered SEO actions. Our service is
               available at{" "}
               <a href={process.env.NEXT_PUBLIC_SITE_URL ?? "#"} className="text-indigo-600 hover:underline">
@@ -56,7 +56,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-3">3. Google Search Console data</h2>
             <p>
-              With your permission, AI SEO reads your Google Search Console data (clicks,
+              With your permission, SerpDo reads your Google Search Console data (clicks,
               impressions, queries, pages). This data is used in real time to generate
               recommendations and is cached briefly for performance. We do not sell, share, or
               permanently store your GSC data beyond the active session.
@@ -128,7 +128,7 @@ export default function PrivacyPage() {
               >
                 Google account permissions
               </a>
-              . To delete your AI SEO account and data, email{" "}
+              . To delete your SerpDo account and data, email{" "}
               <a href="mailto:support@ai-seo.app" className="text-indigo-600 hover:underline">
                 support@ai-seo.app
               </a>
