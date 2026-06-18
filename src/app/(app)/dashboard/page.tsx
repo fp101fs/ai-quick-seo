@@ -19,6 +19,8 @@ import {
   MessageSquare,
   AlertTriangle,
   X,
+  History,
+  DatabaseZap,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,7 +31,8 @@ import { ConnectGate } from "@/components/connect-gate";
 import { PageHeader } from "@/components/page-header";
 import { AiLoading } from "@/components/ai-loading";
 import { TaskCard } from "@/components/task-card";
-import { clearSnapshotCache, getDashboardData, type DashboardData } from "@/app/actions/seo";
+import { getDashboardData, getAnalysisHistory, type DashboardData } from "@/app/actions/seo";
+import type { AnalysisSummary } from "@/lib/db";
 import { DashboardUserChip } from "@/components/dashboard-user-chip";
 import type { Opportunity } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -98,6 +101,100 @@ function MiniOpportunity({ opportunity }: { opportunity: Opportunity }) {
   );
 }
 
+function formatAnalysisDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const diffHours = (Date.now() - date.getTime()) / 3_600_000;
+  if (diffHours < 1) return "Just now";
+  if (diffHours < 24) return `${Math.floor(diffHours)}h ago`;
+  if (diffHours < 48) return "Yesterday";
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function cleanProperty(property: string): string {
+  return property.replace(/^sc-domain:/, "").replace(/^https?:\/\//, "").replace(/\/$/, "");
+}
+
+function HistoryPanel({
+  open,
+  onClose,
+  history,
+  currentProperty,
+}: {
+  open: boolean;
+  onClose: () => void;
+  history: AnalysisSummary[] | null;
+  currentProperty: string | null | undefined;
+}) {
+  return (
+    <>
+      {/* Backdrop */}
+      {open && (
+        <div
+          className="fixed inset-0 z-30 bg-black/20"
+          onClick={onClose}
+        />
+      )}
+      {/* Drawer */}
+      <div
+        className={cn(
+          "fixed top-0 bottom-0 left-0 lg:left-64 z-40 w-80 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col",
+          open ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <div className="flex items-center justify-between px-4 h-14 border-b border-slate-100 dark:border-slate-700 shrink-0">
+          <h2 className="font-semibold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <History className="w-4 h-4 text-indigo-600" />
+            Analysis History
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="overflow-y-auto flex-1 p-2">
+          {history === null ? (
+            <p className="text-xs text-slate-400 text-center py-8">Loading…</p>
+          ) : history.length === 0 ? (
+            <p className="text-xs text-slate-400 text-center py-8">No analyses yet.</p>
+          ) : (
+            history.map((item) => {
+              const isCurrent = currentProperty && cleanProperty(item.property) === cleanProperty(currentProperty);
+              return (
+                <div
+                  key={item.id}
+                  className={cn(
+                    "rounded-lg px-3 py-2.5 mb-1",
+                    isCurrent ? "bg-indigo-50 dark:bg-indigo-900/30" : "hover:bg-slate-50 dark:hover:bg-slate-700/50"
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-2 mb-0.5">
+                    <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 truncate">
+                      {cleanProperty(item.property)}
+                    </p>
+                    {isCurrent && (
+                      <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 shrink-0">current</span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-400 dark:text-slate-500 mb-1">
+                    {formatAnalysisDate(item.created_at)}
+                  </p>
+                  {item.top_task_title && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                      {item.top_task_title}
+                    </p>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
 const oauthErrorMessages: Record<string, string> = {
   state_mismatch:
     "The sign-in session expired or cookies were blocked before Google redirected back. Please try connecting again.",
@@ -128,10 +225,12 @@ export default function DashboardPage() {
   const [connectError, setConnectError] = useState<string | null>(() =>
     oauthErrorFromParams(searchParams)
   );
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [history, setHistory] = useState<AnalysisSummary[] | null>(null);
 
   const fetchData = useCallback(
-    () =>
-      getDashboardData()
+    (opts?: { forceRefresh?: boolean }) =>
+      getDashboardData(opts)
         .then(setData)
         .catch((error: Error) => toast.error(error.message))
         .finally(() => setLoading(false)),
@@ -143,10 +242,10 @@ export default function DashboardPage() {
     fetchData();
   }, [fetchData]);
 
-  const hardRefresh = useCallback(async () => {
+  const hardRefresh = useCallback(() => {
     setLoading(true);
-    await clearSnapshotCache().catch(() => {});
-    fetchData();
+    setHistory(null); // invalidate history so it reloads next open
+    fetchData({ forceRefresh: true });
   }, [fetchData]);
 
   useEffect(() => {
@@ -155,6 +254,12 @@ export default function DashboardPage() {
     if (params.size > 0) window.history.replaceState(null, "", "/dashboard");
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    if (historyOpen && history === null) {
+      getAnalysisHistory().then(setHistory);
+    }
+  }, [historyOpen, history]);
 
   if (loading) {
     return (
@@ -183,6 +288,15 @@ export default function DashboardPage() {
 
   if (!data) return null;
 
+  const historyPanel = (
+    <HistoryPanel
+      open={historyOpen}
+      onClose={() => setHistoryOpen(false)}
+      history={history}
+      currentProperty={data.status.property}
+    />
+  );
+
   const errorBanner = connectError ? (
     <div className="flex items-start gap-3 rounded-xl bg-rose-50 border border-rose-200 px-4 py-3 mb-6">
       <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
@@ -202,6 +316,7 @@ export default function DashboardPage() {
   if (!data.status.demo && (!data.status.connected || !data.status.property)) {
     return (
       <>
+        {historyPanel}
         <PageHeader
           title="Dashboard"
           description="Your AI employee's daily SEO briefing."
@@ -224,14 +339,33 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
+      {historyPanel}
       <PageHeader
         title="Dashboard"
         description={`Daily briefing for ${data.status.property?.replace(/^sc-domain:/, "").replace(/^https?:\/\//, "").replace(/\/$/, "") ?? "your site"}`}
         action={
           <div className="flex items-center gap-2">
+            {data.fromCache && (
+              <span
+                title="Loaded from saved analysis. Click Refresh to re-run."
+                className="hidden sm:flex items-center gap-1 text-xs text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-full px-2.5 py-1"
+              >
+                <DatabaseZap className="w-3 h-3" />
+                Cached
+              </span>
+            )}
+            <Button
+              variant="outline"
+              onClick={() => setHistoryOpen(true)}
+              className="border-slate-200"
+              title="View analysis history"
+            >
+              <History className="w-4 h-4" />
+              <span className="hidden sm:inline">History</span>
+            </Button>
             <Button variant="outline" onClick={hardRefresh} className="border-slate-200">
               <RefreshCw className="w-4 h-4" />
-              Refresh
+              <span className="hidden sm:inline">Refresh</span>
             </Button>
             <DashboardUserChip />
           </div>

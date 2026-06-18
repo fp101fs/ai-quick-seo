@@ -51,6 +51,24 @@ export async function runMigrations() {
       fetched_at TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS dashboard_analyses (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      property TEXT NOT NULL,
+      tasks JSONB NOT NULL DEFAULT '[]',
+      opportunities JSONB NOT NULL DEFAULT '[]',
+      snapshot JSONB,
+      crawl JSONB,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  await sql`
+    CREATE INDEX IF NOT EXISTS dashboard_analyses_user_property_idx
+    ON dashboard_analyses (user_id, property, created_at DESC)
+  `;
 }
 
 // ---------- Users ----------
@@ -202,5 +220,63 @@ export async function deleteCachedSnapshot(property: string): Promise<void> {
     await sql`DELETE FROM gsc_snapshots WHERE property = ${property}`;
   } catch {
     // Silently fail
+  }
+}
+
+// ---------- Dashboard Analyses Cache ----------
+
+export interface AnalysisSummary {
+  id: number;
+  property: string;
+  created_at: string;
+  top_task_title: string | null;
+}
+
+export async function saveAnalysis(
+  userId: number,
+  property: string,
+  data: { tasks: unknown; opportunities: unknown; snapshot: unknown; crawl: unknown }
+): Promise<void> {
+  await sql`
+    INSERT INTO dashboard_analyses (user_id, property, tasks, opportunities, snapshot, crawl)
+    VALUES (
+      ${userId}, ${property},
+      ${JSON.stringify(data.tasks)},
+      ${JSON.stringify(data.opportunities)},
+      ${JSON.stringify(data.snapshot)},
+      ${JSON.stringify(data.crawl)}
+    )
+  `;
+}
+
+export async function getLatestAnalysis(
+  userId: number,
+  property: string
+): Promise<{ tasks: unknown; opportunities: unknown; snapshot: unknown; crawl: unknown } | null> {
+  try {
+    const result = await sql<{ tasks: unknown; opportunities: unknown; snapshot: unknown; crawl: unknown }>`
+      SELECT tasks, opportunities, snapshot, crawl
+      FROM dashboard_analyses
+      WHERE user_id = ${userId} AND property = ${property}
+      ORDER BY created_at DESC LIMIT 1
+    `;
+    return result.rows[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function getAnalysisHistory(userId: number): Promise<AnalysisSummary[]> {
+  try {
+    const result = await sql<AnalysisSummary>`
+      SELECT id, property, created_at, tasks->0->>'title' AS top_task_title
+      FROM dashboard_analyses
+      WHERE user_id = ${userId}
+      ORDER BY created_at DESC
+      LIMIT 50
+    `;
+    return result.rows;
+  } catch {
+    return [];
   }
 }

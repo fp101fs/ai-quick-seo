@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 import {
   LayoutDashboard,
   Target,
@@ -16,6 +17,8 @@ import {
   Crown,
   BarChart3,
   Lightbulb,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { InfoTooltip } from "@/components/info-tooltip";
 import { cn } from "@/lib/utils";
@@ -140,6 +143,7 @@ export function AppShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { resolvedTheme, setTheme } = useTheme();
 
   const nav = (orientation: "vertical" | "horizontal") => (
     <nav
@@ -159,8 +163,8 @@ export function AppShell({
               className={cn(
                 "flex-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors whitespace-nowrap",
                 active
-                  ? "bg-indigo-50 text-indigo-700"
-                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  ? "bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300"
+                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100"
               )}
             >
               <Icon
@@ -180,12 +184,12 @@ export function AppShell({
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-[--font-inter]">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex fixed inset-y-0 left-0 w-64 flex-col bg-white border-r border-slate-200 z-20">
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 w-64 flex-col bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 z-20">
         <Link
           href="/"
-          className="flex items-center gap-2.5 px-5 h-16 border-b border-slate-100"
+          className="flex items-center gap-2.5 px-5 h-16 border-b border-slate-100 dark:border-slate-700"
         >
           <img src="/icon-512.png" className="w-8 h-8 rounded-lg" alt="SerpDo" />
           <span className="font-bold tracking-tight">SerpDo</span>
@@ -196,7 +200,7 @@ export function AppShell({
           {nav("vertical")}
         </div>
 
-        <div className="p-3 border-t border-slate-100 space-y-3">
+        <div className="p-3 border-t border-slate-100 dark:border-slate-700 space-y-3">
           {/* Usage meter */}
           {user && (
             <div className="flex items-center justify-between px-1">
@@ -264,27 +268,43 @@ export function AppShell({
             </Link>
           )}
 
-          {/* Usage page link */}
-          {user && (
-            <Link
-              href="/usage"
-              className="flex items-center gap-2 px-1 text-xs text-slate-400 hover:text-slate-600 transition-colors"
+          {/* Usage page link + dark mode toggle */}
+          <div className="flex items-center justify-between px-1">
+            {user ? (
+              <Link
+                href="/usage"
+                className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+              >
+                <BarChart3 className="w-3 h-3" />
+                View usage details
+              </Link>
+            ) : <span />}
+            <button
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              title="Toggle dark mode"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
             >
-              <BarChart3 className="w-3 h-3" />
-              View usage details
-            </Link>
-          )}
+              {resolvedTheme === "dark" ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+            </button>
+          </div>
         </div>
       </aside>
 
       {/* Mobile header */}
-      <header className="lg:hidden sticky top-0 z-20 bg-white border-b border-slate-200">
+      <header className="lg:hidden sticky top-0 z-20 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
         <div className="flex items-center justify-between px-4 h-14">
           <Link href="/" className="flex items-center gap-2">
             <img src="/icon-512.png" className="w-7 h-7 rounded-lg" alt="SerpDo" />
             <span className="font-bold tracking-tight text-sm">SerpDo</span>
           </Link>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              title="Toggle dark mode"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+            >
+              {resolvedTheme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
             {isSignedIn ? (
               <div className="flex items-center gap-2">
                 {user?.picture ? (

@@ -19,7 +19,7 @@ import {
 } from "@/lib/services/context";
 import { crawlSitemap } from "@/lib/services/crawler";
 import { cacheDelete } from "@/lib/services/store";
-import { getConnectionStatus, getSelectedProperty, isDemoMode } from "@/lib/services/session";
+import { getConnectionStatus, getSelectedProperty, getUserId, isDemoMode } from "@/lib/services/session";
 import { generateDailyTasks } from "@/lib/services/tasks";
 
 export interface DashboardData {
@@ -28,12 +28,40 @@ export interface DashboardData {
   opportunities: Opportunity[];
   tasks: SeoTask[];
   crawl: CrawlResult | null;
+  fromCache?: boolean;
 }
 
-export async function getDashboardData(): Promise<DashboardData> {
+export async function getDashboardData(opts?: { forceRefresh?: boolean }): Promise<DashboardData> {
   const status = await getConnectionStatus();
   if (!status.demo && (!status.connected || !status.property)) {
     return { status, snapshot: null, opportunities: [], tasks: [], crawl: null };
+  }
+
+  if (opts?.forceRefresh) {
+    await clearSnapshotCache().catch(() => {});
+  }
+
+  // Check DB analysis cache (skip for demo and force refresh)
+  if (!opts?.forceRefresh && !status.demo && status.property) {
+    try {
+      const { getLatestAnalysis } = await import("@/lib/db");
+      const userId = await getUserId();
+      if (userId) {
+        const cached = await getLatestAnalysis(userId, status.property);
+        if (cached) {
+          return {
+            status,
+            snapshot: cached.snapshot as GscSnapshot | null,
+            opportunities: cached.opportunities as Opportunity[],
+            tasks: cached.tasks as SeoTask[],
+            crawl: cached.crawl as CrawlResult | null,
+            fromCache: true,
+          };
+        }
+      }
+    } catch {
+      // DB unavailable — fall through to fresh analysis
+    }
   }
 
   const [{ snapshot, opportunities }, crawl] = await Promise.all([
@@ -47,7 +75,29 @@ export async function getDashboardData(): Promise<DashboardData> {
     crawl?.suggestions ?? []
   );
 
+  // Save to DB (fire and forget, skip for demo)
+  if (!status.demo && status.property) {
+    getUserId()
+      .then(async (userId) => {
+        if (!userId) return;
+        const { saveAnalysis } = await import("@/lib/db");
+        saveAnalysis(userId, status.property!, { tasks, opportunities, snapshot, crawl });
+      })
+      .catch(() => {});
+  }
+
   return { status, snapshot, opportunities, tasks, crawl };
+}
+
+export async function getAnalysisHistory() {
+  try {
+    const { getAnalysisHistory: dbGetHistory } = await import("@/lib/db");
+    const userId = await getUserId();
+    if (!userId) return [];
+    return dbGetHistory(userId);
+  } catch {
+    return [];
+  }
 }
 
 export async function getOpportunities(): Promise<{
