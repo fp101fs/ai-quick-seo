@@ -89,7 +89,7 @@ export default function OpportunitiesPage() {
                     "rounded-full px-4 py-1.5 text-sm font-medium transition-colors border",
                     filter === f.value
                       ? "bg-indigo-600 text-white border-indigo-600"
-                      : "bg-white text-slate-600 border-slate-200 hover:border-indigo-300"
+                      : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700"
                   )}
                 >
                   {f.label}
@@ -107,11 +107,11 @@ export default function OpportunitiesPage() {
           </div>
 
           {filtered.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-slate-200">
-              <div className="mx-auto w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                <Target className="w-8 h-8 text-slate-300" />
+            <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
+              <div className="mx-auto w-16 h-16 bg-slate-50 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
+                <Target className="w-8 h-8 text-slate-300 dark:text-slate-500" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-1">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">
                 No opportunities in this category
               </h3>
               <p className="text-slate-500">

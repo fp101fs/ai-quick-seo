@@ -62,23 +62,23 @@ export default async function UsagePage() {
       <div className="flex items-center gap-4">
         <Link
           href="/dashboard"
-          className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors"
+          className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Dashboard
         </Link>
-        <h1 className="text-2xl font-bold text-slate-900">Usage & Billing</h1>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Usage & Billing</h1>
       </div>
 
       {/* Plan overview */}
-      <div className="bg-white rounded-2xl ring-1 ring-slate-200 shadow-sm p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
             <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">
               Current plan
             </p>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-2xl font-bold text-slate-900">
+              <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                 {isPro ? "Pro" : "Free"}
               </span>
               {isPro && (
@@ -104,17 +104,17 @@ export default async function UsagePage() {
         {/* Usage bar */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-slate-600 font-medium">
+            <span className="text-slate-600 dark:text-slate-300 font-medium">
               AI usage this month
             </span>
-            <span className="text-slate-900 font-semibold">
+            <span className="text-slate-900 dark:text-slate-100 font-semibold">
               ${spentUsd.toFixed(4)}
-              <span className="text-slate-400 font-normal">
+              <span className="text-slate-400 dark:text-slate-500 font-normal">
                 {" "}/ {isPro ? "Unlimited" : `$${capUsd.toFixed(2)}`}
               </span>
             </span>
           </div>
-          <div className="w-full bg-slate-100 rounded-full h-2.5">
+          <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2.5">
             <div
               className={`h-2.5 rounded-full transition-all duration-500 ${barColor(usedPct)}`}
               style={{ width: `${usedPct}%` }}
@@ -140,26 +140,26 @@ export default async function UsagePage() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="bg-white rounded-xl ring-1 ring-slate-200 p-4 shadow-sm"
+            className="bg-white dark:bg-slate-800 rounded-xl ring-1 ring-slate-200 dark:ring-slate-700 p-4 shadow-sm"
           >
             <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">
               {stat.label}
             </p>
-            <p className="text-xl font-bold text-slate-900 mt-1">{stat.value}</p>
+            <p className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-1">{stat.value}</p>
           </div>
         ))}
       </div>
 
       {/* Recent usage table */}
       {recentUsage.length > 0 && (
-        <div className="bg-white rounded-2xl ring-1 ring-slate-200 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100">
-            <h2 className="font-semibold text-slate-900">Recent AI requests</h2>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700">
+            <h2 className="font-semibold text-slate-900 dark:text-slate-100">Recent AI requests</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50">
+                <tr className="border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
                   <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Time
                   </th>
@@ -180,25 +180,25 @@ export default async function UsagePage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-slate-50 dark:divide-slate-700">
                 {recentUsage.map((row, i) => (
-                  <tr key={i} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-3 text-slate-500 whitespace-nowrap">
+                  <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                    <td className="px-6 py-3 text-slate-500 dark:text-slate-400 whitespace-nowrap">
                       {new Date(row.created_at).toLocaleString()}
                     </td>
-                    <td className="px-6 py-3 text-slate-700 capitalize">
+                    <td className="px-6 py-3 text-slate-700 dark:text-slate-300 capitalize">
                       {row.feature.replace(/-/g, " ")}
                     </td>
-                    <td className="px-6 py-3 text-slate-500 font-mono text-xs truncate max-w-[160px]">
+                    <td className="px-6 py-3 text-slate-500 dark:text-slate-400 font-mono text-xs truncate max-w-[160px]">
                       {row.model}
                     </td>
-                    <td className="px-6 py-3 text-right text-slate-600">
+                    <td className="px-6 py-3 text-right text-slate-600 dark:text-slate-300">
                       {row.prompt_tokens.toLocaleString()}
                     </td>
-                    <td className="px-6 py-3 text-right text-slate-600">
+                    <td className="px-6 py-3 text-right text-slate-600 dark:text-slate-300">
                       {row.completion_tokens.toLocaleString()}
                     </td>
-                    <td className="px-6 py-3 text-right font-medium text-slate-900">
+                    <td className="px-6 py-3 text-right font-medium text-slate-900 dark:text-slate-100">
                       ${parseFloat(row.cost_usd).toFixed(5)}
                     </td>
                   </tr>
@@ -210,7 +210,7 @@ export default async function UsagePage() {
       )}
 
       {recentUsage.length === 0 && (
-        <div className="bg-white rounded-2xl ring-1 ring-slate-200 p-12 text-center">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl ring-1 ring-slate-200 dark:ring-slate-700 p-12 text-center">
           <p className="text-slate-400">No AI usage recorded yet this month.</p>
           <Link
             href="/coach"

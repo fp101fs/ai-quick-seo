@@ -24,11 +24,11 @@ function MessageBubble({ message }: { message: ChatMessage }) {
       <span
         className={cn(
           "flex w-8 h-8 shrink-0 items-center justify-center rounded-full",
-          isUser ? "bg-slate-200" : "bg-indigo-600"
+          isUser ? "bg-slate-200 dark:bg-slate-700" : "bg-indigo-600"
         )}
       >
         {isUser ? (
-          <User className="w-4 h-4 text-slate-600" />
+          <User className="w-4 h-4 text-slate-600 dark:text-slate-300" />
         ) : (
           <Bot className="w-4 h-4 text-white" />
         )}
@@ -38,7 +38,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
           "rounded-2xl px-4 py-3 max-w-[85%] sm:max-w-[75%] text-sm leading-relaxed whitespace-pre-wrap",
           isUser
             ? "bg-indigo-600 text-white rounded-tr-sm"
-            : "bg-white text-slate-700 shadow-sm ring-1 ring-slate-200 rounded-tl-sm"
+            : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 rounded-tl-sm"
         )}
       >
         {message.content}
@@ -90,7 +90,7 @@ export default function CoachPage() {
             <div className="mx-auto w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center mb-4 shadow-lg shadow-indigo-200">
               <Sparkles className="w-7 h-7 text-white" />
             </div>
-            <h3 className="font-semibold text-slate-900 mb-1">
+            <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-1">
               Your SEO expert, on demand
             </h3>
             <p className="text-sm text-slate-500 mb-6 max-w-sm mx-auto">
@@ -102,7 +102,7 @@ export default function CoachPage() {
                 <button
                   key={q}
                   onClick={() => send(q)}
-                  className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-indigo-300 hover:text-indigo-700 transition-colors"
+                  className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:border-indigo-300 dark:hover:border-indigo-700 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors"
                 >
                   {q}
                 </button>
@@ -121,7 +121,7 @@ export default function CoachPage() {
               <span className="absolute inset-0 rounded-full bg-indigo-400 opacity-40 animate-ping" />
               <Bot className="w-4 h-4 text-white animate-pulse relative" />
             </span>
-            <div className="rounded-2xl rounded-tl-sm px-4 py-3 bg-white shadow-sm ring-1 ring-slate-200">
+            <div className="rounded-2xl rounded-tl-sm px-4 py-3 bg-white dark:bg-slate-800 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
               <span className="flex gap-1.5 items-center h-5">
                 {[0, 150, 300].map((delay) => (
                   <span
@@ -148,7 +148,7 @@ export default function CoachPage() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask your SEO coach anything..."
-          className="pr-14 h-13 rounded-full border-slate-200 bg-white shadow-sm"
+          className="pr-14 h-13 rounded-full border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm"
           disabled={thinking}
         />
         <Button

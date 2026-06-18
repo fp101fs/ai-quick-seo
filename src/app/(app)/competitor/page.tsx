@@ -93,7 +93,7 @@ export default function CompetitorPage() {
           placeholder="https://competitor.com"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          className="pl-12 pr-32 h-13 rounded-full border-slate-200 bg-white shadow-sm"
+          className="pl-12 pr-32 h-13 rounded-full border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm"
           required
         />
         <Button
@@ -114,7 +114,7 @@ export default function CompetitorPage() {
       </form>
 
       {loading && (
-        <div className="bg-white rounded-2xl ring-1 ring-slate-200 shadow-sm">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm">
           <AiLoading message="Analyzing competitor site…" size="lg" className="py-20" />
         </div>
       )}
@@ -123,7 +123,7 @@ export default function CompetitorPage() {
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">{report.siteName} Report</h2>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{report.siteName} Report</h2>
               <p className="text-slate-500 text-sm">
                 Generated on {new Date().toLocaleDateString()}
               </p>
@@ -136,7 +136,7 @@ export default function CompetitorPage() {
 
           <div
             ref={reportRef}
-            className="space-y-8 bg-white p-8 rounded-2xl shadow-sm border border-slate-100"
+            className="space-y-8 bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700"
           >
             <section>
               <div className="flex items-center gap-2 mb-4">
@@ -145,10 +145,10 @@ export default function CompetitorPage() {
                   Overview
                 </h3>
               </div>
-              <p className="text-lg leading-relaxed text-slate-700">{report.summary}</p>
+              <p className="text-lg leading-relaxed text-slate-700 dark:text-slate-300">{report.summary}</p>
             </section>
 
-            <hr className="border-slate-100" />
+            <hr className="border-slate-100 dark:border-slate-700" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <section>
@@ -163,7 +163,7 @@ export default function CompetitorPage() {
                     <Badge
                       key={kw}
                       variant="secondary"
-                      className="bg-emerald-50 text-emerald-700 border-emerald-100 px-3 py-1 text-sm font-medium"
+                      className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800 px-3 py-1 text-sm font-medium"
                     >
                       {kw}
                     </Badge>
@@ -178,13 +178,13 @@ export default function CompetitorPage() {
                     SEO Strategy
                   </h3>
                 </div>
-                <p className="text-slate-700 text-sm leading-relaxed italic">
+                <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed italic">
                   {report.seoStrategy}
                 </p>
               </section>
             </div>
 
-            <hr className="border-slate-100" />
+            <hr className="border-slate-100 dark:border-slate-700" />
 
             <section>
               <div className="flex items-center gap-2 mb-6">
@@ -195,12 +195,12 @@ export default function CompetitorPage() {
               </div>
               <div className="grid grid-cols-1 gap-4">
                 {report.contentGaps.map((gap, i) => (
-                  <Card key={i} className="bg-slate-50 border-none shadow-none ring-0">
+                  <Card key={i} className="bg-slate-50 dark:bg-slate-900/50 border-none shadow-none ring-0">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-base text-slate-900">{gap.topic}</CardTitle>
+                      <CardTitle className="text-base text-slate-900 dark:text-slate-100">{gap.topic}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-slate-600">{gap.description}</p>
+                      <p className="text-sm text-slate-600 dark:text-slate-300">{gap.description}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -216,8 +216,8 @@ export default function CompetitorPage() {
               </div>
               <ul className="space-y-3">
                 {report.suggestedBlogTitles.map((title, i) => (
-                  <li key={i} className="flex items-start gap-3 text-slate-700 group">
-                    <span className="flex-none w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold">
+                  <li key={i} className="flex items-start gap-3 text-slate-700 dark:text-slate-300 group">
+                    <span className="flex-none w-6 h-6 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs font-bold">
                       {i + 1}
                     </span>
                     <span className="group-hover:text-indigo-600 transition-colors cursor-default">
@@ -232,11 +232,11 @@ export default function CompetitorPage() {
       )}
 
       {!report && !loading && (
-        <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-slate-200">
-          <div className="mx-auto w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-            <Search className="w-8 h-8 text-slate-300" />
+        <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
+          <div className="mx-auto w-16 h-16 bg-slate-50 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
+            <Search className="w-8 h-8 text-slate-300 dark:text-slate-500" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-900 mb-1">No Analysis Yet</h3>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">No Analysis Yet</h3>
           <p className="text-slate-500">
             Enter a competitor&apos;s URL above to start dissecting their strategy.
           </p>

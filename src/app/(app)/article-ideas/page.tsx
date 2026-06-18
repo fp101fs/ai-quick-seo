@@ -53,14 +53,14 @@ function IdeaRow({ idea, index }: { idea: ArticleIdea; index: number }) {
   };
 
   return (
-    <div className="flex items-start gap-4 px-5 py-4 hover:bg-slate-50 transition-colors group">
-      <div className="flex-none w-7 h-7 rounded-full bg-indigo-50 flex items-center justify-center text-xs font-bold text-indigo-600 mt-0.5">
+    <div className="flex items-start gap-4 px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
+      <div className="flex-none w-7 h-7 rounded-full bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">
         {index + 1}
       </div>
       <div className="flex-1 min-w-0 space-y-1.5">
-        <p className="text-sm font-semibold text-slate-900 leading-snug">{idea.title}</p>
+        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-snug">{idea.title}</p>
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-mono text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+          <span className="text-xs font-mono text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 px-2 py-0.5 rounded">
             {idea.targetKeyword}
           </span>
           <Badge variant="outline" className={cn("text-xs border capitalize", intentColors[idea.intent])}>
@@ -74,7 +74,7 @@ function IdeaRow({ idea, index }: { idea: ArticleIdea; index: number }) {
       </div>
       <button
         onClick={copyTitle}
-        className="flex-none opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700"
+        className="flex-none opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
         title="Copy title"
       >
         {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
@@ -159,12 +159,12 @@ export default function ArticleIdeasPage() {
 
       {/* Plan gate */}
       {blockedByPlan && (
-        <div className="bg-white rounded-2xl ring-1 ring-amber-200 shadow-sm p-8 text-center mb-8">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center mb-4">
-            <Crown className="w-7 h-7 text-amber-500" />
+        <div className="bg-white dark:bg-slate-800 rounded-2xl ring-1 ring-amber-200 dark:ring-amber-800 shadow-sm p-8 text-center mb-8">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center mb-4">
+            <Crown className="w-7 h-7 text-amber-500 dark:text-amber-400" />
           </div>
-          <h3 className="font-bold text-slate-900 text-lg mb-2">Free AI limit reached</h3>
-          <p className="text-slate-500 text-sm mb-6 max-w-sm mx-auto">
+          <h3 className="font-bold text-slate-900 dark:text-slate-100 text-lg mb-2">Free AI limit reached</h3>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 max-w-sm mx-auto">
             You&apos;ve used your $0.10/mo free AI credit. Upgrade to Pro for unlimited article
             ideas, content refresh, coach, and competitor spy.
           </p>
@@ -181,14 +181,14 @@ export default function ArticleIdeasPage() {
 
       {/* Generate button */}
       {!result && !loading && !blockedByPlan && (
-        <div className="text-center py-16 bg-white rounded-3xl border-2 border-dashed border-slate-200">
-          <div className="mx-auto w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-4">
-            <Sparkles className="w-8 h-8 text-indigo-400" />
+        <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
+          <div className="mx-auto w-16 h-16 bg-indigo-50 dark:bg-indigo-900/20 rounded-full flex items-center justify-center mb-4">
+            <Sparkles className="w-8 h-8 text-indigo-400 dark:text-indigo-500" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
             Find your keyword gaps
           </h3>
-          <p className="text-slate-500 text-sm mb-6 max-w-sm mx-auto">
+          <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 max-w-sm mx-auto">
             Click below to analyze your Search Console data and generate 15 article ideas for
             topics your site is missing.
           </p>
@@ -205,10 +205,10 @@ export default function ArticleIdeasPage() {
       {/* Loading */}
       {loading && (
         <div className="space-y-3">
-          <div className="bg-white rounded-2xl ring-1 ring-slate-200 shadow-sm p-5">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm p-5">
             <div className="flex items-center gap-3 mb-4">
               <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
-              <p className="text-sm font-medium text-slate-700">
+              <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 Analyzing your niche and identifying keyword gaps…
               </p>
             </div>
@@ -231,17 +231,17 @@ export default function ArticleIdeasPage() {
       {result && !loading && (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
           {/* Header summary */}
-          <div className="bg-white rounded-2xl ring-1 ring-slate-200 shadow-sm p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm p-5 flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <TrendingUp className="w-4 h-4 text-indigo-500" />
-                <p className="text-sm font-semibold text-slate-700">Niche identified</p>
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">Niche identified</p>
               </div>
-              <p className="text-slate-900 font-medium">{result.niche}</p>
+              <p className="text-slate-900 dark:text-slate-100 font-medium">{result.niche}</p>
               {result.existingTopics.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   {result.existingTopics.map((t) => (
-                    <span key={t} className="text-xs bg-slate-100 text-slate-500 rounded-full px-2.5 py-0.5">
+                    <span key={t} className="text-xs bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-full px-2.5 py-0.5">
                       {t}
                     </span>
                   ))}
@@ -278,19 +278,19 @@ export default function ArticleIdeasPage() {
 
           {/* How to use the copy */}
           {!copied && (
-            <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3">
+            <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-xl px-4 py-3">
               <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-              <p className="text-xs text-amber-800 leading-relaxed">
+              <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
                 <strong>Tip:</strong> Click &ldquo;Copy top 10 as AI prompt&rdquo; then paste into any AI (ChatGPT, Claude, Gemini) and hit Enter. It will write all 10 articles in one shot. Publish them and come back to refresh with new ideas.
               </p>
             </div>
           )}
 
           {/* Idea list */}
-          <div className="bg-white rounded-2xl ring-1 ring-slate-200 shadow-sm overflow-hidden">
-            <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-indigo-500" />
-              <h2 className="font-semibold text-slate-900">
+              <h2 className="font-semibold text-slate-900 dark:text-slate-100">
                 {result.ideas.length} article ideas
               </h2>
               <InfoTooltip
@@ -303,7 +303,7 @@ export default function ArticleIdeasPage() {
                 </Badge>
               )}
             </div>
-            <div className="divide-y divide-slate-50">
+            <div className="divide-y divide-slate-50 dark:divide-slate-700">
               {result.ideas.map((idea, i) => (
                 <IdeaRow key={i} idea={idea} index={i} />
               ))}

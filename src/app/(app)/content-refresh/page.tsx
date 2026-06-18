@@ -57,21 +57,21 @@ function Section({
   return (
     <details
       open={defaultOpen}
-      className="group bg-white rounded-xl shadow-sm ring-1 ring-slate-200 overflow-hidden"
+      className="group bg-white dark:bg-slate-800 rounded-xl shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 overflow-hidden"
     >
       <summary className="flex items-center gap-3 px-5 py-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
-        <span className="flex w-8 h-8 items-center justify-center rounded-lg bg-indigo-50">
-          <Icon className="w-4 h-4 text-indigo-600" />
+        <span className="flex w-8 h-8 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-900/20">
+          <Icon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
         </span>
-        <span className="font-semibold text-slate-900 flex-1">{title}</span>
+        <span className="font-semibold text-slate-900 dark:text-slate-100 flex-1">{title}</span>
         {count !== undefined && (
-          <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-none">
+          <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-none">
             {count}
           </Badge>
         )}
         <ChevronDown className="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180" />
       </summary>
-      <div className="px-5 pb-5 border-t border-slate-100 pt-4">{children}</div>
+      <div className="px-5 pb-5 border-t border-slate-100 dark:border-slate-700 pt-4">{children}</div>
     </details>
   );
 }
@@ -89,13 +89,13 @@ function Comparison({
 }) {
   return (
     <div className="space-y-3">
-      <div className="rounded-lg bg-slate-50 px-4 py-3">
-        <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
+      <div className="rounded-lg bg-slate-50 dark:bg-slate-900/50 px-4 py-3">
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
           Current {label}
         </p>
-        <p className="text-sm text-slate-600">{current || <em>None found</em>}</p>
+        <p className="text-sm text-slate-600 dark:text-slate-300">{current || <em>None found</em>}</p>
       </div>
-      <div className="rounded-lg bg-emerald-50 border border-emerald-100 px-4 py-3">
+      <div className="rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 px-4 py-3">
         <div className="flex items-center justify-between mb-1">
           <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
             Suggested {label}
@@ -109,7 +109,7 @@ function Comparison({
             <CopyButton text={suggested} />
           </div>
         </div>
-        <p className="text-sm text-slate-800 font-medium">{suggested}</p>
+        <p className="text-sm text-slate-800 dark:text-slate-200 font-medium">{suggested}</p>
       </div>
     </div>
   );
@@ -174,7 +174,7 @@ export default function ContentRefreshPage() {
             placeholder={baseUrl ? `${baseUrl}/your-page-path` : "https://yoursite.com/page-to-refresh"}
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            className="pl-12 pr-36 h-13 rounded-full border-slate-200 bg-white shadow-sm"
+            className="pl-12 pr-36 h-13 rounded-full border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm"
           />
           <Button
             type="submit"

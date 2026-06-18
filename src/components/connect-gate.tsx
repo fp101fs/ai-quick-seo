@@ -80,14 +80,14 @@ export function ConnectGate({
 
   if (needsProperty) {
     return (
-      <Card className="bg-white border-none shadow-sm ring-slate-200 max-w-xl mx-auto">
+      <Card className="bg-white dark:bg-slate-800 border-none shadow-sm ring-slate-200 dark:ring-slate-700 max-w-xl mx-auto">
         <CardContent className="py-8 text-center space-y-5">
-          <div className="mx-auto w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center">
-            <ShieldCheck className="w-6 h-6 text-emerald-600" />
+          <div className="mx-auto w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center">
+            <ShieldCheck className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">Google connected</h2>
-            <p className="text-slate-500 text-sm mt-1">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Google connected</h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
               Pick the Search Console property you want your AI employee to work on.
             </p>
           </div>
@@ -163,7 +163,7 @@ export function ConnectGate({
                   key={p.siteUrl}
                   disabled={busy}
                   onClick={() => handleSelect(p.siteUrl)}
-                  className="w-full flex items-center justify-between rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 hover:border-indigo-400 hover:bg-indigo-50/50 transition-colors disabled:opacity-50"
+                  className="w-full flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:border-indigo-400 dark:hover:border-indigo-700 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 transition-colors disabled:opacity-50"
                 >
                   <span className="flex items-center gap-2 min-w-0">
                     <Globe className="w-4 h-4 text-slate-400 shrink-0" />
@@ -184,10 +184,10 @@ export function ConnectGate({
       <div className="mx-auto w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center mb-6 shadow-lg shadow-indigo-200">
         <Globe className="w-8 h-8 text-white" />
       </div>
-      <h2 className="text-2xl font-bold text-slate-900 mb-3">
+      <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-3">
         Connect Google Search Console
       </h2>
-      <p className="text-slate-500 mb-8 max-w-md mx-auto">
+      <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-md mx-auto">
         Your AI employee analyzes your real search performance to find the
         highest-impact actions. Read-only access — we never change anything.
       </p>

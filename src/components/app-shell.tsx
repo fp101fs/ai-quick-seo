@@ -76,22 +76,22 @@ const navItems = [
 function ConnectionChip({ status }: { status: ConnectionStatus }) {
   if (status.demo) {
     return (
-      <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
-        <FlaskConical className="w-4 h-4 text-amber-600 shrink-0" />
+      <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 py-2">
+        <FlaskConical className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
         <div className="min-w-0">
-          <p className="text-xs font-semibold text-amber-800">Demo mode</p>
-          <p className="text-xs text-amber-600 truncate">trailgearhub.com</p>
+          <p className="text-xs font-semibold text-amber-800 dark:text-amber-300">Demo mode</p>
+          <p className="text-xs text-amber-600 dark:text-amber-400 truncate">trailgearhub.com</p>
         </div>
       </div>
     );
   }
   if (status.connected && status.property) {
     return (
-      <div className="flex items-center gap-2 rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-2">
-        <Globe className="w-4 h-4 text-emerald-600 shrink-0" />
+      <div className="flex items-center gap-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 px-3 py-2">
+        <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
         <div className="min-w-0">
-          <p className="text-xs font-semibold text-emerald-800">Connected</p>
-          <p className="text-xs text-emerald-600 truncate">
+          <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">Connected</p>
+          <p className="text-xs text-emerald-600 dark:text-emerald-400 truncate">
             {status.property.replace(/^sc-domain:/, "").replace(/^https?:\/\//, "")}
           </p>
         </div>
@@ -102,12 +102,12 @@ function ConnectionChip({ status }: { status: ConnectionStatus }) {
     return (
       <Link
         href="/dashboard"
-        className="flex items-center gap-2 rounded-lg bg-indigo-50 border border-indigo-200 px-3 py-2 hover:border-indigo-300 transition-colors"
+        className="flex items-center gap-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 px-3 py-2 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors"
       >
-        <Globe className="w-4 h-4 text-indigo-600 shrink-0" />
+        <Globe className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
         <div className="min-w-0">
-          <p className="text-xs font-semibold text-indigo-800">Google connected</p>
-          <p className="text-xs text-indigo-500 truncate">Choose a property</p>
+          <p className="text-xs font-semibold text-indigo-800 dark:text-indigo-300">Google connected</p>
+          <p className="text-xs text-indigo-500 dark:text-indigo-400 truncate">Choose a property</p>
         </div>
       </Link>
     );
@@ -115,12 +115,12 @@ function ConnectionChip({ status }: { status: ConnectionStatus }) {
   return (
     <Link
       href="/dashboard"
-      className="flex items-center gap-2 rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 hover:border-indigo-300 transition-colors"
+      className="flex items-center gap-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-3 py-2 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors"
     >
       <CircleDot className="w-4 h-4 text-slate-400 shrink-0" />
       <div className="min-w-0">
-        <p className="text-xs font-semibold text-slate-600">Not connected</p>
-        <p className="text-xs text-slate-400 truncate">Connect Search Console</p>
+        <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">Not connected</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500 truncate">Connect Search Console</p>
       </div>
     </Link>
   );
@@ -241,7 +241,7 @@ export function AppShell({
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-slate-700 truncate">
+                <p className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate">
                   {user?.name ?? user?.email ?? "Signed in"}
                 </p>
                 {isPro && (

@@ -42,14 +42,14 @@ function CrawlStat({
   tone: string;
 }) {
   return (
-    <Card size="sm" className="bg-white border-none shadow-sm ring-slate-200">
+    <Card size="sm" className="bg-white dark:bg-slate-800 border-none shadow-sm ring-slate-200 dark:ring-slate-700">
       <CardContent className="flex items-center gap-3">
         <span className={`flex w-9 h-9 items-center justify-center rounded-lg ${tone}`}>
           <Icon className="w-4.5 h-4.5" />
         </span>
         <div>
-          <p className="text-xl font-bold text-slate-900">{value}</p>
-          <p className="text-xs text-slate-500">{label}</p>
+          <p className="text-xl font-bold text-slate-900 dark:text-slate-100">{value}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
         </div>
       </CardContent>
     </Card>
@@ -107,7 +107,7 @@ export default function InternalLinksPage() {
           placeholder="https://yoursite.com/sitemap.xml"
           value={sitemapUrl}
           onChange={(e) => setSitemapUrl(e.target.value)}
-          className="pl-12 pr-32 h-13 rounded-full border-slate-200 bg-white shadow-sm"
+          className="pl-12 pr-32 h-13 rounded-full border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm"
         />
         <Button
           type="submit"
@@ -127,7 +127,7 @@ export default function InternalLinksPage() {
       </form>
 
       {loading || crawling ? (
-        <div className="bg-white rounded-2xl ring-1 ring-slate-200 shadow-sm">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm">
           <AiLoading
             message={crawling ? "Crawling your sitemap…" : "Loading crawl data…"}
             size="lg"
@@ -135,11 +135,11 @@ export default function InternalLinksPage() {
           />
         </div>
       ) : !result ? (
-        <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-slate-200">
-          <div className="mx-auto w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-            <Link2 className="w-8 h-8 text-slate-300" />
+        <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
+          <div className="mx-auto w-16 h-16 bg-slate-50 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
+            <Link2 className="w-8 h-8 text-slate-300 dark:text-slate-500" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-900 mb-1">No crawl yet</h3>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">No crawl yet</h3>
           <p className="text-slate-500">
             Enter your sitemap URL above to map your internal link structure.
           </p>
@@ -175,27 +175,27 @@ export default function InternalLinksPage() {
 
           {result.suggestions.length > 0 && (
             <section>
-              <h2 className="font-bold text-slate-900 mb-4">Suggested link placements</h2>
+              <h2 className="font-bold text-slate-900 dark:text-slate-100 mb-4">Suggested link placements</h2>
               <div className="space-y-3">
                 {result.suggestions.map((s, i) => (
-                  <Card key={i} size="sm" className="bg-white border-none shadow-sm ring-slate-200">
+                  <Card key={i} size="sm" className="bg-white dark:bg-slate-800 border-none shadow-sm ring-slate-200 dark:ring-slate-700">
                     <CardContent>
-                      <div className="flex items-center gap-2 flex-wrap text-sm font-medium text-slate-800 mb-2">
-                        <span className="font-mono text-xs bg-slate-100 rounded px-2 py-1">
+                      <div className="flex items-center gap-2 flex-wrap text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
+                        <span className="font-mono text-xs bg-slate-100 dark:bg-slate-700 dark:text-slate-300 rounded px-2 py-1">
                           {pagePath(s.sourceUrl)}
                         </span>
                         <ArrowRight className="w-4 h-4 text-indigo-400 shrink-0" />
-                        <span className="font-mono text-xs bg-indigo-50 text-indigo-700 rounded px-2 py-1">
+                        <span className="font-mono text-xs bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 rounded px-2 py-1">
                           {pagePath(s.targetUrl)}
                         </span>
                       </div>
-                      <p className="text-sm text-slate-700 mb-1">
+                      <p className="text-sm text-slate-700 dark:text-slate-300 mb-1">
                         Anchor text:{" "}
-                        <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-100 font-medium">
+                        <Badge variant="secondary" className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800 font-medium">
                           {s.anchorText}
                         </Badge>
                       </p>
-                      <p className="text-sm text-slate-500">{s.reasoning}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{s.reasoning}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -205,9 +205,9 @@ export default function InternalLinksPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {result.orphanPages.length > 0 && (
-              <Card className="bg-white border-none shadow-sm ring-slate-200">
+              <Card className="bg-white dark:bg-slate-800 border-none shadow-sm ring-slate-200 dark:ring-slate-700">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-slate-900">
+                  <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
                     <Unlink className="w-4 h-4 text-rose-500" />
                     Orphan pages
                   </CardTitle>
@@ -218,7 +218,7 @@ export default function InternalLinksPage() {
                 <CardContent>
                   <ul className="space-y-1.5">
                     {result.orphanPages.map((url) => (
-                      <li key={url} className="text-sm font-mono text-slate-600 truncate">
+                      <li key={url} className="text-sm font-mono text-slate-600 dark:text-slate-300 truncate">
                         {pagePath(url)}
                       </li>
                     ))}
@@ -228,9 +228,9 @@ export default function InternalLinksPage() {
             )}
 
             {result.weakPages.length > 0 && (
-              <Card className="bg-white border-none shadow-sm ring-slate-200">
+              <Card className="bg-white dark:bg-slate-800 border-none shadow-sm ring-slate-200 dark:ring-slate-700">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-slate-900">
+                  <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
                     <AlertTriangle className="w-4 h-4 text-amber-500" />
                     Weakly linked pages
                   </CardTitle>
@@ -241,7 +241,7 @@ export default function InternalLinksPage() {
                 <CardContent>
                   <ul className="space-y-1.5">
                     {result.weakPages.map((url) => (
-                      <li key={url} className="text-sm font-mono text-slate-600 truncate">
+                      <li key={url} className="text-sm font-mono text-slate-600 dark:text-slate-300 truncate">
                         {pagePath(url)}
                       </li>
                     ))}
@@ -252,15 +252,15 @@ export default function InternalLinksPage() {
           </div>
 
           <section>
-            <h2 className="font-bold text-slate-900 mb-4">All crawled pages</h2>
-            <Card className="bg-white border-none shadow-sm ring-slate-200 py-0">
-              <div className="divide-y divide-slate-100">
+            <h2 className="font-bold text-slate-900 dark:text-slate-100 mb-4">All crawled pages</h2>
+            <Card className="bg-white dark:bg-slate-800 border-none shadow-sm ring-slate-200 dark:ring-slate-700 py-0">
+              <div className="divide-y divide-slate-100 dark:divide-slate-700">
                 {[...result.pages]
                   .sort((a, b) => a.inboundLinks - b.inboundLinks)
                   .map((page) => (
                     <div key={page.url} className="flex items-center gap-4 px-4 py-3">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-800 truncate">
+                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
                           {page.title || pagePath(page.url)}
                         </p>
                         <p className="text-xs text-slate-400 font-mono truncate">

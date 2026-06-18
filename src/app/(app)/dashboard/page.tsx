@@ -68,15 +68,15 @@ function StatCard({
   icon: typeof Eye;
 }) {
   return (
-    <Card size="sm" className="bg-white border-none shadow-sm ring-slate-200">
+    <Card size="sm" className="bg-white dark:bg-slate-800 border-none shadow-sm ring-slate-200 dark:ring-slate-700">
       <CardContent className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-slate-400">{label}</p>
-          <p className="text-2xl font-bold text-slate-900 mt-1">{value}</p>
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">{label}</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">{value}</p>
           {delta && <div className="mt-1">{delta}</div>}
         </div>
-        <span className="flex w-9 h-9 items-center justify-center rounded-lg bg-indigo-50">
-          <Icon className="w-4.5 h-4.5 text-indigo-600" />
+        <span className="flex w-9 h-9 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-900/20">
+          <Icon className="w-4.5 h-4.5 text-indigo-600 dark:text-indigo-400" />
         </span>
       </CardContent>
     </Card>
@@ -85,7 +85,7 @@ function StatCard({
 
 function MiniOpportunity({ opportunity }: { opportunity: Opportunity }) {
   return (
-    <div className="flex items-start gap-3 py-3 border-b border-slate-100 last:border-0">
+    <div className="flex items-start gap-3 py-3 border-b border-slate-100 dark:border-slate-700 last:border-0">
       <span
         className={cn(
           "mt-1.5 w-2 h-2 rounded-full shrink-0",
@@ -93,8 +93,8 @@ function MiniOpportunity({ opportunity }: { opportunity: Opportunity }) {
         )}
       />
       <div className="min-w-0">
-        <p className="text-sm font-medium text-slate-800 leading-snug">{opportunity.issue}</p>
-        <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">
+        <p className="text-sm font-medium text-slate-800 dark:text-slate-200 leading-snug">{opportunity.issue}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">
           {opportunity.recommendedAction}
         </p>
       </div>
@@ -270,7 +270,7 @@ export default function DashboardPage() {
           <DashboardUserChip />
         </div>
         {/* Big, visible AI loading animation in the main area */}
-        <div className="bg-white rounded-2xl ring-1 ring-slate-200 shadow-sm">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm">
           <AiLoading
             message="Analyzing your SEO data…"
             size="lg"
@@ -299,9 +299,9 @@ export default function DashboardPage() {
   );
 
   const errorBanner = connectError ? (
-    <div className="flex items-start gap-3 rounded-xl bg-rose-50 border border-rose-200 px-4 py-3 mb-6">
+    <div className="flex items-start gap-3 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 px-4 py-3 mb-6">
       <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-      <p className="text-sm text-rose-700 flex-1">{connectError}</p>
+      <p className="text-sm text-rose-700 dark:text-rose-400 flex-1">{connectError}</p>
       <button
         onClick={() => setConnectError(null)}
         className="text-rose-400 hover:text-rose-600"
@@ -349,7 +349,7 @@ export default function DashboardPage() {
             {data.fromCache && (
               <span
                 title="Loaded from saved analysis. Click Refresh to re-run."
-                className="hidden sm:flex items-center gap-1 text-xs text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-full px-2.5 py-1"
+                className="hidden sm:flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-full px-2.5 py-1"
               >
                 <DatabaseZap className="w-3 h-3" />
                 Cached
@@ -440,7 +440,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="bg-white border-none shadow-sm ring-slate-200">
+        <Card className="bg-white dark:bg-slate-800 border-none shadow-sm ring-slate-200 dark:ring-slate-700">
           <CardContent className="py-8 text-center text-slate-500 text-sm">
             No tasks yet — once data is imported, your daily plan appears here.
           </CardContent>
@@ -479,7 +479,7 @@ export default function DashboardPage() {
       {tasks.length > 1 && (
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="flex items-center gap-2 font-bold text-slate-900">
+            <h2 className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100">
               <ListChecks className="w-5 h-5 text-indigo-600" />
               Rest of today&apos;s plan
             </h2>
@@ -494,9 +494,9 @@ export default function DashboardPage() {
 
       {/* Opportunity sections */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-white border-none shadow-sm ring-slate-200">
+        <Card className="bg-white dark:bg-slate-800 border-none shadow-sm ring-slate-200 dark:ring-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-900">
+            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
               <TrendingDown className="w-4 h-4 text-rose-500" />
               Traffic Declines
             </CardTitle>
@@ -518,9 +518,9 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-none shadow-sm ring-slate-200">
+        <Card className="bg-white dark:bg-slate-800 border-none shadow-sm ring-slate-200 dark:ring-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-900">
+            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
               <Zap className="w-4 h-4 text-emerald-500" />
               Quick Wins
             </CardTitle>
@@ -542,24 +542,24 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-none shadow-sm ring-slate-200">
+        <Card className="bg-white dark:bg-slate-800 border-none shadow-sm ring-slate-200 dark:ring-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-900">
+            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
               <Link2 className="w-4 h-4 text-indigo-500" />
               Internal Link Opportunities
             </CardTitle>
           </CardHeader>
           <CardContent>
             {crawl ? (
-              <div className="space-y-2 text-sm text-slate-600">
+              <div className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
                 <p>
-                  <span className="font-semibold text-slate-900">{crawl.orphanPages.length}</span>{" "}
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">{crawl.orphanPages.length}</span>{" "}
                   orphan pages and{" "}
-                  <span className="font-semibold text-slate-900">{crawl.weakPages.length}</span>{" "}
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">{crawl.weakPages.length}</span>{" "}
                   weakly linked pages found across {crawl.pages.length} crawled pages.
                 </p>
                 <p>
-                  <span className="font-semibold text-slate-900">
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">
                     {crawl.suggestions.length}
                   </span>{" "}
                   link placements suggested.
@@ -580,15 +580,15 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-none shadow-sm ring-slate-200">
+        <Card className="bg-white dark:bg-slate-800 border-none shadow-sm ring-slate-200 dark:ring-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-900">
+            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
               <RefreshCw className="w-4 h-4 text-violet-500" />
               Content Refresh
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-slate-600 dark:text-slate-300">
               {declines.length > 0
                 ? `${declines.length} declining ${declines.length === 1 ? "page needs" : "pages need"} a refresh. Get AI-drafted titles, sections, and FAQs for any URL.`
                 : "Get AI-drafted titles, missing topics, new sections, and FAQs for any page on your site."}
