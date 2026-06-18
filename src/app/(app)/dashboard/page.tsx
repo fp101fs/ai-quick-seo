@@ -338,7 +338,7 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 font-[--font-inter]">
       {historyPanel}
       <PageHeader
         title="Dashboard"

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import {
   LayoutDashboard,
@@ -144,6 +145,10 @@ export function AppShell({
 }) {
   const pathname = usePathname();
   const { resolvedTheme, setTheme } = useTheme();
+  // ponytail: mounted guard prevents hydration mismatch — resolvedTheme is
+  // undefined on server/first render, causing different icon than client
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   const nav = (orientation: "vertical" | "horizontal") => (
     <nav
@@ -256,6 +261,7 @@ export function AppShell({
           ) : (
             <Link
               href="/api/auth/google"
+              prefetch={false}
               className="flex items-center justify-center gap-2 w-full rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 transition-colors"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -284,7 +290,7 @@ export function AppShell({
               title="Toggle dark mode"
               className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
             >
-              {resolvedTheme === "dark" ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+              {mounted && resolvedTheme === "dark" ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
             </button>
           </div>
         </div>
@@ -303,7 +309,7 @@ export function AppShell({
               title="Toggle dark mode"
               className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
             >
-              {resolvedTheme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {mounted && resolvedTheme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             {isSignedIn ? (
               <div className="flex items-center gap-2">
@@ -324,6 +330,7 @@ export function AppShell({
             ) : (
               <Link
                 href="/api/auth/google"
+                prefetch={false}
                 className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors"
               >
                 Sign in
