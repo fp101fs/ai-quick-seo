@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -34,14 +29,14 @@ export const metadata: Metadata = {
     description:
       "Connects to your Google Search Console and tells you exactly which SEO task to do today — ranked by traffic impact.",
     siteName: "SerpDo",
-    images: [{ url: "/serpdo-og-1200x630-chatgpt.png", width: 1200, height: 630 }],
+    images: [{ url: "/serpdo-og-1200x630-bnw.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "SerpDo — Your daily SEO action plan, powered by AI",
     description:
       "Connects to your Google Search Console and tells you exactly which SEO task to do today — ranked by traffic impact.",
-    images: ["/serpdo-og-1200x630-chatgpt.png"],
+    images: ["/serpdo-og-1200x630-bnw.png"],
   },
 };
 
@@ -53,7 +48,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} h-full antialiased font-[--font-inter]`}
     >
       <body className="min-h-full flex flex-col">
         {children}
