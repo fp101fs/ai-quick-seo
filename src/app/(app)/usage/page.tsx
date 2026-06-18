@@ -48,8 +48,8 @@ export default async function UsagePage() {
     // DB not migrated yet
   }
 
-  const capUsd = isPro ? 10 : FREE_CAP_USD;
-  const usedPct = capUsd > 0 ? Math.min((spentUsd / capUsd) * 100, 100) : 0;
+  const capUsd = isPro ? Infinity : FREE_CAP_USD;
+  const usedPct = capUsd > 0 && capUsd !== Infinity ? Math.min((spentUsd / capUsd) * 100, 100) : 0;
 
   function barColor(pct: number) {
     if (pct >= 95) return "bg-red-500";
@@ -110,7 +110,7 @@ export default async function UsagePage() {
             <span className="text-slate-900 font-semibold">
               ${spentUsd.toFixed(4)}
               <span className="text-slate-400 font-normal">
-                {" "}/ {isPro ? "$10.00" : `$${capUsd.toFixed(2)}`}
+                {" "}/ {isPro ? "Unlimited" : `$${capUsd.toFixed(2)}`}
               </span>
             </span>
           </div>
@@ -131,7 +131,7 @@ export default async function UsagePage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { label: "This month", value: `$${spentUsd.toFixed(4)}` },
-          { label: "Plan cap", value: isPro ? "$10.00" : "$0.10" },
+          { label: "Plan cap", value: isPro ? "Unlimited" : "$0.10" },
           { label: "Recent requests", value: recentUsage.length.toString() },
           {
             label: "Plan",

@@ -28,7 +28,7 @@ export default async function AppLayout({
       user = dbUser;
       spentUsd = spent;
       isPro = sub !== null;
-      capUsd = isPro ? 10 : db.FREE_CAP_USD;
+      capUsd = isPro ? Infinity : db.FREE_CAP_USD;
     } catch {
       // DB unavailable or not yet migrated — degrade gracefully
     }

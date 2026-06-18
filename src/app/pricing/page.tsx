@@ -148,6 +148,36 @@ export default function PricingPage() {
           </div>
         </div>
 
+        {/* FAQ */}
+        <div className="mt-16 max-w-2xl mx-auto">
+          <h2 className="text-xl font-bold text-slate-900 text-center mb-6">Quick answers</h2>
+          <div className="space-y-3">
+            {[
+              {
+                q: "Is my Google Search Console data safe?",
+                a: "Yes. SerpDo uses read-only OAuth — we can see your performance data but cannot make any changes to your site or property settings. Raw page content is never stored.",
+              },
+              {
+                q: "What AI model does this use?",
+                a: "SerpDo routes through OpenRouter to high-quality models (DeepSeek V4 Flash by default). Your data is used only to generate your suggestions and is never used to train AI models.",
+              },
+            ].map((faq) => (
+              <details
+                key={faq.q}
+                className="group bg-white rounded-2xl ring-1 ring-slate-200 overflow-hidden"
+              >
+                <summary className="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none font-semibold text-slate-800 text-sm hover:bg-slate-50 transition-colors">
+                  {faq.q}
+                  <span className="shrink-0 text-slate-400 group-open:rotate-45 transition-transform duration-200">
+                    +
+                  </span>
+                </summary>
+                <p className="px-5 pb-4 text-sm text-slate-500 leading-relaxed">{faq.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+
         <p className="text-center text-sm text-slate-400 mt-8">
           Questions?{" "}
           <a href="mailto:support@serpdo.com" className="text-indigo-600 hover:underline">

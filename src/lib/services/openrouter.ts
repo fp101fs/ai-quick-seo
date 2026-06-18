@@ -24,8 +24,12 @@ function getModel(): string {
 // These are rough estimates; OpenRouter sometimes returns usage.cost directly.
 const TOKEN_COSTS: Record<string, { prompt: number; completion: number }> = {
   "openrouter/free": { prompt: 0, completion: 0 },
+  "deepseek/deepseek-v4-flash": { prompt: 0.000_000_07, completion: 0.000_000_28 },
   "google/gemini-flash-1.5": { prompt: 0.000_000_075, completion: 0.000_000_3 },
+  "google/gemini-1.5-flash": { prompt: 0.000_000_075, completion: 0.000_000_3 },
+  "google/gemini-2.0-flash": { prompt: 0.000_000_1, completion: 0.000_000_4 },
   "anthropic/claude-3-haiku": { prompt: 0.000_000_25, completion: 0.000_001_25 },
+  "anthropic/claude-3-5-haiku": { prompt: 0.000_000_8, completion: 0.000_004 },
   "openai/gpt-4o-mini": { prompt: 0.000_000_15, completion: 0.000_000_6 },
 };
 

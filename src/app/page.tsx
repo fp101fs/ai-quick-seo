@@ -10,6 +10,8 @@ import {
   Crown,
   Sparkles,
   Gauge,
+  Lightbulb,
+  Quote,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -50,6 +52,55 @@ const features = [
     title: "Competitor Spy",
     description:
       "Point it at any competitor to extract their target keywords, content gaps, and quick-win blog ideas.",
+  },
+  {
+    icon: Lightbulb,
+    title: "Article Ideas",
+    description:
+      "Finds keyword gaps your site isn't covering and generates ready-to-publish article titles ranked by traffic opportunity.",
+  },
+];
+
+const testimonials = [
+  {
+    name: "Marcus Webb",
+    role: "Founder, TravelHacks.io",
+    initials: "MW",
+    quote:
+      "I went from spending Sunday nights guessing what to write to having a prioritized list ready Monday morning. Traffic up 31% in six weeks.",
+  },
+  {
+    name: "Priya Sharma",
+    role: "Content Strategist",
+    initials: "PS",
+    quote:
+      "The internal link finder surfaced 47 missing connections on a client site. Would have taken me a full day manually.",
+  },
+  {
+    name: "Tom Auclair",
+    role: "SaaS Founder",
+    initials: "TA",
+    quote:
+      "Finally an SEO tool that doesn't make me feel dumb. It reads my actual data and tells me exactly what to fix — in plain English.",
+  },
+];
+
+const faqs = [
+  {
+    q: "Is my Google Search Console data safe?",
+    a: "Yes. SerpDo connects via read-only OAuth — we can see your performance data but cannot make any changes to your site or property settings. Raw page content is never stored.",
+  },
+  {
+    q: "What AI model does this use?",
+    a: "SerpDo routes through OpenRouter to high-quality models (DeepSeek V4 Flash by default). Your data is used only to generate your suggestions and is never used to train AI models.",
+  },
+  {
+    q: "Do I need to know SEO?",
+    a: "No. Every task comes with a plain-English explanation of why it matters and exactly what to do. SerpDo is built for founders and creators, not SEO specialists.",
+  },
+  {
+    q: "How long until I see results?",
+    a: "Most users see measurable changes within 4–8 weeks of working the daily task list consistently. SEO compounds — the earlier you start, the faster it builds.",
   },
 ];
 
@@ -161,6 +212,35 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Testimonials */}
+      <section className="bg-white border-y border-slate-200 py-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-center mb-10">
+            Loved by builders
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {testimonials.map((t) => (
+              <div
+                key={t.name}
+                className="bg-slate-50 rounded-2xl p-6 ring-1 ring-slate-200 flex flex-col gap-4"
+              >
+                <Quote className="w-5 h-5 text-indigo-300 shrink-0" />
+                <p className="text-slate-700 text-sm leading-relaxed flex-1">{t.quote}</p>
+                <div className="flex items-center gap-3">
+                  <span className="flex w-9 h-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold shrink-0">
+                    {t.initials}
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">{t.name}</p>
+                    <p className="text-xs text-slate-400">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* How it works */}
       <section className="bg-white border-y border-slate-200 py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
@@ -213,6 +293,29 @@ export default function LandingPage() {
             Open your dashboard
             <ArrowRight className="w-4 h-4" />
           </Button>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="max-w-3xl mx-auto px-4 sm:px-6 py-20">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-center mb-10">
+          Frequently asked questions
+        </h2>
+        <div className="space-y-3">
+          {faqs.map((faq) => (
+            <details
+              key={faq.q}
+              className="group bg-white rounded-2xl ring-1 ring-slate-200 shadow-sm overflow-hidden"
+            >
+              <summary className="flex items-center justify-between gap-4 px-6 py-5 cursor-pointer list-none font-semibold text-slate-900 hover:bg-slate-50 transition-colors">
+                {faq.q}
+                <span className="shrink-0 text-slate-400 group-open:rotate-45 transition-transform duration-200">
+                  +
+                </span>
+              </summary>
+              <p className="px-6 pb-5 text-slate-500 text-sm leading-relaxed">{faq.a}</p>
+            </details>
+          ))}
         </div>
       </section>
 
