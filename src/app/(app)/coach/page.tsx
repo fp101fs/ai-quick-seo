@@ -80,7 +80,7 @@ export default function CoachPage() {
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)] lg:h-[calc(100vh-7rem)]">
       <PageHeader
-        title="AI SEO Coach"
+        title="SerpDo Coach"
         description="Ask anything about your site — answers use your live Search Console and crawl data."
       />
 

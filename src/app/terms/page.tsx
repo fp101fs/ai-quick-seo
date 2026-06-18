@@ -119,8 +119,8 @@ export default function TermsPage() {
             <h2 className="text-xl font-bold text-slate-900 mb-3">12. Contact</h2>
             <p>
               Questions:{" "}
-              <a href="mailto:support@ai-seo.app" className="text-indigo-600 hover:underline">
-                support@ai-seo.app
+              <a href="mailto:support@serpdo.com" className="text-indigo-600 hover:underline">
+                support@serpdo.com
               </a>
             </p>
           </section>

@@ -9,7 +9,7 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ai-quick-seo.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://serpdo.com";
 const GA_ID_RAW = process.env.NEXT_PUBLIC_GA_ID;
 // Validate GA4 format (G-XXXXXXXXXX) before injecting into script tag
 const GA_ID = GA_ID_RAW && /^G-[A-Z0-9]+$/.test(GA_ID_RAW) ? GA_ID_RAW : null;

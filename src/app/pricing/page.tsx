@@ -18,7 +18,7 @@ const proFeatures = [
   "Unlimited AI usage ($10/mo value)",
   "AI Content Refresh drafts",
   "Internal Link Finder (AI suggestions)",
-  "AI SEO Coach (unlimited chat)",
+  "AI Coach (unlimited chat)",
   "Competitor Spy analysis",
   "Priority support",
 ];
@@ -150,8 +150,8 @@ export default function PricingPage() {
 
         <p className="text-center text-sm text-slate-400 mt-8">
           Questions?{" "}
-          <a href="mailto:support@ai-seo.app" className="text-indigo-600 hover:underline">
-            support@ai-seo.app
+          <a href="mailto:support@serpdo.com" className="text-indigo-600 hover:underline">
+            support@serpdo.com
           </a>
         </p>
       </main>

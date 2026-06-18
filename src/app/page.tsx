@@ -41,7 +41,7 @@ const features = [
   },
   {
     icon: MessageSquare,
-    title: "AI SEO Coach",
+    title: "AI Coach",
     description:
       "Ask why traffic dropped or what to work on first. The coach answers with your actual pages, queries, and numbers.",
   },
@@ -97,17 +97,16 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto">
           <Badge className="mb-6 bg-indigo-100 text-indigo-700 hover:bg-indigo-100 border-none px-3 py-1">
             <Sparkles className="w-3 h-3" />
-            Your first AI hire
+            Powered by your real Search Console data
           </Badge>
           <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6">
-            What&apos;s the highest-impact SEO
-            <br className="hidden sm:block" /> action{" "}
-            <span className="text-indigo-600">to take today?</span>
+            Know exactly what to fix.
+            <br className="hidden sm:block" />{" "}
+            <span className="text-indigo-600">Every single day.</span>
           </h1>
-          <p className="text-lg text-slate-600 mb-10 max-w-2xl mx-auto">
-            SerpDo analyzes your Search Console data, crawls your site, and hands
-            you a prioritized daily plan — declining pages to rescue, page-2 keywords to
-            push, links to add, and content drafted for you.
+          <p className="text-lg text-slate-600 mb-10 max-w-xl mx-auto">
+            SerpDo reads your Google Search Console data and tells you the one SEO action
+            that will move the needle most — then helps you execute it.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button
@@ -117,21 +116,21 @@ export default function LandingPage() {
               nativeButton={false}
             >
               <Crown className="w-4 h-4" />
-              Get today&apos;s top task
+              See today&apos;s top task
             </Button>
             <Button
               size="lg"
               variant="outline"
               className="rounded-full px-8 h-12 text-base border-slate-200 bg-white"
-              render={<Link href="/dashboard" />}
+              render={<Link href="/api/auth/google" />}
               nativeButton={false}
             >
-              <MessageSquare className="w-4 h-4" />
-              Ask the AI coach
+              <ArrowRight className="w-4 h-4" />
+              Connect Search Console
             </Button>
           </div>
           <p className="text-sm text-slate-400 mt-6">
-            No credit card. Works with demo data before you connect anything.
+            Free to start. No credit card. Try it with demo data in seconds.
           </p>
         </div>
       </section>
@@ -140,11 +139,10 @@ export default function LandingPage() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
         <div className="text-center mb-12">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
-            Everything an SEO hire would do on day one
+            Six tools. One daily plan.
           </h2>
           <p className="text-slate-500 max-w-xl mx-auto">
-            No keyword databases, no enterprise pricing — just your real data turned into
-            specific, actionable work.
+            Your real Search Console data — turned into specific, ranked actions.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -179,7 +177,7 @@ export default function LandingPage() {
               {
                 step: "2",
                 title: "Analyze",
-                description: "Your employee imports performance data, crawls your sitemap, and detects opportunities.",
+                description: "SerpDo imports your performance data, crawls your sitemap, and surfaces what's hurting your traffic.",
               },
               {
                 step: "3",
@@ -204,7 +202,7 @@ export default function LandingPage() {
         <div className="max-w-2xl mx-auto">
           <Gauge className="w-10 h-10 text-indigo-600 mx-auto mb-5" />
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-4">
-            Stop guessing. Start with the highest-impact task.
+            Stop guessing. Start executing.
           </h2>
           <Button
             size="lg"

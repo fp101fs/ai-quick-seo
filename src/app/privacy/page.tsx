@@ -80,8 +80,8 @@ export default function PrivacyPage() {
               Your account data is retained as long as your account is active. AI usage records
               are retained for 12 months. You may request deletion of your account and all
               associated data by emailing{" "}
-              <a href="mailto:support@ai-seo.app" className="text-indigo-600 hover:underline">
-                support@ai-seo.app
+              <a href="mailto:support@serpdo.com" className="text-indigo-600 hover:underline">
+                support@serpdo.com
               </a>
               .
             </p>
@@ -129,8 +129,8 @@ export default function PrivacyPage() {
                 Google account permissions
               </a>
               . To delete your SerpDo account and data, email{" "}
-              <a href="mailto:support@ai-seo.app" className="text-indigo-600 hover:underline">
-                support@ai-seo.app
+              <a href="mailto:support@serpdo.com" className="text-indigo-600 hover:underline">
+                support@serpdo.com
               </a>
               .
             </p>
@@ -149,8 +149,8 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-bold text-slate-900 mb-3">10. Contact</h2>
             <p>
               Questions or requests:{" "}
-              <a href="mailto:support@ai-seo.app" className="text-indigo-600 hover:underline">
-                support@ai-seo.app
+              <a href="mailto:support@serpdo.com" className="text-indigo-600 hover:underline">
+                support@serpdo.com
               </a>
             </p>
           </section>
