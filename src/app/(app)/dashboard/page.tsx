@@ -166,7 +166,7 @@ function HistoryPanel({
                   key={item.id}
                   className={cn(
                     "rounded-lg px-3 py-2.5 mb-1",
-                    isCurrent ? "bg-indigo-50 dark:bg-indigo-900/30" : "hover:bg-slate-50 dark:hover:bg-slate-700/50"
+                    isCurrent ? "bg-indigo-50 dark:bg-white/10" : "hover:bg-slate-50 dark:hover:bg-slate-700/50"
                   )}
                 >
                   <div className="flex items-center justify-between gap-2 mb-0.5">
@@ -174,7 +174,7 @@ function HistoryPanel({
                       {cleanProperty(item.property)}
                     </p>
                     {isCurrent && (
-                      <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 shrink-0">current</span>
+                      <span className="text-[10px] font-bold text-indigo-600 dark:text-slate-300 shrink-0">current</span>
                     )}
                   </div>
                   <p className="text-[11px] text-slate-400 dark:text-slate-500 mb-1">
