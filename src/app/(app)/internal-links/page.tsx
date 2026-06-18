@@ -18,7 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { AiLoading } from "@/components/ai-loading";
-import { getLastCrawl, runCrawl } from "@/app/actions/seo";
+import { getLastCrawl, runCrawl, getPropertyBaseUrl } from "@/app/actions/seo";
 import type { CrawlResult } from "@/lib/types";
 
 const pagePath = (url: string) => {
@@ -63,11 +63,13 @@ export default function InternalLinksPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getLastCrawl()
-      .then((crawl) => {
+    Promise.all([getLastCrawl(), getPropertyBaseUrl()])
+      .then(([crawl, baseUrl]) => {
         if (crawl) {
           setResult(crawl);
           setSitemapUrl(crawl.sitemapUrl);
+        } else if (baseUrl) {
+          setSitemapUrl(`${baseUrl}/sitemap.xml`);
         }
       })
       .catch(() => null)

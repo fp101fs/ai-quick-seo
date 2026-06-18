@@ -69,6 +69,16 @@ export async function runMigrations() {
     CREATE INDEX IF NOT EXISTS dashboard_analyses_user_property_idx
     ON dashboard_analyses (user_id, property, created_at DESC)
   `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS article_ideas (
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      property TEXT NOT NULL,
+      result JSONB NOT NULL,
+      generated_at TIMESTAMPTZ DEFAULT NOW(),
+      PRIMARY KEY (user_id, property)
+    )
+  `;
 }
 
 // ---------- Users ----------
@@ -278,5 +288,35 @@ export async function getAnalysisHistory(userId: number): Promise<AnalysisSummar
     return result.rows;
   } catch {
     return [];
+  }
+}
+
+// ---------- Article Ideas ----------
+
+export async function saveArticleIdeas(
+  userId: number,
+  property: string,
+  result: unknown
+): Promise<void> {
+  await sql`
+    INSERT INTO article_ideas (user_id, property, result, generated_at)
+    VALUES (${userId}, ${property}, ${JSON.stringify(result)}, NOW())
+    ON CONFLICT (user_id, property) DO UPDATE
+    SET result = EXCLUDED.result, generated_at = NOW()
+  `;
+}
+
+export async function getLatestArticleIdeas(
+  userId: number,
+  property: string
+): Promise<unknown | null> {
+  try {
+    const r = await sql`
+      SELECT result FROM article_ideas
+      WHERE user_id = ${userId} AND property = ${property}
+    `;
+    return r.rows[0]?.result ?? null;
+  } catch {
+    return null;
   }
 }

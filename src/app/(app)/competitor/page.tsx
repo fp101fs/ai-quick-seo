@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+
 import {
   Search,
   Download,
@@ -9,6 +10,7 @@ import {
   TrendingUp,
   BookOpen,
   AlertCircle,
+  Wand2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { AiLoading } from "@/components/ai-loading";
-import { analyzeCompetitor } from "@/app/actions/analyze";
+import { analyzeCompetitor, suggestCompetitors } from "@/app/actions/analyze";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
@@ -35,7 +37,22 @@ export default function CompetitorPage() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<CompetitorReport | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggesting, setSuggesting] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
+
+  const handleSuggest = async () => {
+    setSuggesting(true);
+    try {
+      const results = await suggestCompetitors();
+      setSuggestions(results);
+      if (!results.length) toast.info("No suggestions found — try entering a competitor manually.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not suggest competitors");
+    } finally {
+      setSuggesting(false);
+    }
+  };
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,6 +129,38 @@ export default function CompetitorPage() {
           )}
         </Button>
       </form>
+
+      {/* Suggest competitors */}
+      {!report && !loading && (
+        <div className="mb-8 space-y-3">
+          <Button
+            variant="outline"
+            onClick={handleSuggest}
+            disabled={suggesting}
+            className="border-slate-200 dark:border-slate-700"
+          >
+            {suggesting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Wand2 className="w-4 h-4" />
+            )}
+            Suggest competitors from my niche
+          </Button>
+          {suggestions.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {suggestions.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setUrl(s)}
+                  className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-1.5 text-sm text-slate-600 dark:text-slate-300 hover:border-indigo-400 dark:hover:border-indigo-600 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors font-mono"
+                >
+                  {s.replace(/^https?:\/\//, "")}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {loading && (
         <div className="bg-white dark:bg-slate-800 rounded-2xl ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm">

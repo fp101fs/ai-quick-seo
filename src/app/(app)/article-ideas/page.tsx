@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Lightbulb,
   Sparkles,
@@ -18,7 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { InfoTooltip } from "@/components/info-tooltip";
-import { generateArticleIdeas } from "@/app/actions/article-ideas";
+import { generateArticleIdeas, loadArticleIdeas } from "@/app/actions/article-ideas";
 import type { ArticleIdea, ArticleIdeasResult } from "@/lib/types";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -86,8 +86,16 @@ function IdeaRow({ idea, index }: { idea: ArticleIdea; index: number }) {
 export default function ArticleIdeasPage() {
   const [result, setResult] = useState<ArticleIdeasResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
   const [copied, setCopied] = useState(false);
   const [blockedByPlan, setBlockedByPlan] = useState(false);
+
+  useEffect(() => {
+    loadArticleIdeas()
+      .then((saved) => { if (saved) setResult(saved); })
+      .catch(() => {})
+      .finally(() => setChecking(false));
+  }, []);
 
   const generate = async () => {
     setLoading(true);
@@ -140,7 +148,7 @@ export default function ArticleIdeasPage() {
       />
 
       {/* Explainer */}
-      {!result && !loading && !blockedByPlan && (
+      {!result && !loading && !checking && !blockedByPlan && (
         <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-6 mb-8 flex gap-4">
           <div className="flex-none w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
             <Lightbulb className="w-5 h-5 text-indigo-600" />
@@ -179,8 +187,16 @@ export default function ArticleIdeasPage() {
         </div>
       )}
 
+      {/* Initial DB check skeleton */}
+      {checking && !result && (
+        <div className="flex items-center justify-center py-16 text-slate-400 text-sm gap-2">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Loading…
+        </div>
+      )}
+
       {/* Generate button */}
-      {!result && !loading && !blockedByPlan && (
+      {!result && !loading && !checking && !blockedByPlan && (
         <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
           <div className="mx-auto w-16 h-16 bg-indigo-50 dark:bg-indigo-900/20 rounded-full flex items-center justify-center mb-4">
             <Sparkles className="w-8 h-8 text-indigo-400 dark:text-indigo-500" />

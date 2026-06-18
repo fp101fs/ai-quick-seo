@@ -6,8 +6,16 @@ import { jsonCompletion } from "@/lib/services/openrouter";
 import { buildArticleIdeasPrompt } from "@/lib/prompts/article-ideas";
 import { getDemoSnapshot } from "@/lib/demo-data";
 import type { ArticleIdeasResult } from "@/lib/types";
-import { getCachedSnapshot } from "@/lib/db";
+import { getCachedSnapshot, saveArticleIdeas, getLatestArticleIdeas } from "@/lib/db";
 import type { GscSnapshot } from "@/lib/types";
+
+export async function loadArticleIdeas(): Promise<ArticleIdeasResult | null> {
+  const [userId, status] = await Promise.all([getUserId(), getConnectionStatus()]);
+  if (!userId || (!status.demo && !status.property)) return null;
+  const property = status.demo ? "demo" : status.property!;
+  const saved = await getLatestArticleIdeas(userId, property);
+  return saved ? (saved as ArticleIdeasResult) : null;
+}
 
 export async function generateArticleIdeas(): Promise<ArticleIdeasResult> {
   const [status, usage] = await Promise.all([
@@ -47,7 +55,7 @@ export async function generateArticleIdeas(): Promise<ArticleIdeasResult> {
     { userId: userId ?? undefined, feature: "article-ideas" }
   );
 
-  return {
+  const final: ArticleIdeasResult = {
     ...result,
     ideas: (result.ideas ?? []).slice(0, 15).map((idea, i) => ({
       ...idea,
@@ -58,4 +66,9 @@ export async function generateArticleIdeas(): Promise<ArticleIdeasResult> {
     generatedAt: Date.now(),
     demo: isDemo,
   };
+
+  const property = isDemo ? "demo" : status.property!;
+  if (userId) saveArticleIdeas(userId, property, final).catch(() => {});
+
+  return final;
 }

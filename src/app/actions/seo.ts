@@ -193,3 +193,17 @@ export async function refreshContent(url: string): Promise<ContentRefreshResult>
   const snapshot = await getCurrentSnapshot().catch(() => null);
   return analyzeContentRefresh(target, snapshot);
 }
+
+export async function getSuggestedRefreshPages(): Promise<string[]> {
+  const userId = await getUserId();
+  const status = await getConnectionStatus();
+  if (!userId || (!status.demo && !status.property)) return [];
+  const { getLatestAnalysis } = await import("@/lib/db");
+  const cached = await getLatestAnalysis(userId, status.property ?? "demo");
+  if (!cached) return [];
+  const opps = (cached.opportunities as Opportunity[] | null) ?? [];
+  return opps
+    .filter((o) => (o.type === "declining-clicks" || o.type === "low-ctr") && o.page)
+    .slice(0, 5)
+    .map((o) => o.page!);
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+
 import { useSearchParams } from "next/navigation";
 import {
   RefreshCw,
@@ -22,7 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { AiLoading } from "@/components/ai-loading";
-import { refreshContent, getPropertyBaseUrl } from "@/app/actions/seo";
+import { refreshContent, getPropertyBaseUrl, getSuggestedRefreshPages } from "@/app/actions/seo";
 import type { ContentRefreshResult } from "@/lib/types";
 
 function CopyButton({ text }: { text: string }) {
@@ -119,12 +120,14 @@ export default function ContentRefreshPage() {
   const prefill = useSearchParams().get("url");
   const [url, setUrl] = useState(prefill ?? "");
   const [baseUrl, setBaseUrl] = useState<string | null>(null);
+  const [suggestedPages, setSuggestedPages] = useState<string[]>([]);
   const [result, setResult] = useState<ContentRefreshResult | null>(null);
   const [loading, setLoading] = useState(Boolean(prefill));
   const ranPrefill = useRef(false);
 
   useEffect(() => {
     getPropertyBaseUrl().then(setBaseUrl).catch(() => {});
+    getSuggestedRefreshPages().then(setSuggestedPages).catch(() => {});
   }, []);
 
   const doRefresh = useCallback(
@@ -201,8 +204,30 @@ export default function ContentRefreshPage() {
         )}
       </form>
 
+      {!result && !loading && suggestedPages.length > 0 && (
+        <div className="mb-8">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+            Suggested pages to refresh
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {suggestedPages.map((page) => {
+              const label = (() => { try { return new URL(page).pathname; } catch { return page; } })();
+              return (
+                <button
+                  key={page}
+                  onClick={() => { setUrl(page); setLoading(true); setResult(null); doRefresh(page); }}
+                  className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-1.5 text-sm text-slate-600 dark:text-slate-300 hover:border-indigo-400 dark:hover:border-indigo-600 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors font-mono"
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {loading && (
-        <div className="bg-white rounded-2xl ring-1 ring-slate-200 shadow-sm">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm">
           <AiLoading message="Drafting content improvements…" size="lg" className="py-20" />
         </div>
       )}

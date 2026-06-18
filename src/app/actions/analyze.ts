@@ -1,6 +1,58 @@
 "use server";
 
 import { getUsageStatus } from "@/lib/services/usage";
+import { getConnectionStatus, getUserId } from "@/lib/services/session";
+import { jsonCompletion } from "@/lib/services/openrouter";
+
+export async function suggestCompetitors(): Promise<string[]> {
+  const [status, userId] = await Promise.all([getConnectionStatus(), getUserId()]);
+  const { getCachedSnapshot, getLatestAnalysis } = await import("@/lib/db");
+
+  let niche = "";
+  let topQueries: string[] = [];
+
+  if (status.demo || status.property) {
+    const property = status.demo ? "demo" : status.property!;
+    const [snap, analysis] = await Promise.all([
+      getCachedSnapshot(property).catch(() => null),
+      userId ? getLatestAnalysis(userId, property).catch(() => null) : null,
+    ]);
+    if (snap) {
+      // ponytail: grab top 10 queries by clicks for niche context
+      topQueries = (snap as { pages?: Array<{ queries?: Array<{ query: string; clicks: number }> }> })
+        .pages?.flatMap((p) => p.queries ?? [])
+        .sort((a, b) => b.clicks - a.clicks)
+        .slice(0, 10)
+        .map((q) => q.query) ?? [];
+    }
+    if (analysis) {
+      const tasks = analysis.tasks as Array<{ title: string }> | null;
+      niche = tasks?.[0]?.title ?? "";
+    }
+  }
+
+  if (!topQueries.length && !niche) {
+    throw new Error("Connect Google Search Console first to get competitor suggestions.");
+  }
+
+  const result = await jsonCompletion<{ competitors: string[] }>(
+    [
+      {
+        role: "user",
+        content: `You are an SEO expert. Based on this site's top search queries and niche context, suggest 5 real competitor websites to analyze.
+
+Top queries: ${topQueries.join(", ")}
+Niche context: ${niche}
+
+Return ONLY a JSON object: {"competitors": ["https://example.com", ...]}
+Return real, specific competitor domains — not generic examples. Return full URLs with https://.`,
+      },
+    ],
+    { userId: userId ?? undefined, feature: "competitor-suggest" }
+  );
+
+  return (result.competitors ?? []).slice(0, 5);
+}
 
 export async function analyzeCompetitor(url: string) {
   if (!url) throw new Error("URL is required");
