@@ -27,27 +27,30 @@ export async function suggestCompetitors(): Promise<string[]> {
   }
 
   const searchQuery = topQueries.join(" ");
-  const jinaUrl = `https://r.jina.ai/https://duckduckgo.com/?q=${encodeURIComponent(searchQuery)}`;
 
-  const jinaRes = await fetch(jinaUrl, {
-    headers: { "X-Return-Format": "markdown" },
-    signal: AbortSignal.timeout(20000),
-  });
-  if (!jinaRes.ok) throw new Error("Could not fetch search results. Try again.");
-  const markdown = await jinaRes.text();
+  // ponytail: html.duckduckgo.com/html is server-rendered; duckduckgo.com needs JS
+  let markdown = "";
+  try {
+    const jinaUrl = `https://r.jina.ai/https://html.duckduckgo.com/html/?q=${encodeURIComponent(searchQuery)}`;
+    const jinaRes = await fetch(jinaUrl, { headers: { "X-Return-Format": "markdown" } });
+    if (jinaRes.ok) markdown = await jinaRes.text();
+  } catch {
+    // Jina unavailable — fall through to AI-only
+  }
 
-  const result = await jsonCompletion<{ competitors: string[] }>(
-    [
-      {
-        role: "user",
-        content: `Extract 5 real competitor website URLs from these DuckDuckGo search results. Return only external domains (not duckduckgo.com itself). Return full URLs with https://.
+  const prompt = markdown.length > 200
+    ? `Extract 5 real competitor website URLs from these search results. Exclude duckduckgo.com. Return full https:// URLs.
 
 Search results:
 ${markdown.slice(0, 8000)}
 
-Return ONLY a JSON object: {"competitors": ["https://example.com", ...]}`,
-      },
-    ],
+Return ONLY: {"competitors": ["https://example.com", ...]}`
+    : `Suggest 5 real competitor websites for a site whose top search queries are: ${topQueries.join(", ")}
+
+Return ONLY: {"competitors": ["https://example.com", ...]}`;
+
+  const result = await jsonCompletion<{ competitors: string[] }>(
+    [{ role: "user", content: prompt }],
     { userId: userId ?? undefined, feature: "competitor-suggest" }
   );
 
