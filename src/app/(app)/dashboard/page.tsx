@@ -134,11 +134,11 @@ function HistoryPanel({
           onClick={onClose}
         />
       )}
-      {/* Drawer */}
+      {/* Drawer — anchored at left-0; on desktop open state shifts right past sidebar */}
       <div
         className={cn(
-          "fixed top-0 bottom-0 left-0 lg:left-64 z-40 w-80 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col",
-          open ? "translate-x-0" : "-translate-x-full"
+          "fixed top-0 bottom-0 left-0 z-40 w-80 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col",
+          open ? "translate-x-0 lg:translate-x-64" : "-translate-x-full pointer-events-none"
         )}
       >
         <div className="flex items-center justify-between px-4 h-14 border-b border-slate-100 dark:border-slate-700 shrink-0">
