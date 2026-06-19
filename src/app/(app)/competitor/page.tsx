@@ -44,10 +44,12 @@ export default function CompetitorPage() {
   const handleSuggest = async () => {
     setSuggesting(true);
     try {
-      const results = await suggestCompetitors();
-      setSuggestions(results);
-      if (!results.length) toast.info("No suggestions found — try entering a competitor manually.");
+      const { competitors, debug } = await suggestCompetitors();
+      console.log("[suggest-competitors]", debug);
+      setSuggestions(competitors);
+      if (!competitors.length) toast.info("No suggestions found — try entering a competitor manually.");
     } catch (err) {
+      console.error("[suggest-competitors] client error", err);
       toast.error(err instanceof Error ? err.message : "Could not suggest competitors");
     } finally {
       setSuggesting(false);

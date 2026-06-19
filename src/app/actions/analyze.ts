@@ -4,7 +4,13 @@ import { getUsageStatus } from "@/lib/services/usage";
 import { getConnectionStatus, getUserId } from "@/lib/services/session";
 import { jsonCompletion } from "@/lib/services/openrouter";
 
-export async function suggestCompetitors(): Promise<string[]> {
+interface SuggestResult {
+  competitors: string[];
+  debug: { gsc: boolean; queries: string[]; jinaOk: boolean; jinaLen: number; aiOk: boolean; error?: string };
+}
+
+export async function suggestCompetitors(): Promise<SuggestResult> {
+  const debug: SuggestResult["debug"] = { gsc: false, queries: [], jinaOk: false, jinaLen: 0, aiOk: false };
   try {
     const [status, userId] = await Promise.all([getConnectionStatus(), getUserId()]);
     const { getCachedSnapshot } = await import("@/lib/db");
@@ -23,7 +29,10 @@ export async function suggestCompetitors(): Promise<string[]> {
       }
     }
 
-    if (!topQueries.length) return [];
+    debug.gsc = topQueries.length > 0;
+    debug.queries = topQueries;
+
+    if (!topQueries.length) return { competitors: [], debug };
 
     const searchQuery = topQueries.join(" ");
 
@@ -32,9 +41,13 @@ export async function suggestCompetitors(): Promise<string[]> {
     try {
       const jinaUrl = `https://r.jina.ai/https://html.duckduckgo.com/html/?q=${encodeURIComponent(searchQuery)}`;
       const jinaRes = await fetch(jinaUrl, { headers: { "X-Return-Format": "markdown" } });
-      if (jinaRes.ok) markdown = await jinaRes.text();
-    } catch {
-      // Jina unavailable — fall through to AI-only
+      if (jinaRes.ok) {
+        markdown = await jinaRes.text();
+        debug.jinaOk = true;
+        debug.jinaLen = markdown.length;
+      }
+    } catch (e) {
+      debug.error = `jina: ${e instanceof Error ? e.message : String(e)}`;
     }
 
     const prompt = markdown.length > 200
@@ -53,9 +66,11 @@ Return ONLY: {"competitors": ["https://example.com", ...]}`;
       { userId: userId ?? undefined, feature: "competitor-suggest" }
     );
 
-    return (result.competitors ?? []).slice(0, 5);
-  } catch {
-    return [];
+    debug.aiOk = true;
+    return { competitors: (result.competitors ?? []).slice(0, 5), debug };
+  } catch (e) {
+    debug.error = `outer: ${e instanceof Error ? e.message : String(e)}`;
+    return { competitors: [], debug };
   }
 }
 
