@@ -79,6 +79,91 @@ export async function runMigrations() {
       PRIMARY KEY (user_id, property)
     )
   `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS tracked_keywords (
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      keyword TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      PRIMARY KEY (user_id, keyword)
+    )
+  `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS keyword_positions (
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      keyword TEXT NOT NULL,
+      date DATE NOT NULL DEFAULT CURRENT_DATE,
+      position NUMERIC(5,1),
+      PRIMARY KEY (user_id, keyword, date)
+    )
+  `;
+}
+
+// ---------- Rank Tracking ----------
+
+export async function getTrackedKeywords(userId: number): Promise<string[]> {
+  try {
+    const r = await sql<{ keyword: string }>`
+      SELECT keyword FROM tracked_keywords WHERE user_id = ${userId} ORDER BY created_at DESC
+    `;
+    return r.rows.map((row) => row.keyword);
+  } catch { return []; }
+}
+
+export async function addTrackedKeyword(userId: number, keyword: string): Promise<void> {
+  await sql`
+    INSERT INTO tracked_keywords (user_id, keyword) VALUES (${userId}, ${keyword})
+    ON CONFLICT DO NOTHING
+  `;
+}
+
+export async function removeTrackedKeyword(userId: number, keyword: string): Promise<void> {
+  await sql`DELETE FROM tracked_keywords WHERE user_id = ${userId} AND keyword = ${keyword}`;
+}
+
+export async function upsertKeywordPosition(
+  userId: number, keyword: string, date: string, position: number | null
+): Promise<void> {
+  await sql`
+    INSERT INTO keyword_positions (user_id, keyword, date, position)
+    VALUES (${userId}, ${keyword}, ${date}, ${position})
+    ON CONFLICT (user_id, keyword, date) DO NOTHING
+  `;
+}
+
+export async function getKeywordsWithLatestPositions(userId: number): Promise<
+  { keyword: string; today: number | null; yesterday: number | null }[]
+> {
+  try {
+    const r = await sql<{ keyword: string; today: number | null; yesterday: number | null }>`
+      SELECT
+        tk.keyword,
+        t.position::float AS today,
+        y.position::float AS yesterday
+      FROM tracked_keywords tk
+      LEFT JOIN keyword_positions t
+        ON t.user_id = tk.user_id AND t.keyword = tk.keyword AND t.date = CURRENT_DATE
+      LEFT JOIN keyword_positions y
+        ON y.user_id = tk.user_id AND y.keyword = tk.keyword AND y.date = CURRENT_DATE - INTERVAL '1 day'
+      WHERE tk.user_id = ${userId}
+      ORDER BY tk.created_at DESC
+    `;
+    return r.rows;
+  } catch { return []; }
+}
+
+export async function getKeywordHistory(
+  userId: number, keyword: string
+): Promise<{ date: string; position: number | null }[]> {
+  try {
+    const r = await sql<{ date: string; position: number | null }>`
+      SELECT date::text, position::float FROM keyword_positions
+      WHERE user_id = ${userId} AND keyword = ${keyword}
+      ORDER BY date ASC LIMIT 90
+    `;
+    return r.rows;
+  } catch { return []; }
 }
 
 // ---------- Users ----------

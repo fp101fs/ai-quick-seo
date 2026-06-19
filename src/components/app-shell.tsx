@@ -20,6 +20,8 @@ import {
   Lightbulb,
   Sun,
   Moon,
+  Hash,
+  Activity,
 } from "lucide-react";
 import { InfoTooltip } from "@/components/info-tooltip";
 import { cn } from "@/lib/utils";
@@ -70,6 +72,18 @@ const navItems = [
     label: "Competitor Spy",
     icon: Search,
     tooltip: "Enter a competitor URL to extract their target keywords, content gaps, and blog ideas.",
+  },
+  {
+    href: "/keywords",
+    label: "Keywords",
+    icon: Hash,
+    tooltip: "Top queries from Google Search Console with clicks, impressions, CTR, and average position.",
+  },
+  {
+    href: "/rank-tracking",
+    label: "Rank Tracking",
+    icon: Activity,
+    tooltip: "Track keyword positions over time using your GSC data. Click any keyword to see its trend.",
   },
 ];
 

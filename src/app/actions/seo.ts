@@ -22,6 +22,41 @@ import { cacheDelete } from "@/lib/services/store";
 import { getConnectionStatus, getSelectedProperty, getUserId, isDemoMode } from "@/lib/services/session";
 import { generateDailyTasks } from "@/lib/services/tasks";
 
+export interface GscQueryRow {
+  query: string;
+  clicks: number;
+  impressions: number;
+  ctr: number;
+  position: number;
+}
+
+export async function getGscQueries(): Promise<GscQueryRow[]> {
+  try {
+    const snap = await getCurrentSnapshot();
+    if (!snap?.queries?.length) return [];
+    // Aggregate: same query appears per-page, merge by summing clicks/impressions, weighted-avg position
+    const map = new Map<string, { clicks: number; impressions: number; posSum: number }>();
+    for (const q of snap.queries) {
+      const k = q.query.toLowerCase();
+      const e = map.get(k) ?? { clicks: 0, impressions: 0, posSum: 0 };
+      e.clicks += q.clicks;
+      e.impressions += q.impressions;
+      e.posSum += q.position * q.impressions; // impression-weighted
+      map.set(k, e);
+    }
+    return Array.from(map.entries())
+      .map(([query, e]) => ({
+        query,
+        clicks: e.clicks,
+        impressions: e.impressions,
+        ctr: e.impressions > 0 ? e.clicks / e.impressions : 0,
+        position: e.impressions > 0 ? e.posSum / e.impressions : 0,
+      }))
+      .sort((a, b) => b.clicks - a.clicks)
+      .slice(0, 100);
+  } catch { return []; }
+}
+
 export interface DashboardData {
   status: ConnectionStatus;
   snapshot: GscSnapshot | null;
