@@ -113,6 +113,23 @@ export async function getTrackedKeywords(userId: number): Promise<string[]> {
 
 export async function addTrackedKeyword(userId: number, keyword: string): Promise<void> {
   await sql`
+    CREATE TABLE IF NOT EXISTS tracked_keywords (
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      keyword TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      PRIMARY KEY (user_id, keyword)
+    )
+  `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS keyword_positions (
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      keyword TEXT NOT NULL,
+      date DATE NOT NULL DEFAULT CURRENT_DATE,
+      position NUMERIC(5,1),
+      PRIMARY KEY (user_id, keyword, date)
+    )
+  `;
+  await sql`
     INSERT INTO tracked_keywords (user_id, keyword) VALUES (${userId}, ${keyword})
     ON CONFLICT DO NOTHING
   `;
