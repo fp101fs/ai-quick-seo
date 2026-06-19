@@ -34,9 +34,8 @@ export async function suggestCompetitors(): Promise<SuggestResult> {
       const snap = await getCurrentSnapshot().catch((e) => { debug.error = `snap: ${e?.message}`; return null; });
       debug.snapOk = !!snap;
       if (snap) {
-        topQueries = (snap as { pages?: Array<{ queries?: Array<{ query: string; clicks: number }> }> })
-          .pages?.flatMap((p) => p.queries ?? [])
-          .sort((a, b) => b.clicks - a.clicks)
+        topQueries = (snap as { queries?: Array<{ query: string; clicks: number }> })
+          .queries?.slice().sort((a, b) => b.clicks - a.clicks)
           .slice(0, 5)
           .map((q) => q.query) ?? [];
       }
