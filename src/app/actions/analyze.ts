@@ -6,13 +6,24 @@ import { jsonCompletion } from "@/lib/services/openrouter";
 
 interface SuggestResult {
   competitors: string[];
-  debug: { gsc: boolean; queries: string[]; jinaOk: boolean; jinaStatus?: number; jinaLen: number; aiOk: boolean; error?: string };
+  debug: {
+    demo: boolean; property: string | null | undefined; userId: number | null;
+    snapOk: boolean; gsc: boolean; queries: string[];
+    jinaOk: boolean; jinaStatus?: number; jinaLen: number; aiOk: boolean; error?: string;
+  };
 }
 
 export async function suggestCompetitors(): Promise<SuggestResult> {
-  const debug: SuggestResult["debug"] = { gsc: false, queries: [], jinaOk: false, jinaLen: 0, aiOk: false };
+  const debug: SuggestResult["debug"] = {
+    demo: false, property: null, userId: null,
+    snapOk: false, gsc: false, queries: [],
+    jinaOk: false, jinaLen: 0, aiOk: false,
+  };
   try {
     const [status, userId] = await Promise.all([getConnectionStatus(), getUserId()]);
+    debug.demo = status.demo ?? false;
+    debug.property = status.property;
+    debug.userId = userId;
 
     let topQueries: string[] = [];
 
@@ -20,7 +31,8 @@ export async function suggestCompetitors(): Promise<SuggestResult> {
       // ponytail: getCurrentSnapshot handles demo + live GSC fetch + DB cache;
       // getCachedSnapshot only reads DB with 30min TTL — expires between dashboard visits
       const { getCurrentSnapshot } = await import("@/lib/services/context");
-      const snap = await getCurrentSnapshot().catch(() => null);
+      const snap = await getCurrentSnapshot().catch((e) => { debug.error = `snap: ${e?.message}`; return null; });
+      debug.snapOk = !!snap;
       if (snap) {
         topQueries = (snap as { pages?: Array<{ queries?: Array<{ query: string; clicks: number }> }> })
           .pages?.flatMap((p) => p.queries ?? [])
