@@ -6,20 +6,21 @@ import { jsonCompletion } from "@/lib/services/openrouter";
 
 interface SuggestResult {
   competitors: string[];
-  debug: { gsc: boolean; queries: string[]; jinaOk: boolean; jinaLen: number; aiOk: boolean; error?: string };
+  debug: { gsc: boolean; queries: string[]; jinaOk: boolean; jinaStatus?: number; jinaLen: number; aiOk: boolean; error?: string };
 }
 
 export async function suggestCompetitors(): Promise<SuggestResult> {
   const debug: SuggestResult["debug"] = { gsc: false, queries: [], jinaOk: false, jinaLen: 0, aiOk: false };
   try {
     const [status, userId] = await Promise.all([getConnectionStatus(), getUserId()]);
-    const { getCachedSnapshot } = await import("@/lib/db");
 
     let topQueries: string[] = [];
 
     if (status.demo || status.property) {
-      const property = status.demo ? "demo" : status.property!;
-      const snap = await getCachedSnapshot(property).catch(() => null);
+      // ponytail: getCurrentSnapshot handles demo + live GSC fetch + DB cache;
+      // getCachedSnapshot only reads DB with 30min TTL — expires between dashboard visits
+      const { getCurrentSnapshot } = await import("@/lib/services/context");
+      const snap = await getCurrentSnapshot().catch(() => null);
       if (snap) {
         topQueries = (snap as { pages?: Array<{ queries?: Array<{ query: string; clicks: number }> }> })
           .pages?.flatMap((p) => p.queries ?? [])
@@ -36,11 +37,12 @@ export async function suggestCompetitors(): Promise<SuggestResult> {
 
     const searchQuery = topQueries.join(" ");
 
-    // ponytail: html.duckduckgo.com/html is server-rendered; duckduckgo.com needs JS
+    // ponytail: lite.duckduckgo.com/lite is minimal HTML designed for basic clients — doesn't block scrapers
     let markdown = "";
     try {
-      const jinaUrl = `https://r.jina.ai/https://html.duckduckgo.com/html/?q=${encodeURIComponent(searchQuery)}`;
+      const jinaUrl = `https://r.jina.ai/https://lite.duckduckgo.com/lite/?q=${encodeURIComponent(searchQuery)}`;
       const jinaRes = await fetch(jinaUrl, { headers: { "X-Return-Format": "markdown" } });
+      debug.jinaStatus = jinaRes.status;
       if (jinaRes.ok) {
         markdown = await jinaRes.text();
         debug.jinaOk = true;
