@@ -93,14 +93,18 @@ Read the page in full and understand:
 
 ## Step 2: Analyze query losses
 
+Use the provided GSC data.
+
 Identify:
 
-- Queries that lost impressions
-- Queries that lost clicks
+- Queries with the largest impression losses
+- Queries with the largest click losses
 - Queries with declining average position
-- New queries competitors rank for that this page does not
+- Query themes that lost visibility
 
 Group findings into themes and rank them by opportunity.
+
+If query-level data is unavailable, infer likely gaps from competitor analysis and current rankings.
 
 ## Step 3: Research
 
@@ -112,6 +116,10 @@ Research the topic and identify:
 - Missing examples
 - Missing entities
 - Long-tail keyword opportunities
+
+When researching competitors, focus on identifying information gain.
+
+Do not merely match competitor content. Identify useful information, examples, frameworks, data, tools, comparisons, or insights that are missing from this page and would make it more helpful than competing results.
 
 ## Step 4: Gap analysis
 
@@ -146,11 +154,13 @@ Every new section must target:
 - A competitor content gap
 - Or a high-value related topic
 
+Prefer improving existing sections before adding new sections whenever possible.
+
 Once the plan is complete:
 
 - Edit the page directly
-- Add missing sections
-- Improve weak content
+- Improve existing sections first
+- Add new sections only where a clear gap exists
 - Add FAQs
 - Improve internal linking
 - Preserve existing formatting and style
