@@ -91,7 +91,18 @@ Read the page in full and understand:
 - Topics currently covered
 - Existing headings and sections
 
-## Step 2: Research
+## Step 2: Analyze query losses
+
+Identify:
+
+- Queries that lost impressions
+- Queries that lost clicks
+- Queries with declining average position
+- New queries competitors rank for that this page does not
+
+Group findings into themes and rank them by opportunity.
+
+## Step 3: Research
 
 Research the topic and identify:
 
@@ -102,7 +113,7 @@ Research the topic and identify:
 - Missing entities
 - Long-tail keyword opportunities
 
-## Step 3: Gap analysis
+## Step 4: Gap analysis
 
 Compare the research findings against the current page.
 
@@ -115,18 +126,25 @@ List:
 
 Prioritize findings by likely SEO impact.
 
-## Step 4: Create an implementation plan
+## Step 5: Create a concise implementation plan
 
-Before editing anything, present:
+Limit to:
 
-- New sections to add
-- Existing sections to improve
-- Internal links to add
-- FAQs to add
+- Top 5 content additions
+- Top 3 content improvements
+- Top 5 internal links
 
-Explain why each change matters.
+Focus on highest-impact opportunities only.
 
-## Step 5: Implement
+## Step 6: Implement
+
+Do not add sections solely to increase word count.
+
+Every new section must target:
+- A lost query theme
+- A missing search intent
+- A competitor content gap
+- Or a high-value related topic
 
 Once the plan is complete:
 
@@ -137,7 +155,7 @@ Once the plan is complete:
 - Improve internal linking
 - Preserve existing formatting and style
 
-## Step 6: Summary
+## Step 7: Summary
 
 Provide:
 
@@ -146,7 +164,17 @@ Provide:
 - Word count added
 - Major SEO improvements made
 
-Focus only on changes that are likely to recover lost impressions.`;
+Focus only on changes that are likely to recover lost impressions.
+
+---
+
+## Success criteria
+
+- Page better satisfies search intent
+- Lost query themes are covered
+- Content depth exceeds top-ranking competitors
+- New content is integrated naturally into the existing article
+- Changes are implemented directly, not merely recommended`;
 }
 
 export function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
