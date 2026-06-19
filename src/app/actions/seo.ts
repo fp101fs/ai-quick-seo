@@ -57,6 +57,41 @@ export async function getGscQueries(): Promise<GscQueryRow[]> {
   } catch { return []; }
 }
 
+export interface CannibalRow {
+  query: string;
+  totalClicks: number;
+  pages: { url: string; clicks: number; position: number }[];
+}
+
+export async function getCannibalization(): Promise<CannibalRow[]> {
+  try {
+    const snap = await getCurrentSnapshot();
+    if (!snap?.queries?.length) return [];
+    const map = new Map<string, Map<string, { clicks: number; posSum: number; impressions: number }>>();
+    for (const q of snap.queries) {
+      if (!q.page) continue;
+      if (!map.has(q.query)) map.set(q.query, new Map());
+      const pages = map.get(q.query)!;
+      const e = pages.get(q.page) ?? { clicks: 0, posSum: 0, impressions: 0 };
+      e.clicks += q.clicks;
+      e.posSum += q.position * q.impressions;
+      e.impressions += q.impressions;
+      pages.set(q.page, e);
+    }
+    return Array.from(map.entries())
+      .filter(([, pages]) => pages.size >= 2)
+      .map(([query, pages]) => {
+        const pageList = Array.from(pages.entries()).map(([url, d]) => ({
+          url,
+          clicks: d.clicks,
+          position: d.impressions > 0 ? d.posSum / d.impressions : 0,
+        })).sort((a, b) => a.position - b.position);
+        return { query, totalClicks: pageList.reduce((s, p) => s + p.clicks, 0), pages: pageList };
+      })
+      .sort((a, b) => b.totalClicks - a.totalClicks);
+  } catch { return []; }
+}
+
 export interface DashboardData {
   status: ConnectionStatus;
   snapshot: GscSnapshot | null;
