@@ -144,17 +144,27 @@ Limit to:
 
 Focus on highest-impact opportunities only.
 
+For every proposed content change, cite the reason:
+
+- Lost query theme
+- Competitor gap
+- Missing search intent
+- Information gain opportunity
+
+Do not make changes that cannot be justified by at least one of these.
+
 ## Step 6: Implement
+
+Avoid generic introductory content. Assume the reader already understands the basics and prioritize actionable, specific, experience-based information.
 
 Do not add sections solely to increase word count.
 
-Every new section must target:
-- A lost query theme
-- A missing search intent
-- A competitor content gap
-- Or a high-value related topic
+When possible, modify existing sections instead of creating new sections.
 
-Prefer improving existing sections before adding new sections whenever possible.
+Only add a new section when:
+- The topic is not already covered
+- The topic represents a meaningful query opportunity
+- The topic cannot be incorporated naturally into an existing section
 
 Once the plan is complete:
 
