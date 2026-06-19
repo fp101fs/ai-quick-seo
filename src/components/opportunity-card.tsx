@@ -54,48 +54,99 @@ const impactConfig = {
 };
 
 function buildClaudePrompt(o: Opportunity): string {
-  const typeLabels: Record<OpportunityType, string> = {
-    "declining-clicks": "declining organic clicks",
-    "declining-impressions": "declining search impressions",
-    "quick-win": "a quick SEO win opportunity",
-    "low-ctr": "a low click-through rate issue",
-  };
-
   const metricsLines: string[] = [];
   if (o.metrics.clicks !== undefined) metricsLines.push(`- Clicks: ${o.metrics.clicks}`);
-  if (o.metrics.impressions !== undefined)
-    metricsLines.push(`- Impressions: ${o.metrics.impressions}`);
-  if (o.metrics.ctr !== undefined)
-    metricsLines.push(`- CTR: ${(o.metrics.ctr * 100).toFixed(2)}%`);
-  if (o.metrics.position !== undefined)
-    metricsLines.push(`- Avg position: ${o.metrics.position.toFixed(1)}`);
-  if (o.metrics.clicksDelta !== undefined)
-    metricsLines.push(
-      `- Clicks change: ${o.metrics.clicksDelta > 0 ? "+" : ""}${o.metrics.clicksDelta}`
-    );
-  if (o.metrics.impressionsDelta !== undefined)
-    metricsLines.push(
-      `- Impressions change: ${o.metrics.impressionsDelta > 0 ? "+" : ""}${o.metrics.impressionsDelta}`
-    );
+  if (o.metrics.impressions !== undefined) metricsLines.push(`- Impressions: ${o.metrics.impressions}`);
+  if (o.metrics.ctr !== undefined) metricsLines.push(`- CTR: ${(o.metrics.ctr * 100).toFixed(2)}%`);
+  if (o.metrics.position !== undefined) metricsLines.push(`- Avg position: ${o.metrics.position.toFixed(1)}`);
+  if (o.metrics.clicksDelta !== undefined) metricsLines.push(`- Clicks change: ${o.metrics.clicksDelta > 0 ? "+" : ""}${o.metrics.clicksDelta}`);
+  if (o.metrics.impressionsDelta !== undefined) metricsLines.push(`- Impressions change: ${o.metrics.impressionsDelta > 0 ? "+" : ""}${o.metrics.impressionsDelta}`);
 
-  return `I have an SEO issue I need your help fixing. Here's the context:
+  const context = [
+    o.page ? `**Page:** ${o.page}` : "",
+    o.query ? `**Query:** ${o.query}` : "",
+    `**Issue:** ${o.issue}`,
+    `**Why it matters:** ${o.whyItMatters}`,
+    metricsLines.length ? `**Current metrics:**\n${metricsLines.join("\n")}` : "",
+    `**Goal:** ${o.recommendedAction}`,
+    `**Expected impact:** ${o.estimatedImpact}`,
+  ].filter(Boolean).join("\n\n");
 
-**Issue type:** ${typeLabels[o.type]} (${o.impact} impact)
-${o.page ? `**Page:** ${o.page}` : ""}
-${o.query ? `**Query:** ${o.query}` : ""}
+  return `Your task is to recover lost SEO visibility for this page.
 
-**What's happening:** ${o.issue}
+## Context
 
-**Why it matters:** ${o.whyItMatters}
+${context}
 
-**Current metrics:**
-${metricsLines.join("\n") || "No metrics available"}
+IMPORTANT: Do not make any changes until you have completed the audit, research, and gap analysis.
 
-**Recommended action:** ${o.recommendedAction}
+---
 
-**Expected impact if fixed:** ${o.estimatedImpact}
+## Step 1: Read the page
 
-Please help me implement the recommended action step by step. Be specific and practical — give me the exact changes to make, the copy to write, or the technical steps to take. Focus only on fixing this specific issue.`;
+Read the page in full and understand:
+
+- Search intent
+- Existing content structure
+- Topics currently covered
+- Existing headings and sections
+
+## Step 2: Research
+
+Research the topic and identify:
+
+- Topics covered by competing pages
+- Missing subtopics
+- Missing FAQs
+- Missing examples
+- Missing entities
+- Long-tail keyword opportunities
+
+## Step 3: Gap analysis
+
+Compare the research findings against the current page.
+
+List:
+
+- Missing sections
+- Weak sections
+- Outdated information
+- Internal linking opportunities
+
+Prioritize findings by likely SEO impact.
+
+## Step 4: Create an implementation plan
+
+Before editing anything, present:
+
+- New sections to add
+- Existing sections to improve
+- Internal links to add
+- FAQs to add
+
+Explain why each change matters.
+
+## Step 5: Implement
+
+Once the plan is complete:
+
+- Edit the page directly
+- Add missing sections
+- Improve weak content
+- Add FAQs
+- Improve internal linking
+- Preserve existing formatting and style
+
+## Step 6: Summary
+
+Provide:
+
+- Files changed
+- Sections added
+- Word count added
+- Major SEO improvements made
+
+Focus only on changes that are likely to recover lost impressions.`;
 }
 
 export function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
