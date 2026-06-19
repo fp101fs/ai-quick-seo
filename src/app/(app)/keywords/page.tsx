@@ -1,17 +1,35 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Hash } from "lucide-react";
+import { Hash, Plus, Check } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { getGscQueries, type GscQueryRow } from "@/app/actions/seo";
+import { addKeyword, getTrackingData } from "@/app/actions/rank-tracking";
+import { toast } from "sonner";
 
 export default function KeywordsPage() {
   const [rows, setRows] = useState<GscQueryRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tracked, setTracked] = useState<Set<string>>(new Set());
+  const [adding, setAdding] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     getGscQueries().then(setRows).finally(() => setLoading(false));
+    getTrackingData().then((data) => setTracked(new Set(data.map((d) => d.keyword))));
   }, []);
+
+  async function handleTrack(query: string) {
+    setAdding((prev) => new Set(prev).add(query));
+    try {
+      await addKeyword(query);
+      setTracked((prev) => new Set(prev).add(query));
+      toast.success(`Tracking "${query}"`);
+    } catch {
+      toast.error("Failed to add keyword");
+    } finally {
+      setAdding((prev) => { const s = new Set(prev); s.delete(query); return s; });
+    }
+  }
 
   return (
     <div>
@@ -41,6 +59,7 @@ export default function KeywordsPage() {
                 <th className="px-5 py-3 text-right">Impressions</th>
                 <th className="px-5 py-3 text-right">CTR</th>
                 <th className="px-5 py-3 text-right">Avg Position</th>
+                <th className="px-5 py-3 w-10" />
               </tr>
             </thead>
             <tbody>
@@ -61,6 +80,20 @@ export default function KeywordsPage() {
                     <span className={`font-semibold ${r.position <= 3 ? "text-emerald-600" : r.position <= 10 ? "text-amber-600" : "text-slate-500"}`}>
                       {r.position.toFixed(1)}
                     </span>
+                  </td>
+                  <td className="px-5 py-3 text-right">
+                    {tracked.has(r.query) ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-500 ml-auto" />
+                    ) : (
+                      <button
+                        onClick={() => handleTrack(r.query)}
+                        disabled={adding.has(r.query)}
+                        title="Track in Rank Tracking"
+                        className="text-slate-300 hover:text-indigo-500 transition-colors disabled:opacity-40 ml-auto block"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
