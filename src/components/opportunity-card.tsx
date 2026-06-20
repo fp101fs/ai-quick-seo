@@ -53,7 +53,128 @@ const impactConfig = {
   low: "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300",
 };
 
+function buildCtrPrompt(o: Opportunity): string {
+  const metricLines = [
+    o.metrics.impressions !== undefined ? `- Impressions: ${o.metrics.impressions}` : "",
+    o.metrics.ctr !== undefined ? `- CTR: ${(o.metrics.ctr * 100).toFixed(2)}%` : "",
+    o.metrics.position !== undefined ? `- Avg position: ${o.metrics.position.toFixed(1)}` : "",
+  ].filter(Boolean).join("\n");
+
+  return `Your task is to increase organic CTR for this page.
+
+## Context
+
+${o.page ? `**Page:** ${o.page}` : ""}
+
+**Issue:** The page receives significant impressions but CTR is far below expected for its average position.
+
+**Current metrics:**
+${metricLines}
+
+**Goal:** Improve CTR without changing rankings.
+
+IMPORTANT: Do not make any changes until you have completed the analysis steps.
+
+---
+
+## Step 1: Read the page
+
+Understand:
+
+- Primary search intent
+- Target audience
+- Core benefit offered
+- Unique value proposition
+- Existing title tag
+- Existing meta description
+
+## Step 2: Analyze search demand
+
+Using available query and SERP data, identify:
+
+- Highest-impression queries driving traffic to this page
+- Dominant search intent (informational, commercial, navigational)
+- Commercial vs informational intent split
+- Keywords appearing in top-ranking titles
+- Common title patterns used by competing results
+
+## Step 3: Analyze the SERP
+
+Review competing results ranking near this page.
+
+Identify:
+
+- Common wording patterns
+- Common promises
+- Common numbers and years
+- Common modifiers
+- Gaps and differentiation opportunities
+
+Determine why a searcher might click competing results instead of this page.
+
+## Step 4: Create CTR hypotheses
+
+List the top reasons CTR may be underperforming, such as:
+
+- Weak benefit statement
+- Generic title
+- Missing keyword match
+- Weak emotional trigger
+- No specificity
+- Outdated year
+- Poor SERP differentiation
+
+Rank by likely impact.
+
+## Step 5: Generate replacements
+
+Create:
+
+- 10 title tag options
+- 5 meta description options
+
+Requirements:
+
+- Match search intent
+- Include primary keyword naturally
+- Emphasize benefits over features
+- Use specificity where appropriate
+- Differentiate from competing results
+- Stay within recommended character limits (60 chars for title, 155 for description)
+
+## Step 6: Select the winner
+
+Choose the single best title tag and meta description.
+
+Explain:
+
+- Why it should improve CTR
+- Which search intent it targets
+- How it differs from competing results
+
+## Step 7: Implement
+
+Update:
+
+- Title tag
+- Meta description
+
+Only make content changes if they directly support the promise made in the title or description.
+
+---
+
+## Success criteria
+
+- Stronger click appeal
+- Better intent matching
+- Clear differentiation in the SERP
+- No clickbait
+- Higher expected CTR`;
+}
+
 function buildClaudePrompt(o: Opportunity): string {
+  if (o.type === "low-ctr") return buildCtrPrompt(o);
+
   const metricsLines: string[] = [];
   if (o.metrics.clicks !== undefined) metricsLines.push(`- Clicks: ${o.metrics.clicks}`);
   if (o.metrics.impressions !== undefined) metricsLines.push(`- Impressions: ${o.metrics.impressions}`);
