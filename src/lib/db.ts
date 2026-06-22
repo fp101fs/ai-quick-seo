@@ -200,6 +200,8 @@ export async function upsertUser(data: {
   name?: string;
   picture?: string;
 }): Promise<DbUser> {
+  // ponytail: auto-migrate on first user upsert (happens during OAuth callback)
+  await runMigrations().catch(() => {});
   const result = await sql<DbUser>`
     INSERT INTO users (google_id, email, name, picture)
     VALUES (${data.googleId}, ${data.email}, ${data.name ?? null}, ${data.picture ?? null})
