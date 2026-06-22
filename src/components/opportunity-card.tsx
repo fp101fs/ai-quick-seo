@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import {
   TrendingDown,
@@ -11,6 +12,7 @@ import {
   BarChart3,
   ClipboardCopy,
   Check,
+  ArrowRight,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -387,6 +389,16 @@ export function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
             </>
           )}
         </button>
+
+        {opportunity.page && (
+          <Link
+            href={`/content-refresh?url=${encodeURIComponent(opportunity.page)}`}
+            className="w-full flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all border bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:border-indigo-700 dark:text-indigo-400 dark:hover:bg-indigo-900/30"
+          >
+            <ArrowRight className="w-3.5 h-3.5" />
+            Fix this page
+          </Link>
+        )}
       </CardContent>
     </Card>
   );
