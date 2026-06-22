@@ -424,6 +424,15 @@ export async function getLatestArticleIdeas(
   property: string
 ): Promise<unknown | null> {
   try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS article_ideas (
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        property TEXT NOT NULL,
+        result JSONB NOT NULL,
+        generated_at TIMESTAMPTZ DEFAULT NOW(),
+        PRIMARY KEY (user_id, property)
+      )
+    `;
     const r = await sql`
       SELECT result FROM article_ideas
       WHERE user_id = ${userId} AND property = ${property}
