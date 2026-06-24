@@ -30,7 +30,7 @@ export async function gradePage(url: string): Promise<GradeResult> {
 
   const target = await resolveUrl(url);
   const snapshot = await getCurrentSnapshot().catch(() => null);
-  const result = await gradePageSeo(target, snapshot);
+  const result = await gradePageSeo(target, snapshot, usage.userId ?? undefined);
 
   const userId = await getUserId();
   if (userId) {

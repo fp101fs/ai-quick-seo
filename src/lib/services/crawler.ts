@@ -173,7 +173,8 @@ function heuristicSuggestions(
 
 async function generateSuggestions(
   targets: CrawledPage[],
-  pages: CrawledPage[]
+  pages: CrawledPage[],
+  userId?: number
 ): Promise<LinkSuggestion[]> {
   if (targets.length === 0) return [];
   const candidates = heuristicSuggestions(targets, pages);
@@ -181,7 +182,8 @@ async function generateSuggestions(
 
   try {
     const ai = await jsonCompletion<{ suggestions: LinkSuggestion[] }>(
-      buildLinkSuggestionPrompt(targets, pages, candidates)
+      buildLinkSuggestionPrompt(targets, pages, candidates),
+      { userId, feature: "internal-links" }
     );
     const valid = (ai.suggestions ?? []).filter(
       (s) => s.sourceUrl && s.targetUrl && s.anchorText && s.reasoning
@@ -197,7 +199,7 @@ async function generateSuggestions(
  * Crawls a sitemap (capped at 30 pages), builds the internal link graph,
  * and produces link recommendations. Cached for 30 minutes per sitemap.
  */
-export async function crawlSitemap(sitemapUrl: string): Promise<CrawlResult> {
+export async function crawlSitemap(sitemapUrl: string, userId?: number): Promise<CrawlResult> {
   return cached(`crawl:${sitemapUrl}`, 30 * 60 * 1000, async () => {
     const allUrls = await getSitemapUrls(sitemapUrl);
     if (allUrls.length === 0) {
@@ -226,7 +228,8 @@ export async function crawlSitemap(sitemapUrl: string): Promise<CrawlResult> {
 
     const suggestions = await generateSuggestions(
       [...orphans, ...weak].slice(0, 8),
-      crawledOk
+      crawledOk,
+      userId
     );
 
     return {

@@ -134,15 +134,17 @@ export async function getDashboardData(opts?: { forceRefresh?: boolean }): Promi
     }
   }
 
-  const [{ snapshot, opportunities }, crawl] = await Promise.all([
+  const [{ snapshot, opportunities }, crawl, dashUserId] = await Promise.all([
     getCurrentOpportunities(),
     getCachedCrawl(),
+    getUserId().catch(() => null),
   ]);
 
   const tasks = await generateDailyTasks(
     status.property ?? "default",
     opportunities,
-    crawl?.suggestions ?? []
+    crawl?.suggestions ?? [],
+    dashUserId ?? undefined
   );
 
   // Save to DB (fire and forget, skip for demo)
@@ -192,7 +194,8 @@ export async function runCrawl(sitemapUrl: string): Promise<CrawlResult> {
     target = `https://${target}`;
   }
 
-  const result = await crawlSitemap(target);
+  const crawlUserId = await getUserId().catch(() => null);
+  const result = await crawlSitemap(target, crawlUserId ?? undefined);
 
   // Remember the sitemap so the dashboard can surface link opportunities.
   const store = await cookies();
@@ -261,7 +264,7 @@ export async function refreshContent(url: string): Promise<ContentRefreshResult>
   }
 
   const snapshot = await getCurrentSnapshot().catch(() => null);
-  const result = await analyzeContentRefresh(target, snapshot);
+  const result = await analyzeContentRefresh(target, snapshot, usage.userId ?? undefined);
 
   // Save to cache (best-effort)
   const userId = await getUserId();

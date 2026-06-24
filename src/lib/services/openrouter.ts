@@ -17,7 +17,7 @@ export interface AiCallOptions {
 }
 
 function getModel(): string {
-  return process.env.OPENROUTER_MODEL || "openrouter/free";
+  return process.env.OPENROUTER_MODEL || "deepseek/deepseek-v4-flash";
 }
 
 // Approximate cost per token for common models (USD).

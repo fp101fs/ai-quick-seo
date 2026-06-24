@@ -50,7 +50,8 @@ function fallbackTasks(
 export async function generateDailyTasks(
   cacheKey: string,
   opportunities: Opportunity[],
-  linkSuggestions: LinkSuggestion[]
+  linkSuggestions: LinkSuggestion[],
+  userId?: number
 ): Promise<SeoTask[]> {
   if (opportunities.length === 0 && linkSuggestions.length === 0) return [];
 
@@ -58,7 +59,8 @@ export async function generateDailyTasks(
   return cached(`tasks:${cacheKey}:${day}`, 12 * 60 * 60 * 1000, async () => {
     try {
       const result = await jsonCompletion<{ tasks: SeoTask[] }>(
-        buildDailyTasksPrompt(opportunities, linkSuggestions)
+        buildDailyTasksPrompt(opportunities, linkSuggestions),
+        { userId, feature: "tasks" }
       );
       const tasks = (result.tasks ?? [])
         .filter((t) => t.title && t.explanation)

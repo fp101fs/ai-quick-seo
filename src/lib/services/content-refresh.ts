@@ -23,7 +23,8 @@ async function fetchPageContent(url: string): Promise<string> {
 
 export async function analyzeContentRefresh(
   url: string,
-  snapshot: GscSnapshot | null
+  snapshot: GscSnapshot | null,
+  userId?: number
 ): Promise<ContentRefreshResult> {
   const content = await fetchPageContent(url);
 
@@ -33,7 +34,8 @@ export async function analyzeContentRefresh(
     .slice(0, 12);
 
   const result = await jsonCompletion<Omit<ContentRefreshResult, "url">>(
-    buildContentRefreshPrompt(url, content, pageQueries)
+    buildContentRefreshPrompt(url, content, pageQueries),
+    { userId, feature: "content-refresh" }
   );
 
   return {

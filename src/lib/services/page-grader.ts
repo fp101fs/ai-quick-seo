@@ -18,7 +18,7 @@ const CATEGORY_ORDER = [
   "internal-links", "faq-questions", "entity-signals", "geo-readiness",
 ];
 
-export async function gradePageSeo(url: string, snapshot: GscSnapshot | null): Promise<GradeResult> {
+export async function gradePageSeo(url: string, snapshot: GscSnapshot | null, userId?: number): Promise<GradeResult> {
   const res = await fetch(`https://r.jina.ai/${url}`, {
     headers: { "X-Return-Format": "markdown" },
     signal: AbortSignal.timeout(30000),
@@ -90,7 +90,7 @@ fixType: "content-refresh"=needs content edits, "internal-links"=needs link addi
 
   const raw = await jsonCompletion<{
     categories: Omit<GradeCategory, "name" | "emoji" | "maxScore">[];
-  }>(messages);
+  }>(messages, { userId, feature: "page-grader" });
 
   const categories: GradeCategory[] = CATEGORY_ORDER.map((id) => {
     const meta = CATEGORY_META[id];
