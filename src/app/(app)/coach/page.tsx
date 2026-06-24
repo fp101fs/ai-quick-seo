@@ -17,6 +17,21 @@ const suggestedQuestions = [
   "Which pages should I update this week?",
 ];
 
+function renderMd(text: string) {
+  return text.split("\n").map((line, i, arr) => {
+    const parts = line.split(/(\*\*[^*]+\*\*|`[^`]+`|\*[^*]+\*)/g).map((chunk, j) => {
+      if (chunk.startsWith("**") && chunk.endsWith("**"))
+        return <strong key={j}>{chunk.slice(2, -2)}</strong>;
+      if (chunk.startsWith("`") && chunk.endsWith("`"))
+        return <code key={j} className="bg-slate-100 dark:bg-slate-700 px-1 rounded text-xs font-mono">{chunk.slice(1, -1)}</code>;
+      if (chunk.startsWith("*") && chunk.endsWith("*") && chunk.length > 2)
+        return <em key={j}>{chunk.slice(1, -1)}</em>;
+      return chunk;
+    });
+    return <span key={i}>{parts}{i < arr.length - 1 && <br />}</span>;
+  });
+}
+
 function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
   return (
@@ -35,13 +50,13 @@ function MessageBubble({ message }: { message: ChatMessage }) {
       </span>
       <div
         className={cn(
-          "rounded-2xl px-4 py-3 max-w-[85%] sm:max-w-[75%] text-sm leading-relaxed whitespace-pre-wrap",
+          "rounded-2xl px-4 py-3 max-w-[85%] sm:max-w-[75%] text-sm leading-relaxed",
           isUser
-            ? "bg-indigo-600 text-white rounded-tr-sm"
+            ? "bg-indigo-600 text-white rounded-tr-sm whitespace-pre-wrap"
             : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 rounded-tl-sm"
         )}
       >
-        {message.content}
+        {isUser ? message.content : renderMd(message.content)}
       </div>
     </div>
   );

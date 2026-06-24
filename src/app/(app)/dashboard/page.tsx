@@ -37,6 +37,7 @@ import type { AnalysisSummary } from "@/lib/db";
 import { DashboardUserChip } from "@/components/dashboard-user-chip";
 import type { Opportunity } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { ActionPlan } from "@/components/action-plan";
 
 function DeltaBadge({ delta, suffix = "" }: { delta: number; suffix?: string }) {
   const positive = delta >= 0;
@@ -374,6 +375,24 @@ export default function DashboardPage() {
       />
 
       {errorBanner}
+
+      {/* Action plan: compact ranked list with copy buttons */}
+      {tasks.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <ListChecks className="w-4 h-4 text-orange-500" />
+              Action Plan
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <ActionPlan
+              tasks={tasks}
+              site={data.status.property?.replace(/^sc-domain:/, "").replace(/^https?:\/\//, "").replace(/\/$/, "")}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Today's highest impact task */}
       {topTask ? (

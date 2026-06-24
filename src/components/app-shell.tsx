@@ -23,6 +23,7 @@ import {
   Hash,
   Activity,
   Gauge,
+  ListChecks,
 } from "lucide-react";
 import { InfoTooltip } from "@/components/info-tooltip";
 import { cn } from "@/lib/utils";
@@ -91,6 +92,12 @@ const navItems = [
     label: "Page Grader",
     icon: Gauge,
     tooltip: "Grade any page out of 100 for SEO and AI search readiness. Get a step-by-step plan to reach 100.",
+  },
+  {
+    href: "/action-plan",
+    label: "Action Plan",
+    icon: ListChecks,
+    tooltip: "Top 10 ranked SEO tasks with copy-ready Claude prompts. One click to copy them all.",
   },
 ];
 
@@ -169,6 +176,7 @@ export function AppShell({
   // ponytail: mounted guard prevents hydration mismatch — resolvedTheme is
   // undefined on server/first render, causing different icon than client
   const [mounted, setMounted] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
   const nav = (orientation: "vertical" | "horizontal") => (
@@ -323,30 +331,76 @@ export function AppShell({
             <img src="/icon-512.png" className="w-7 h-7 rounded-lg" alt="SerpDo" />
             <span className="font-bold tracking-tight text-sm">SerpDo</span>
           </Link>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-              title="Toggle dark mode"
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-            >
-              {mounted && resolvedTheme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
+          <div className="relative flex items-center">
             {isSignedIn ? (
-              <div className="flex items-center gap-2">
-                {user?.picture ? (
-                  <img
-                    src={user.picture}
-                    alt={user.name ?? user.email}
-                    className="w-7 h-7 rounded-full"
-                  />
-                ) : (
-                  <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center">
-                    <span className="text-xs font-semibold text-indigo-600">
-                      {(user?.name ?? user?.email ?? "U")[0].toUpperCase()}
-                    </span>
-                  </div>
+              <>
+                <button
+                  onClick={() => setMenuOpen((v) => !v)}
+                  className="focus:outline-none"
+                  aria-label="Account menu"
+                >
+                  {user?.picture ? (
+                    <img src={user.picture} alt={user.name ?? user.email} className="w-8 h-8 rounded-full ring-2 ring-transparent hover:ring-indigo-400 transition-all" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center ring-2 ring-transparent hover:ring-indigo-400 transition-all">
+                      <span className="text-xs font-semibold text-indigo-600">
+                        {(user?.name ?? user?.email ?? "U")[0].toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                </button>
+                {menuOpen && (
+                  <>
+                    <div className="fixed inset-0 z-30" onClick={() => setMenuOpen(false)} />
+                    <div className="absolute right-0 top-10 z-40 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-xl ring-1 ring-slate-200 dark:ring-slate-700 py-1 text-sm">
+                      <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700">
+                        <p className="font-medium text-slate-800 dark:text-slate-200 truncate">{user?.name ?? user?.email ?? "Account"}</p>
+                        {isPro ? (
+                          <p className="text-xs text-indigo-500 font-medium">Pro plan</p>
+                        ) : (
+                          <p className="text-xs text-slate-400">Free plan</p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => { setTheme(resolvedTheme === "dark" ? "light" : "dark"); setMenuOpen(false); }}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                      >
+                        {mounted && resolvedTheme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                        {mounted && resolvedTheme === "dark" ? "Light mode" : "Dark mode"}
+                      </button>
+                      <Link
+                        href="/usage"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                      >
+                        <BarChart3 className="w-4 h-4" />
+                        View usage
+                      </Link>
+                      {!isPro && (
+                        <Link
+                          href="/pricing"
+                          onClick={() => setMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 text-indigo-600 dark:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors font-medium"
+                        >
+                          <Crown className="w-4 h-4" />
+                          Upgrade to Pro
+                        </Link>
+                      )}
+                      <div className="border-t border-slate-100 dark:border-slate-700 mt-1 pt-1">
+                        <form action="/api/auth/logout" method="POST">
+                          <button
+                            type="submit"
+                            className="flex w-full items-center gap-3 px-4 py-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                          >
+                            <LogOut className="w-4 h-4" />
+                            Sign out
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </>
                 )}
-              </div>
+              </>
             ) : (
               <a
                 href="/api/auth/google"
