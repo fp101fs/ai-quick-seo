@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Activity, Plus, RefreshCw, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -184,7 +185,13 @@ export default function RankTrackingPage() {
                     className="border-b border-slate-50 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-700/30 cursor-pointer"
                     onClick={() => handleExpand(r.keyword)}
                   >
-                    <td className="px-5 py-3 font-medium text-slate-900 dark:text-slate-100">{r.keyword}</td>
+                    <td className="px-5 py-3 font-medium text-slate-900 dark:text-slate-100">
+                      <Link
+                        href="/keywords"
+                        onClick={(e) => e.stopPropagation()}
+                        className="hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline"
+                      >{r.keyword}</Link>
+                    </td>
                     <td className="px-5 py-3 text-right">
                       {r.today != null ? (
                         <span className={`font-semibold ${r.today <= 3 ? "text-emerald-600" : r.today <= 10 ? "text-amber-600" : "text-slate-500"}`}>
