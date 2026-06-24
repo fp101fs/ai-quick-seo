@@ -287,6 +287,13 @@ export async function getContentRefreshCache(
   return { result: row.result as ContentRefreshResult, generatedAt: row.generated_at };
 }
 
+export async function getSitemapPages(): Promise<string[]> {
+  try {
+    const snap = await getCurrentSnapshot();
+    return (snap?.pages ?? []).sort((a, b) => b.clicks - a.clicks).map((p) => p.url);
+  } catch { return []; }
+}
+
 export async function getSuggestedRefreshPages(): Promise<string[]> {
   const userId = await getUserId();
   const status = await getConnectionStatus();

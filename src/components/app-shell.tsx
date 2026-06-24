@@ -24,6 +24,7 @@ import {
   Activity,
   Gauge,
   ListChecks,
+  Layers,
 } from "lucide-react";
 import { InfoTooltip } from "@/components/info-tooltip";
 import { cn } from "@/lib/utils";
@@ -98,6 +99,12 @@ const navItems = [
     label: "Action Plan",
     icon: ListChecks,
     tooltip: "Top 10 ranked SEO tasks with copy-ready Claude prompts. One click to copy them all.",
+  },
+  {
+    href: "/sitemap-explorer",
+    label: "Sitemap Explorer",
+    icon: Layers,
+    tooltip: "Browse all your pages in a tree view. Click Grade or Improve to take action on any page.",
   },
 ];
 

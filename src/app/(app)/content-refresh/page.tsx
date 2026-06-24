@@ -35,6 +35,7 @@ import {
   getContentRefreshCache,
 } from "@/app/actions/seo";
 import type { ContentRefreshResult } from "@/lib/types";
+import { SitemapPagePicker } from "@/components/sitemap-page-picker";
 
 function buildAllChangesPrompt(url: string, result: ContentRefreshResult): string {
   const parts: string[] = [
@@ -250,6 +251,10 @@ function ContentRefreshInner() {
         description="AI-drafted improvements for any page: titles, sections, FAQs, and missing topics."
         help="The AI fetches your page, reads it alongside your Search Console queries, then drafts a better title tag, meta description, new H2 sections, and FAQ content you can copy-paste in."
       />
+
+      <div className="max-w-2xl mb-2">
+        <SitemapPagePicker onSelect={(u) => { setUrl(u); }} />
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-2 max-w-2xl mb-8">
         <div className="relative">

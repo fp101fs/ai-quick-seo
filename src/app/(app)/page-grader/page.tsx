@@ -22,6 +22,7 @@ import { AiLoading } from "@/components/ai-loading";
 import { toast } from "sonner";
 import { gradePage, getPageGradeCache } from "@/app/actions/page-grader";
 import type { GradeResult, GradeCategory, GradeStatus } from "@/lib/types";
+import { SitemapPagePicker } from "@/components/sitemap-page-picker";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -239,6 +240,10 @@ function PageGraderInner() {
         description="Grade any page out of 100 for SEO and AI search (GEO) readiness."
         help="Enter a page URL and the AI reads it alongside your Search Console data. You get a score for 8 categories — plus a step-by-step plan to reach 100."
       />
+
+      <div className="max-w-2xl mb-2">
+        <SitemapPagePicker onSelect={(u) => setUrl(u)} />
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-2 max-w-2xl mb-8">
         <div className="relative">

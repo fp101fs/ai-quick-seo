@@ -100,6 +100,62 @@ export async function runMigrations() {
   `;
 }
 
+// ---------- Coach Chat ----------
+
+export async function getChatMessages(userId: number): Promise<Array<{ role: string; content: string }>> {
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS coach_messages (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        role TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
+    const r = await sql<{ role: string; content: string }>`
+      SELECT role, content FROM coach_messages
+      WHERE user_id = ${userId}
+      ORDER BY created_at ASC
+      LIMIT 100
+    `;
+    return r.rows;
+  } catch { return []; }
+}
+
+export async function appendChatMessage(userId: number, role: string, content: string): Promise<void> {
+  await sql`
+    CREATE TABLE IF NOT EXISTS coach_messages (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      role TEXT NOT NULL,
+      content TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+  await sql`INSERT INTO coach_messages (user_id, role, content) VALUES (${userId}, ${role}, ${content})`;
+  await sql`
+    DELETE FROM coach_messages WHERE user_id = ${userId} AND id NOT IN (
+      SELECT id FROM coach_messages WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 100
+    )
+  `;
+}
+
+export async function clearChatMessages(userId: number): Promise<void> {
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS coach_messages (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        role TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
+    await sql`DELETE FROM coach_messages WHERE user_id = ${userId}`;
+  } catch {}
+}
+
 // ---------- Rank Tracking ----------
 
 export async function getTrackedKeywords(userId: number): Promise<string[]> {

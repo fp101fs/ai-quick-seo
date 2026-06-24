@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
-import { askCoach } from "@/app/actions/coach";
+import { askCoach, loadChatHistory, persistChatMessage, clearChatHistory } from "@/app/actions/coach";
 import type { ChatMessage } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -66,7 +66,15 @@ export default function CoachPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    loadChatHistory()
+      .then(setMessages)
+      .catch(() => {})
+      .finally(() => setLoadingHistory(false));
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -82,7 +90,11 @@ export default function CoachPage() {
     setThinking(true);
     try {
       const answer = await askCoach(next);
-      setMessages([...next, { role: "assistant", content: answer }]);
+      const withAnswer: ChatMessage[] = [...next, { role: "assistant", content: answer }];
+      setMessages(withAnswer);
+      // fire-and-forget persistence
+      persistChatMessage("user", text).catch(console.error);
+      persistChatMessage("assistant", answer).catch(console.error);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "The coach is unavailable right now");
       setMessages(messages);
@@ -92,15 +104,35 @@ export default function CoachPage() {
     }
   };
 
+  const handleClear = async () => {
+    await clearChatHistory().catch(console.error);
+    setMessages([]);
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)] lg:h-[calc(100vh-7rem)]">
       <PageHeader
         title="SerpDo Coach"
         description="Ask anything about your site — answers use your live Search Console and crawl data."
+        action={
+          messages.length > 0 ? (
+            <button
+              onClick={handleClear}
+              className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+            >
+              Clear history
+            </button>
+          ) : undefined
+        }
       />
 
       <div className="flex-1 overflow-y-auto space-y-4 pb-4 -mx-1 px-1">
-        {messages.length === 0 && (
+        {loadingHistory && (
+          <div className="flex items-center justify-center py-8 text-slate-400 text-sm">
+            <Loader2 className="w-4 h-4 animate-spin mr-2" /> Loading history…
+          </div>
+        )}
+        {!loadingHistory && messages.length === 0 && (
           <div className="text-center py-12">
             <div className="mx-auto w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center mb-4 shadow-lg shadow-indigo-200">
               <Sparkles className="w-7 h-7 text-white" />

@@ -113,7 +113,7 @@ export default function InternalLinksPage() {
         />
         <Button
           type="submit"
-          disabled={crawling}
+          disabled={crawling || loading || !sitemapUrl.trim()}
           className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full bg-indigo-600 hover:bg-indigo-700 px-5"
         >
           {crawling ? (
