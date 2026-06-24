@@ -202,7 +202,7 @@ export default function CoachPage() {
           type="submit"
           size="icon"
           disabled={thinking || !input.trim()}
-          className="absolute right-1.5 top-1/2 -translate-y-1/2 mt-1 rounded-full bg-indigo-600 hover:bg-indigo-700"
+          className="absolute right-1.5 top-1/2 -translate-y-1/2 mt-1 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white"
         >
           {thinking ? <Loader2 className="animate-spin" /> : <SendHorizonal />}
         </Button>

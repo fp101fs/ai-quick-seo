@@ -151,7 +151,7 @@ export default function RankTrackingPage() {
             onChange={(e) => setInput(e.target.value)}
             className="h-10"
           />
-          <Button type="submit" disabled={adding} className="bg-indigo-600 hover:bg-indigo-700 shrink-0">
+          <Button type="submit" disabled={adding} className="bg-indigo-600 hover:bg-indigo-700 text-white shrink-0">
             <Plus className="w-4 h-4" /> Track
           </Button>
         </form>

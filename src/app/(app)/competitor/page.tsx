@@ -118,7 +118,7 @@ export default function CompetitorPage() {
         <Button
           type="submit"
           disabled={loading}
-          className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full bg-indigo-600 hover:bg-indigo-700 px-5"
+          className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white px-5"
         >
           {loading ? (
             <>
