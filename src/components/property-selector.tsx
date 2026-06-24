@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { Globe, ChevronDown, Loader2, FlaskConical, X } from "lucide-react";
 import { getProperties, selectProperty, enableDemoMode } from "@/app/actions/gsc";
 import type { ConnectionStatus, GscProperty } from "@/lib/types";
 
 export function PropertySelector({ status }: { status: ConnectionStatus }) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [properties, setProperties] = useState<GscProperty[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -36,7 +34,7 @@ export function PropertySelector({ status }: { status: ConnectionStatus }) {
     setOpen(false);
     startTransition(async () => {
       await selectProperty(siteUrl);
-      router.refresh();
+      window.location.reload();
     });
   };
 
@@ -44,7 +42,7 @@ export function PropertySelector({ status }: { status: ConnectionStatus }) {
     setOpen(false);
     startTransition(async () => {
       await enableDemoMode();
-      router.refresh();
+      window.location.reload();
     });
   };
 
