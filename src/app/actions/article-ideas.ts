@@ -67,7 +67,7 @@ export async function generateArticleIdeas(): Promise<ArticleIdeasResult> {
   };
 
   const property = isDemo ? "demo" : status.property!;
-  if (userId) saveArticleIdeas(userId, property, final).catch(() => {});
+  if (userId) await saveArticleIdeas(userId, property, final).catch(() => {});
 
   return final;
 }

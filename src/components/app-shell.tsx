@@ -235,7 +235,7 @@ export function AppShell({
           <img src="/icon-512.png" className="w-8 h-8 rounded-lg" alt="SerpDo" />
           <div className="flex flex-col leading-none">
             <span className="font-bold tracking-tight">SerpDo</span>
-            <span className="text-[9px] text-slate-400 tracking-wide mt-0.5" style={{ fontFamily: "var(--font-michroma)" }}>by BravioLabs</span>
+            <span className="text-[11px] text-slate-400 tracking-wide mt-1.5" style={{ fontFamily: "var(--font-michroma)" }}>by BravioLabs</span>
           </div>
         </Link>
 
@@ -341,7 +341,7 @@ export function AppShell({
             <img src="/icon-512.png" className="w-7 h-7 rounded-lg" alt="SerpDo" />
             <div className="flex flex-col leading-none">
               <span className="font-bold tracking-tight text-sm">SerpDo</span>
-              <span className="text-[8px] text-slate-400 tracking-wide mt-0.5" style={{ fontFamily: "var(--font-michroma)" }}>by BravioLabs</span>
+              <span className="text-[10px] text-slate-400 tracking-wide mt-1.5" style={{ fontFamily: "var(--font-michroma)" }}>by BravioLabs</span>
             </div>
           </Link>
           <div className="relative flex items-center">

@@ -149,13 +149,13 @@ export default function ArticleIdeasPage() {
 
       {/* Explainer */}
       {!result && !loading && !checking && !blockedByPlan && (
-        <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-6 mb-8 flex gap-4">
-          <div className="flex-none w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
-            <Lightbulb className="w-5 h-5 text-indigo-600" />
+        <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 mb-8 flex gap-4">
+          <div className="flex-none w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
+            <Lightbulb className="w-5 h-5 text-indigo-400" />
           </div>
           <div className="space-y-1">
-            <p className="font-semibold text-indigo-900">How it works</p>
-            <p className="text-sm text-indigo-700 leading-relaxed">
+            <p className="font-semibold text-white">How it works</p>
+            <p className="text-sm text-slate-300 leading-relaxed">
               Analyzes your Search Console queries to identify your niche, maps what you already
               cover, then generates 15 article ideas targeting keyword gaps with real search demand.
               Use the <strong>"Copy top 10 as AI prompt"</strong> button to paste directly into

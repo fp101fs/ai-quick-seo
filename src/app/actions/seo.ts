@@ -153,7 +153,7 @@ export async function getDashboardData(opts?: { forceRefresh?: boolean }): Promi
       .then(async (userId) => {
         if (!userId) return;
         const { saveAnalysis } = await import("@/lib/db");
-        saveAnalysis(userId, status.property!, { tasks, opportunities, snapshot, crawl });
+        await saveAnalysis(userId, status.property!, { tasks, opportunities, snapshot, crawl }).catch(() => {});
       })
       .catch(() => {});
   }
