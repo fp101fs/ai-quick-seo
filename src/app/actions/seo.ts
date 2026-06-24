@@ -229,8 +229,8 @@ export async function clearSnapshotCache(): Promise<void> {
   const day = new Date().toISOString().slice(0, 10);
   cacheDelete(`tasks:${property}:${day}`);
   try {
-    const { deleteCachedSnapshot } = await import("@/lib/db");
-    await deleteCachedSnapshot(property);
+    const [{ deleteCachedSnapshot }, userId] = await Promise.all([import("@/lib/db"), getUserId()]);
+    await deleteCachedSnapshot(property, userId ?? undefined);
   } catch {
     // DB unavailable — in-memory clear is sufficient
   }

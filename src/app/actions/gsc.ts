@@ -8,6 +8,7 @@ import {
   clearSession,
   getConnectionStatus,
   getSelectedProperty,
+  getUserId,
   setDemoMode,
   setSelectedProperty,
 } from "@/lib/services/session";
@@ -37,10 +38,11 @@ export async function selectProperty(siteUrl: string): Promise<ConnectionStatus>
 
   // Clear DB-backed snapshot cache so next fetch is fresh from GSC API
   try {
-    const { deleteCachedSnapshot } = await import("@/lib/db");
+    const [{ deleteCachedSnapshot }, userId] = await Promise.all([import("@/lib/db"), getUserId()]);
+    const uid = userId ?? undefined;
     await Promise.all([
-      prev ? deleteCachedSnapshot(prev) : Promise.resolve(),
-      deleteCachedSnapshot(siteUrl),
+      prev ? deleteCachedSnapshot(prev, uid) : Promise.resolve(),
+      deleteCachedSnapshot(siteUrl, uid),
     ]);
   } catch {
     // DB unavailable — in-memory clear above is sufficient

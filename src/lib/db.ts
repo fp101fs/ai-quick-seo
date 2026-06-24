@@ -48,9 +48,12 @@ export async function runMigrations() {
       id SERIAL PRIMARY KEY,
       property TEXT NOT NULL UNIQUE,
       snapshot JSONB NOT NULL,
-      fetched_at TIMESTAMPTZ DEFAULT NOW()
+      fetched_at TIMESTAMPTZ DEFAULT NOW(),
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL
     )
   `;
+  // Migration: add user_id to existing tables that predate this column
+  await sql`ALTER TABLE gsc_snapshots ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id) ON DELETE SET NULL`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS dashboard_analyses (
@@ -358,26 +361,25 @@ export const PRO_CAP_USD = Infinity;
 
 const SNAPSHOT_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
-export async function getCachedSnapshot(property: string): Promise<unknown | null> {
+export async function getCachedSnapshot(property: string, userId?: number): Promise<unknown | null> {
   try {
-    const result = await sql`
-      SELECT snapshot, fetched_at FROM gsc_snapshots
-      WHERE property = ${property}
-        AND fetched_at > NOW() - INTERVAL '30 minutes'
-    `;
+    const result = userId !== undefined
+      ? await sql`SELECT snapshot FROM gsc_snapshots WHERE property = ${property} AND user_id = ${userId} AND fetched_at > NOW() - INTERVAL '30 minutes'`
+      : await sql`SELECT snapshot FROM gsc_snapshots WHERE property = ${property} AND fetched_at > NOW() - INTERVAL '30 minutes'`;
     return result.rows[0]?.snapshot ?? null;
   } catch {
     return null;
   }
 }
 
-export async function setCachedSnapshot(property: string, snapshot: unknown): Promise<void> {
+export async function setCachedSnapshot(property: string, snapshot: unknown, userId?: number): Promise<void> {
   try {
     await sql`
-      INSERT INTO gsc_snapshots (property, snapshot)
-      VALUES (${property}, ${JSON.stringify(snapshot)})
+      INSERT INTO gsc_snapshots (property, snapshot, user_id)
+      VALUES (${property}, ${JSON.stringify(snapshot)}, ${userId ?? null})
       ON CONFLICT (property) DO UPDATE SET
         snapshot = EXCLUDED.snapshot,
+        user_id = EXCLUDED.user_id,
         fetched_at = NOW()
     `;
   } catch {
@@ -385,9 +387,13 @@ export async function setCachedSnapshot(property: string, snapshot: unknown): Pr
   }
 }
 
-export async function deleteCachedSnapshot(property: string): Promise<void> {
+export async function deleteCachedSnapshot(property: string, userId?: number): Promise<void> {
   try {
-    await sql`DELETE FROM gsc_snapshots WHERE property = ${property}`;
+    if (userId !== undefined) {
+      await sql`DELETE FROM gsc_snapshots WHERE property = ${property} AND user_id = ${userId}`;
+    } else {
+      await sql`DELETE FROM gsc_snapshots WHERE property = ${property}`;
+    }
   } catch {
     // Silently fail
   }
@@ -585,6 +591,7 @@ export async function getLatestArticleIdeas(
     const r = await sql`
       SELECT result FROM article_ideas
       WHERE user_id = ${userId} AND property = ${property}
+        AND generated_at > NOW() - INTERVAL '30 days'
     `;
     return r.rows[0]?.result ?? null;
   } catch {

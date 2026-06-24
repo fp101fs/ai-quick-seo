@@ -29,6 +29,7 @@ export async function generateArticleIdeas(): Promise<ArticleIdeasResult> {
     );
   }
 
+  const userId = await getUserId();
   let snapshot: GscSnapshot;
   let isDemo = false;
 
@@ -36,7 +37,7 @@ export async function generateArticleIdeas(): Promise<ArticleIdeasResult> {
     snapshot = getDemoSnapshot();
     isDemo = true;
   } else if (status.connected && status.property) {
-    const cached = await getCachedSnapshot(status.property);
+    const cached = await getCachedSnapshot(status.property, userId ?? undefined);
     if (!cached) {
       throw new Error(
         "No Search Console data found. Visit the Dashboard to import your data first."
@@ -48,8 +49,6 @@ export async function generateArticleIdeas(): Promise<ArticleIdeasResult> {
       "Connect Google Search Console first to generate article ideas for your site."
     );
   }
-
-  const userId = await getUserId();
   const result = await jsonCompletion<Omit<ArticleIdeasResult, "generatedAt" | "demo">>(
     buildArticleIdeasPrompt(snapshot),
     { userId: userId ?? undefined, feature: "article-ideas" }
