@@ -35,79 +35,19 @@ import { PropertySelector } from "@/components/property-selector";
 import { getNavCounts } from "@/app/actions/seo";
 
 const navItems = [
-  {
-    href: "/dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    tooltip: "Daily SEO briefing: traffic overview, quick wins, and your AI-prioritized task list.",
-  },
-  {
-    href: "/opportunities",
-    label: "Opportunities",
-    icon: Target,
-    tooltip: "Pages losing clicks, queries near page 1, low CTR issues — ranked by impact.",
-  },
-  {
-    href: "/article-ideas",
-    label: "Article Ideas",
-    icon: Lightbulb,
-    tooltip: "AI-generated article titles for keyword gaps your site isn't covering yet.",
-  },
-  {
-    href: "/internal-links",
-    label: "Internal Links",
-    icon: Link2,
-    tooltip: "Crawls your sitemap to find orphan pages and suggest where to add internal links.",
-  },
-  {
-    href: "/content-refresh",
-    label: "Content Refresh",
-    icon: RefreshCw,
-    tooltip: "AI-drafted title, meta description, new H2 sections, and FAQs for any existing page.",
-  },
-  {
-    href: "/coach",
-    label: "AI Coach",
-    icon: MessageSquare,
-    tooltip: "Chat with an AI that knows your site's data — ask why traffic dropped, what to fix, etc.",
-  },
-  {
-    href: "/competitor",
-    label: "Competitor Spy",
-    icon: Search,
-    tooltip: "Enter a competitor URL to extract their target keywords, content gaps, and blog ideas.",
-  },
-  {
-    href: "/keywords",
-    label: "Keywords",
-    icon: Hash,
-    tooltip: "Top queries from Google Search Console with clicks, impressions, CTR, and average position.",
-  },
-  {
-    href: "/rank-tracking",
-    label: "Rank Tracking",
-    icon: Activity,
-    tooltip: "Track keyword positions over time using your GSC data. Click any keyword to see its trend.",
-  },
-  {
-    href: "/page-grader",
-    label: "Page Grader",
-    icon: Gauge,
-    tooltip: "Grade any page out of 100 for SEO and AI search readiness. Get a step-by-step plan to reach 100.",
-  },
-  {
-    href: "/action-plan",
-    label: "Action Plan",
-    icon: ListChecks,
-    tooltip: "Top 10 ranked SEO tasks with copy-ready Claude prompts. One click to copy them all.",
-  },
-  {
-    href: "/sitemap-explorer",
-    label: "Sitemap Explorer",
-    icon: Layers,
-    tooltip: "Browse all your pages in a tree view. Click Grade or Improve to take action on any page.",
-  },
-];
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, tooltip: "Daily SEO briefing: traffic overview, quick wins, and your AI-prioritized task list." },
+  { href: "/opportunities", label: "Opportunities", icon: Target, tooltip: "Pages losing clicks, queries near page 1, low CTR issues — ranked by impact." },
+  { href: "/article-ideas", label: "Article Ideas", icon: Lightbulb, tooltip: "AI-generated article titles for keyword gaps your site isn't covering yet." },
+  { href: "/internal-links", label: "Internal Links", icon: Link2, tooltip: "Crawls your sitemap to find orphan pages and suggest where to add internal links." },
+  { href: "/content-refresh", label: "Content Refresh", icon: RefreshCw, tooltip: "AI-drafted title, meta description, new H2 sections, and FAQs for any existing page." },
+  { href: "/coach", label: "AI Coach", icon: MessageSquare, tooltip: "Chat with an AI that knows your site's data — ask why traffic dropped, what to fix, etc." },
+  { href: "/keywords", label: "Keywords", icon: Hash, tooltip: "Top queries from Google Search Console with clicks, impressions, CTR, and average position." },
+  { href: "/rank-tracking", label: "Rank Tracking", icon: Activity, tooltip: "Track keyword positions over time using your GSC data. Click any keyword to see its trend." },
+  { href: "/page-grader", label: "Page Grader", icon: Gauge, tooltip: "Grade any page out of 100 for SEO and AI search readiness. Get a step-by-step plan to reach 100." },
+  { href: "/action-plan", label: "Action Plan", icon: ListChecks, tooltip: "Top 10 ranked SEO tasks with copy-ready Claude prompts. One click to copy them all." },
+  { href: "/sitemap-explorer", label: "Sitemap Explorer", icon: Layers, tooltip: "Browse all your pages in a tree view. Click Grade or Improve to take action on any page." },
+  { href: "/competitor", label: "Competitor Spy", icon: Search, tooltip: "Enter a competitor URL to extract their target keywords, content gaps, and blog ideas.", dim: true },
+] as const;
 
 function ConnectionChip({ status }: { status: ConnectionStatus }) {
   if (status.demo) {
@@ -200,8 +140,9 @@ export function AppShell({
       {navItems.map((item) => {
         const active = pathname.startsWith(item.href);
         const Icon = item.icon;
+        const dim = "dim" in item && item.dim;
         return (
-          <div key={item.href} className="flex items-center gap-1 group/nav">
+          <div key={item.href} className={cn("flex items-center gap-1 group/nav", dim && "opacity-50")}>
             <Link
               href={item.href}
               className={cn(

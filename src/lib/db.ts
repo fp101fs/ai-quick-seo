@@ -502,7 +502,23 @@ export async function getPageGrade(
   }
 }
 
+export async function getPageGradeCount(userId: number): Promise<number> {
+  try {
+    await sql`CREATE TABLE IF NOT EXISTS page_grade_cache (user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, url TEXT NOT NULL, result JSONB NOT NULL, generated_at TIMESTAMPTZ DEFAULT NOW(), PRIMARY KEY (user_id, url))`;
+    const r = await sql<{ count: string }>`SELECT COUNT(*)::text as count FROM page_grade_cache WHERE user_id = ${userId}`;
+    return parseInt(r.rows[0]?.count ?? "0", 10);
+  } catch { return 0; }
+}
+
 // ---------- Content Refresh Cache ----------
+
+export async function getContentRefreshCount(userId: number): Promise<number> {
+  try {
+    await sql`CREATE TABLE IF NOT EXISTS content_refresh_cache (user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, url TEXT NOT NULL, result JSONB NOT NULL, generated_at TIMESTAMPTZ DEFAULT NOW(), PRIMARY KEY (user_id, url))`;
+    const r = await sql<{ count: string }>`SELECT COUNT(*)::text as count FROM content_refresh_cache WHERE user_id = ${userId}`;
+    return parseInt(r.rows[0]?.count ?? "0", 10);
+  } catch { return 0; }
+}
 
 export async function saveContentRefresh(
   userId: number,

@@ -300,20 +300,35 @@ export async function getNavCounts(): Promise<Record<string, number>> {
     if (!userId) return {};
     const property = status.demo ? "demo" : status.property;
     if (!property) return {};
-    const { getLatestAnalysis, getLatestArticleIdeas, getTrackedKeywords } = await import("@/lib/db");
-    const [analysis, ideas, keywords] = await Promise.all([
+    const {
+      getLatestAnalysis, getLatestArticleIdeas, getTrackedKeywords,
+      getPageGradeCount, getContentRefreshCount,
+    } = await import("@/lib/db");
+    const [analysis, ideas, keywords, gradeCount, refreshCount, crawl] = await Promise.all([
       getLatestAnalysis(userId, property).catch(() => null),
       getLatestArticleIdeas(userId, property).catch(() => null),
       getTrackedKeywords(userId).catch(() => []),
+      getPageGradeCount(userId).catch(() => 0),
+      getContentRefreshCount(userId).catch(() => 0),
+      getCachedCrawl().catch(() => null),
     ]);
+    const snap = analysis?.snapshot as { queries?: { query: string }[]; pages?: unknown[] } | null;
+    const uniqueKeywords = snap?.queries ? new Set(snap.queries.map((q) => q.query.toLowerCase())).size : 0;
+    const sitemapPages = snap?.pages?.length ?? 0;
     const counts: Record<string, number> = {};
     const opps = (analysis?.opportunities as unknown[] | null)?.length ?? 0;
     const tasks = (analysis?.tasks as unknown[] | null)?.length ?? 0;
     const ideaCount = ((ideas as { ideas?: unknown[] } | null)?.ideas)?.length ?? 0;
+    const suggestions = (crawl as { suggestions?: unknown[] } | null)?.suggestions?.length ?? 0;
     if (opps) counts["/opportunities"] = opps;
     if (tasks) counts["/action-plan"] = tasks;
     if (ideaCount) counts["/article-ideas"] = ideaCount;
     if (keywords.length) counts["/rank-tracking"] = keywords.length;
+    if (uniqueKeywords) counts["/keywords"] = uniqueKeywords;
+    if (refreshCount) counts["/content-refresh"] = refreshCount;
+    if (suggestions) counts["/internal-links"] = suggestions;
+    if (gradeCount) counts["/page-grader"] = gradeCount;
+    if (sitemapPages) counts["/sitemap-explorer"] = sitemapPages;
     return counts;
   } catch {
     return {};
