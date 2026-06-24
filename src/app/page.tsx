@@ -12,6 +12,8 @@ import {
   Gauge,
   Lightbulb,
   Quote,
+  Hash,
+  Activity,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -59,6 +61,24 @@ const features = [
     description:
       "Finds keyword gaps your site isn't covering and generates ready-to-publish article titles ranked by traffic opportunity.",
   },
+  {
+    icon: Hash,
+    title: "Keywords",
+    description:
+      "Your top queries from Google Search Console — clicks, impressions, CTR, and average position in one clean view.",
+  },
+  {
+    icon: Activity,
+    title: "Rank Tracking",
+    description:
+      "Track keyword positions over time using your GSC data. See what's climbing, what's slipping, and act fast.",
+  },
+  {
+    icon: Gauge,
+    title: "Page Grader",
+    description:
+      "Grade any page out of 100 for SEO and AI search readiness. Get a step-by-step plan to reach 100.",
+  },
 ];
 
 const testimonials = [
@@ -81,7 +101,28 @@ const testimonials = [
     role: "SaaS Founder",
     initials: "TA",
     quote:
-      "Finally an SEO tool that doesn't make me feel dumb. It reads my actual data and tells me exactly what to fix — in plain English.",
+      "Finally an SEO tool that doesn't make me feel dumb. It reads my actual data and tells me exactly what to fix, in plain English.",
+  },
+  {
+    name: "Jake Mullen",
+    role: "Indie Blogger",
+    initials: "JM",
+    quote:
+      "I spent two years writing content that went nowhere. First week using this I found three pages stuck at position 11. Fixed them. Two are on page one now.",
+  },
+  {
+    name: "Rachel Osei",
+    role: "E-commerce Founder",
+    initials: "RO",
+    quote:
+      "The Content Refresh tool rewrote my product category pages in minutes. I couldn't have done it better myself, and I've been doing SEO for eight years.",
+  },
+  {
+    name: "Dan Kowalski",
+    role: "Agency Owner",
+    initials: "DK",
+    quote:
+      "I run a Page Grader report for every new client in the first call. Instant credibility. Shows exactly what's broken, no jargon.",
   },
 ];
 
@@ -128,11 +169,11 @@ export default function LandingPage() {
               Sign in
             </a>
             <Button
-              className="bg-indigo-600 hover:bg-indigo-700 rounded-full px-5"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-5"
               render={<Link href="/dashboard" />}
               nativeButton={false}
             >
-              Open dashboard
+              Dashboard
               <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
@@ -156,13 +197,12 @@ export default function LandingPage() {
             <span className="text-indigo-600">Every single day.</span>
           </h1>
           <p className="text-lg text-slate-600 mb-10 max-w-xl mx-auto">
-            SerpDo reads your Google Search Console data and tells you the one SEO action
-            that will move the needle most — then helps you execute it.
+            Your Search Console data, decoded. One prioritized SEO action — every day.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button
               size="lg"
-              className="bg-indigo-600 hover:bg-indigo-700 rounded-full px-8 h-12 text-base"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-8 h-12 text-base"
               render={<Link href="/dashboard" />}
               nativeButton={false}
             >
@@ -190,7 +230,7 @@ export default function LandingPage() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
         <div className="text-center mb-12">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
-            Six tools. One daily plan.
+            Ten tools. One daily plan.
           </h2>
           <p className="text-slate-500 max-w-xl mx-auto">
             Your real Search Console data — turned into specific, ranked actions.
@@ -245,7 +285,7 @@ export default function LandingPage() {
       <section className="bg-white border-y border-slate-200 py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-center mb-12">
-            Three steps to your daily plan
+            Three steps to AI SEO automation
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {[

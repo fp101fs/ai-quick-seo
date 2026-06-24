@@ -30,7 +30,20 @@ async function positionFromSnapshot(keyword: string): Promise<number | null> {
 export async function getTrackingData() {
   const userId = await getUserId();
   if (!userId) return [];
-  return getKeywordsWithLatestPositions(userId);
+  const rows = await getKeywordsWithLatestPositions(userId);
+  // ponytail: auto-capture today on every visit so "vs yesterday" works next day
+  const missing = rows.filter((r) => r.today == null);
+  if (missing.length) {
+    const today = await todayStr();
+    await Promise.all(
+      missing.map(async (r) => {
+        const pos = await positionFromSnapshot(r.keyword);
+        await upsertKeywordPosition(userId, r.keyword, today, pos);
+      })
+    );
+    return getKeywordsWithLatestPositions(userId);
+  }
+  return rows;
 }
 
 export async function addKeyword(keyword: string) {

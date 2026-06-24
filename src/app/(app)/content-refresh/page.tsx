@@ -103,7 +103,7 @@ function CopyAllButton({ url, result }: { url: string; result: ContentRefreshRes
       className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all border ${
         copied
           ? "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-400"
-          : "bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:border-indigo-700 dark:text-indigo-400 dark:hover:bg-indigo-900/30"
+          : "bg-orange-500 border-orange-500 text-white hover:bg-orange-600 hover:border-orange-600"
       }`}
     >
       {copied ? <Check className="w-4 h-4" /> : <ClipboardList className="w-4 h-4" />}

@@ -415,10 +415,11 @@ export default function DashboardPage() {
                     navigator.clipboard.writeText(prompt).then(() =>
                       toast.success("Prompt copied — paste into Claude")
                     );
+
                   }}
                 >
                   <Copy className="w-3.5 h-3.5" />
-                  Fix with Claude
+                  Copy Prompt
                 </Button>
                 {topTask.page && (
                   <Button

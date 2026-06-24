@@ -375,7 +375,7 @@ export function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
             "w-full flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all border",
             copied
               ? "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-400"
-              : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-700 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-indigo-900/20 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
+              : "bg-orange-500 border-orange-500 text-white hover:bg-orange-600 hover:border-orange-600"
           )}
         >
           {copied ? (

@@ -110,10 +110,10 @@ export function TaskCard({ task }: { task: SeoTask }) {
           )}
           <button
             onClick={copyPrompt}
-            className="inline-flex items-center gap-1 text-xs font-medium text-orange-500 hover:text-orange-600 dark:text-orange-400 dark:hover:text-orange-300"
+            className="inline-flex items-center gap-1 text-xs font-medium bg-orange-500 hover:bg-orange-600 text-white rounded-full px-2.5 py-1"
           >
             <Copy className="w-3 h-3" />
-            Fix with Claude
+            Copy Prompt
           </button>
         </div>
       </CardContent>
