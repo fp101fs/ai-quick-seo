@@ -261,7 +261,27 @@ export async function refreshContent(url: string): Promise<ContentRefreshResult>
   }
 
   const snapshot = await getCurrentSnapshot().catch(() => null);
-  return analyzeContentRefresh(target, snapshot);
+  const result = await analyzeContentRefresh(target, snapshot);
+
+  // Save to cache (best-effort)
+  const userId = await getUserId();
+  if (userId) {
+    const { saveContentRefresh } = await import("@/lib/db");
+    await saveContentRefresh(userId, target, result).catch(() => {});
+  }
+
+  return result;
+}
+
+export async function getContentRefreshCache(
+  url: string
+): Promise<{ result: ContentRefreshResult; generatedAt: string } | null> {
+  const userId = await getUserId();
+  if (!userId) return null;
+  const { getContentRefresh } = await import("@/lib/db");
+  const row = await getContentRefresh(userId, url);
+  if (!row) return null;
+  return { result: row.result as ContentRefreshResult, generatedAt: row.generated_at };
 }
 
 export async function getSuggestedRefreshPages(): Promise<string[]> {
