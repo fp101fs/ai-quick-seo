@@ -2,7 +2,7 @@
 
 > **"What is the highest-impact SEO action I should take today?"**
 
-SerpDo connects to Google Search Console, crawls your sitemap, and turns real traffic data into a prioritized daily action plan. No keyword databases, no enterprise pricing — just your actual data turned into specific work.
+SerpDo connects to Google Search Console, finds your biggest SEO problem, and copies a ready-to-paste Claude prompt to fix it. One click. No keyword databases, no enterprise pricing — just your actual data turned into AI-ready actions.
 
 **Live:** [serpdo.com](https://serpdo.com)
 
@@ -19,6 +19,9 @@ SerpDo connects to Google Search Console, crawls your sitemap, and turns real tr
 | **Content Refresh** | AI-drafted titles, meta descriptions, new H2s, and FAQs for any existing page |
 | **AI Coach** | Chat with an SEO coach that knows your real pages, queries, and numbers |
 | **Competitor Spy** | Analyze any competitor URL: keywords, content gaps, blog ideas |
+| **Keywords** | Top queries from GSC with clicks, impressions, CTR, and average position |
+| **Rank Tracking** | Track keyword positions over time; auto-captures daily snapshot on page load |
+| **Page Grader** | Grade any URL 0–100 for SEO + GEO readiness; step-by-step plan to reach 100 |
 
 **Demo mode:** works without a Google account — click "Explore with demo data" on the dashboard.
 
@@ -130,12 +133,17 @@ src/
 │   │   ├── content-refresh/        # AI content drafts
 │   │   ├── coach/                  # AI chat
 │   │   ├── competitor/             # Competitor analysis
+│   │   ├── keywords/               # GSC keyword table
+│   │   ├── rank-tracking/          # Keyword position history + daily auto-capture
+│   │   ├── page-grader/            # 0-100 SEO+GEO score with improvement plan
 │   │   └── usage/                  # Usage & billing
 │   ├── actions/                    # Next.js server actions (the API layer)
 │   │   ├── analyze.ts              # Competitor analysis
 │   │   ├── article-ideas.ts        # Article idea generation
 │   │   ├── coach.ts                # Coach chat
 │   │   ├── gsc.ts                  # GSC connection + property management
+│   │   ├── rank-tracking.ts        # Keyword position CRUD + daily auto-capture
+│   │   ├── page-grader.ts          # Page grade server action + DB cache
 │   │   └── seo.ts                  # Dashboard, opportunities, crawl, refresh
 │   └── api/
 │       ├── auth/google/            # OAuth flow (initiate + callback + logout)
@@ -166,6 +174,7 @@ src/
         ├── google-auth.ts          # OAuth token exchange + userinfo fetch
         ├── session.ts              # HMAC-signed cookie session
         ├── context.ts              # Resolves current site context (live vs demo)
+        ├── page-grader.ts          # Fetches page via Jina Reader, scores 8 SEO+GEO categories
         └── store.ts                # In-memory TTL cache (per serverless instance)
 ```
 
