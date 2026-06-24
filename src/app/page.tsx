@@ -146,9 +146,34 @@ const faqs = [
   },
 ];
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      name: "SerpDo",
+      url: "https://serpdo.com",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      description:
+        "AI-powered SEO tool that connects to Google Search Console and generates prioritized, paste-ready Claude prompts to fix your biggest SEO problems.",
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: faqs.map((faq) => ({
+        "@type": "Question",
+        name: faq.q,
+        acceptedAnswer: { "@type": "Answer", text: faq.a },
+      })),
+    },
+  ],
+};
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       {/* Nav */}
       <header className="bg-white/80 backdrop-blur border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
@@ -157,6 +182,12 @@ export default function LandingPage() {
             <span className="font-bold tracking-tight">SerpDo</span>
           </Link>
           <div className="flex items-center gap-3">
+            <Link
+              href="/blog"
+              className="text-sm text-slate-500 hover:text-slate-900 transition-colors"
+            >
+              Blog
+            </Link>
             <Link
               href="/pricing"
               className="text-sm text-slate-500 hover:text-slate-900 transition-colors"
@@ -368,6 +399,9 @@ export default function LandingPage() {
           SerpDo — powered by Google Search Console + OpenRouter
         </p>
         <div className="flex items-center justify-center gap-4 text-sm">
+          <Link href="/blog" className="text-slate-400 hover:text-slate-600 transition-colors">
+            Blog
+          </Link>
           <Link href="/pricing" className="text-slate-400 hover:text-slate-600 transition-colors">
             Pricing
           </Link>

@@ -2,7 +2,7 @@
 // live in httpOnly cookies so no persistence layer is needed.
 
 import { cookies } from "next/headers";
-import { createHmac } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import type { ConnectionStatus, GscTokens } from "@/lib/types";
 
 const TOKENS_COOKIE = "gsc_tokens";
@@ -54,7 +54,7 @@ export async function getUserId(): Promise<number | null> {
   const expected = createHmac("sha256", HMAC_SECRET())
     .update(idPart)
     .digest("hex");
-  if (sigPart !== expected) return null;
+  if (!timingSafeEqual(Buffer.from(sigPart), Buffer.from(expected))) return null;
   return id;
 }
 

@@ -30,14 +30,16 @@ export const metadata: Metadata = {
     description:
       "Connects to your Google Search Console and tells you exactly which SEO task to do today — ranked by traffic impact.",
     siteName: "SerpDo",
-    images: [{ url: "/serpdo-og-1200x630-bnw.png", width: 1200, height: 630 }],
+    images: [{ url: "/serpdo-og-1200x630-bnw.png", width: 1200, height: 630, alt: "SerpDo — AI-powered SEO dashboard" }],
   },
   twitter: {
     card: "summary_large_image",
+    site: "@serpdo",
+    creator: "@serpdo",
     title: "SerpDo — Your daily SEO action plan, powered by AI",
     description:
       "Connects to your Google Search Console and tells you exactly which SEO task to do today — ranked by traffic impact.",
-    images: ["/serpdo-og-1200x630-bnw.png"],
+    images: [{ url: "/serpdo-og-1200x630-bnw.png", alt: "SerpDo — AI-powered SEO dashboard" }],
   },
 };
 

@@ -12,6 +12,23 @@
 
 ---
 
+## Brand colors
+
+| Name | Hex | Usage |
+|------|-----|-------|
+| **Indigo 600** | `#4f46e5` | Primary / nav / CTA buttons |
+| **Violet 600** | `#7c3aed` | Gradient accents (indigo→violet), Pro badge |
+| **Orange 500** | `#f97316` | Copy buttons, "Improve" CTA, action highlights |
+| **Amber 300** | `#fcd34d` | Pro crown icon |
+| **Slate 900** | `#0f172a` | Dark mode backgrounds |
+| **Slate 50** | `#f8fafc` | Light mode card backgrounds |
+
+**Primary gradient:** `from-indigo-600 to-violet-600` (used in hero, banners, Pro upgrade confirmation)
+
+**Font:** Inter (Google Fonts, variable weight)
+
+---
+
 ## Target audience
 
 - Founders running their own SEO
@@ -61,19 +78,21 @@ Free at serpdo.com.
 
 ---
 
-## Features (10 tools)
+## Features (12 tools)
 
 | Tool | One-liner |
 |------|-----------|
-| **Dashboard** | Daily SEO briefing with your #1 prioritized task |
-| **Opportunities** | Pages losing clicks, page-2 keywords, low-CTR snippets |
+| **Dashboard** | Daily SEO briefing: top task, traffic stats, and ranked AI action plan |
+| **Action Plan** | Your top 10 SEO tasks ranked by impact — plus a single mega-prompt to paste into Claude |
+| **Opportunities** | Pages losing clicks, page-2 keywords, low-CTR snippets — ranked by traffic impact |
+| **Sitemap Explorer** | Browse your entire site tree, see click/impression data per page, Grade or Improve in one click |
 | **Content Refresh** | AI rewrites titles, meta, H2s, and FAQs for any page |
 | **Page Grader** | Grade any page 0-100 for SEO + AI search readiness |
 | **Rank Tracking** | Track keyword positions over time from your GSC data |
 | **Keywords** | Your top queries with clicks, impressions, CTR, position |
 | **Article Ideas** | AI-generated titles for keyword gaps you aren't covering |
 | **Internal Links** | Find orphan pages and get ready-to-use link suggestions |
-| **AI Coach** | Chat with an SEO coach that knows your actual data |
+| **AI Coach** | Chat with an SEO coach that knows your actual data — history persists across sessions |
 | **Competitor Spy** | Analyze any competitor URL for keywords and content gaps |
 
 ---
@@ -86,7 +105,7 @@ Free at serpdo.com.
 | Pro | $10/mo | $10/mo AI usage |
 
 Free plan: demo mode + GSC connection + limited AI features.
-Pro plan: full AI access across all 10 tools.
+Pro plan: full AI access across all 12 tools.
 
 ---
 
@@ -99,7 +118,7 @@ Pro plan: full AI access across all 10 tools.
 **Description:**
 SerpDo connects to Google Search Console and finds your biggest SEO problems. Every opportunity card includes a ready-to-paste Claude prompt. One click copies it. Paste into Claude and get your page fixed.
 
-Ten tools total: opportunities, content refresh, page grader, rank tracking, internal links, article ideas, competitor spy, AI coach, keywords, and a daily dashboard with your top task.
+Twelve tools total: action plan, sitemap explorer, opportunities, content refresh, page grader, rank tracking, internal links, article ideas, competitor spy, AI coach (with persistent chat history), keywords, and a daily dashboard with your top task.
 
 No SEO expertise required. Free to try with demo data, no credit card needed.
 
@@ -127,7 +146,7 @@ Would love to hear what features you'd want to see next.
 
 ## Stripe checkout description
 
-Connect to Google Search Console. Get AI-generated Claude prompts for your highest-impact SEO fixes. Ten tools, one daily plan, no expertise required.
+Connect to Google Search Console. Get AI-generated Claude prompts for your highest-impact SEO fixes. Twelve tools, one daily plan, no expertise required.
 
 ---
 
@@ -138,3 +157,7 @@ Connect to Google Search Console. Get AI-generated Claude prompts for your highe
 **Screenshot 2:** Opportunities page with 3-4 cards visible. One card expanded showing the orange "Copy Prompt" button. Claude tab visible in background with a prompt pasted in.
 
 **Screenshot 3:** Page Grader results for a real URL. Score ring showing 67/100, category cards below with fix suggestions and "Fix Content" links.
+
+**Screenshot 4:** Action Plan page showing ranked top-10 task list with orange Copy buttons per task and the big "Copy all 10 tasks" mega-prompt button.
+
+**Screenshot 5:** Sitemap Explorer tree view showing grouped pages with Grade and Improve buttons per row.

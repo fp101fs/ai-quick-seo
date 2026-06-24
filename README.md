@@ -13,11 +13,13 @@ SerpDo connects to Google Search Console, finds your biggest SEO problem, and co
 | Feature | Description |
 |---------|-------------|
 | **Dashboard** | Daily briefing: top task, traffic overview, quick wins, AI-prioritized action list |
+| **Action Plan** | Top 10 SEO tasks ranked by impact; per-task copy prompt + single mega-prompt for all 10 |
 | **Opportunities** | Declining pages, page-2 keywords, low-CTR snippets — ranked by traffic impact |
+| **Sitemap Explorer** | Tree view of all GSC pages grouped by path; Grade or Improve any page in one click |
 | **Article Ideas** | AI-generated article titles for keyword gaps your site isn't covering |
 | **Internal Links** | Sitemap crawler that finds orphan pages and suggests link placements with anchor text |
 | **Content Refresh** | AI-drafted titles, meta descriptions, new H2s, and FAQs for any existing page |
-| **AI Coach** | Chat with an SEO coach that knows your real pages, queries, and numbers |
+| **AI Coach** | Chat with an SEO coach that knows your real pages, queries, and numbers; history persists in DB |
 | **Competitor Spy** | Analyze any competitor URL: keywords, content gaps, blog ideas |
 | **Keywords** | Top queries from GSC with clicks, impressions, CTR, and average position |
 | **Rank Tracking** | Track keyword positions over time; auto-captures daily snapshot on page load |
@@ -106,7 +108,7 @@ Access is **read-only**. Tokens stored in httpOnly cookies — nothing persisted
    curl -X POST https://YOUR-DOMAIN/api/migrate \
      -H "x-migrate-secret: YOUR_MIGRATE_SECRET"
    ```
-   Creates tables: `users`, `subscriptions`, `ai_usage`, `gsc_snapshots`
+   Creates tables: `users`, `subscriptions`, `ai_usage`, `gsc_snapshots`, `coach_messages`
 
 > **Order matters:** set env vars → deploy → run migrate → test auth → test Stripe webhook
 
@@ -125,13 +127,15 @@ src/
 │   ├── sitemap.ts                  # /sitemap.xml
 │   ├── robots.ts                   # /robots.txt
 │   ├── (app)/                      # Authenticated product pages
-│   │   ├── layout.tsx              # App shell (sidebar, session, usage)
-│   │   ├── dashboard/              # Daily briefing + task list
+│   │   ├── layout.tsx              # App shell (sidebar, mobile nav, user popup)
+│   │   ├── dashboard/              # Daily briefing + task list + action plan section
+│   │   ├── action-plan/            # Top-10 ranked SEO tasks + mega-prompt copy
 │   │   ├── opportunities/          # GSC opportunity cards
+│   │   ├── sitemap-explorer/       # Tree view of all GSC pages with Grade/Improve actions
 │   │   ├── article-ideas/          # AI keyword gap ideas
 │   │   ├── internal-links/         # Sitemap crawler + link suggestions
 │   │   ├── content-refresh/        # AI content drafts
-│   │   ├── coach/                  # AI chat
+│   │   ├── coach/                  # AI chat with persistent DB history
 │   │   ├── competitor/             # Competitor analysis
 │   │   ├── keywords/               # GSC keyword table
 │   │   ├── rank-tracking/          # Keyword position history + daily auto-capture
@@ -140,18 +144,21 @@ src/
 │   ├── actions/                    # Next.js server actions (the API layer)
 │   │   ├── analyze.ts              # Competitor analysis
 │   │   ├── article-ideas.ts        # Article idea generation
-│   │   ├── coach.ts                # Coach chat
+│   │   ├── coach.ts                # Coach chat + history persistence (load/save/clear)
 │   │   ├── gsc.ts                  # GSC connection + property management
 │   │   ├── rank-tracking.ts        # Keyword position CRUD + daily auto-capture
 │   │   ├── page-grader.ts          # Page grade server action + DB cache
-│   │   └── seo.ts                  # Dashboard, opportunities, crawl, refresh
+│   │   └── seo.ts                  # Dashboard, opportunities, crawl, refresh, sitemap pages
 │   └── api/
 │       ├── auth/google/            # OAuth flow (initiate + callback + logout)
 │       ├── stripe/                 # Checkout, portal, webhook
 │       ├── migrate/                # DB schema init (run once)
 │       └── usage/                  # Usage data endpoint
 ├── components/
-│   ├── app-shell.tsx               # Sidebar + mobile nav + user chip
+│   ├── app-shell.tsx               # Sidebar + mobile nav + user popup menu
+│   ├── action-plan.tsx             # Ranked task list with per-task + mega copy buttons
+│   ├── sitemap-tree.tsx            # Collapsible site tree grouped by path segment
+│   ├── sitemap-page-picker.tsx     # Dropdown picker that pre-fills URL fields from GSC pages
 │   ├── property-selector.tsx       # GSC property switcher
 │   ├── usage-meter.tsx             # Free/Pro usage bar
 │   ├── connect-gate.tsx            # Gate for unauthenticated users
