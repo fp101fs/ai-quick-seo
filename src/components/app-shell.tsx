@@ -32,6 +32,7 @@ import type { ConnectionStatus } from "@/lib/types";
 import type { DbUser } from "@/lib/db";
 import { UsageMeter } from "@/components/usage-meter";
 import { PropertySelector } from "@/components/property-selector";
+import { getNavCounts } from "@/app/actions/seo";
 
 const navItems = [
   {
@@ -184,7 +185,9 @@ export function AppShell({
   // undefined on server/first render, causing different icon than client
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [counts, setCounts] = useState<Record<string, number>>({});
   useEffect(() => { setMounted(true); }, []);
+  useEffect(() => { getNavCounts().then(setCounts).catch(() => {}); }, []);
 
   const nav = (orientation: "vertical" | "horizontal") => (
     <nav
@@ -212,6 +215,11 @@ export function AppShell({
                 className={cn("w-4 h-4 shrink-0", active ? "text-indigo-600" : "text-slate-400")}
               />
               {item.label}
+              {orientation === "vertical" && counts[item.href] ? (
+                <span className="ml-auto text-xs font-medium tabular-nums text-slate-400 dark:text-slate-500">
+                  {counts[item.href]}
+                </span>
+              ) : null}
             </Link>
             {orientation === "vertical" && item.tooltip && (
               <span className="opacity-0 group-hover/nav:opacity-100 transition-opacity pr-1">

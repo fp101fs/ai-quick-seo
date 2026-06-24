@@ -294,6 +294,32 @@ export async function getSitemapPages(): Promise<string[]> {
   } catch { return []; }
 }
 
+export async function getNavCounts(): Promise<Record<string, number>> {
+  try {
+    const [userId, status] = await Promise.all([getUserId(), getConnectionStatus()]);
+    if (!userId) return {};
+    const property = status.demo ? "demo" : status.property;
+    if (!property) return {};
+    const { getLatestAnalysis, getLatestArticleIdeas, getTrackedKeywords } = await import("@/lib/db");
+    const [analysis, ideas, keywords] = await Promise.all([
+      getLatestAnalysis(userId, property).catch(() => null),
+      getLatestArticleIdeas(userId, property).catch(() => null),
+      getTrackedKeywords(userId).catch(() => []),
+    ]);
+    const counts: Record<string, number> = {};
+    const opps = (analysis?.opportunities as unknown[] | null)?.length ?? 0;
+    const tasks = (analysis?.tasks as unknown[] | null)?.length ?? 0;
+    const ideaCount = ((ideas as { ideas?: unknown[] } | null)?.ideas)?.length ?? 0;
+    if (opps) counts["/opportunities"] = opps;
+    if (tasks) counts["/action-plan"] = tasks;
+    if (ideaCount) counts["/article-ideas"] = ideaCount;
+    if (keywords.length) counts["/rank-tracking"] = keywords.length;
+    return counts;
+  } catch {
+    return {};
+  }
+}
+
 export async function getSuggestedRefreshPages(): Promise<string[]> {
   const userId = await getUserId();
   const status = await getConnectionStatus();
