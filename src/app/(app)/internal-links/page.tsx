@@ -76,15 +76,17 @@ export default function InternalLinksPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleCrawl = async (e: React.FormEvent) => {
+  const handleCrawl = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!sitemapUrl && !result?.demo) {
+    const url = (new FormData(e.currentTarget).get("sitemap") as string | null)?.trim() ?? sitemapUrl.trim();
+    if (!url && !result?.demo) {
       toast.error("Please enter a sitemap URL");
       return;
     }
+    setSitemapUrl(url);
     setCrawling(true);
     try {
-      const crawl = await runCrawl(sitemapUrl);
+      const crawl = await runCrawl(url);
       setResult(crawl);
       toast.success(`Crawled ${crawl.pages.filter((p) => p.ok).length} pages`);
     } catch (error) {
@@ -107,6 +109,7 @@ export default function InternalLinksPage() {
         <Input
           type="text"
           placeholder="https://yoursite.com/sitemap.xml"
+          name="sitemap"
           value={sitemapUrl}
           onChange={(e) => setSitemapUrl(e.target.value)}
           className="pl-12 pr-32 h-13 rounded-full border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm"
