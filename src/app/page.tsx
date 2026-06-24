@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { VideoModal } from "@/components/video-modal";
 
 const features = [
   {
@@ -220,7 +221,10 @@ export default function LandingPage() {
               Connect Search Console
             </Button>
           </div>
-          <p className="text-sm text-slate-400 mt-6">
+          <div className="flex justify-center mt-6">
+            <VideoModal />
+          </div>
+          <p className="text-sm text-slate-400 mt-4">
             Free to start. No credit card. Try it with demo data in seconds.
           </p>
         </div>
