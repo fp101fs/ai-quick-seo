@@ -83,8 +83,13 @@ export async function chatCompletion(
     const usage = data?.usage;
     const promptTokens = usage?.prompt_tokens ?? 0;
     const completionTokens = usage?.completion_tokens ?? 0;
-    // OpenRouter sometimes returns cost directly
-    const costUsd = usage?.cost ?? estimateCost(model, promptTokens, completionTokens);
+    // OpenRouter sometimes returns cost directly; fall back to estimate,
+    // and if tokens were also missing, estimate from character count
+    const promptChars = messages.reduce((n, m) => n + m.content.length, 0);
+    const estimatedTokens = promptTokens || Math.ceil(promptChars / 4);
+    const costUsd =
+      usage?.cost ??
+      estimateCost(model, estimatedTokens, completionTokens || Math.ceil(content.length / 4));
     recordAiUsage({
       userId: options.userId,
       model,
