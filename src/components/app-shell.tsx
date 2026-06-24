@@ -22,6 +22,7 @@ import {
   Moon,
   Hash,
   Activity,
+  Gauge,
 } from "lucide-react";
 import { InfoTooltip } from "@/components/info-tooltip";
 import { cn } from "@/lib/utils";
@@ -84,6 +85,12 @@ const navItems = [
     label: "Rank Tracking",
     icon: Activity,
     tooltip: "Track keyword positions over time using your GSC data. Click any keyword to see its trend.",
+  },
+  {
+    href: "/page-grader",
+    label: "Page Grader",
+    icon: Gauge,
+    tooltip: "Grade any page out of 100 for SEO and AI search readiness. Get a step-by-step plan to reach 100.",
   },
 ];
 

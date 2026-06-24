@@ -395,6 +395,50 @@ export async function getAnalysisHistory(userId: number): Promise<AnalysisSummar
   }
 }
 
+// ---------- Page Grade Cache ----------
+
+export async function savePageGrade(userId: number, url: string, result: unknown): Promise<void> {
+  await sql`
+    CREATE TABLE IF NOT EXISTS page_grade_cache (
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      url TEXT NOT NULL,
+      result JSONB NOT NULL,
+      generated_at TIMESTAMPTZ DEFAULT NOW(),
+      PRIMARY KEY (user_id, url)
+    )
+  `;
+  await sql`
+    INSERT INTO page_grade_cache (user_id, url, result, generated_at)
+    VALUES (${userId}, ${url}, ${JSON.stringify(result)}, NOW())
+    ON CONFLICT (user_id, url) DO UPDATE
+    SET result = EXCLUDED.result, generated_at = NOW()
+  `;
+}
+
+export async function getPageGrade(
+  userId: number,
+  url: string
+): Promise<{ result: unknown; generated_at: string } | null> {
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS page_grade_cache (
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        url TEXT NOT NULL,
+        result JSONB NOT NULL,
+        generated_at TIMESTAMPTZ DEFAULT NOW(),
+        PRIMARY KEY (user_id, url)
+      )
+    `;
+    const r = await sql<{ result: unknown; generated_at: string }>`
+      SELECT result, generated_at::text FROM page_grade_cache
+      WHERE user_id = ${userId} AND url = ${url}
+    `;
+    return r.rows[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
 // ---------- Content Refresh Cache ----------
 
 export async function saveContentRefresh(

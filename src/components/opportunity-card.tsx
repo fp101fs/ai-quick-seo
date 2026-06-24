@@ -13,6 +13,7 @@ import {
   ClipboardCopy,
   Check,
   ArrowRight,
+  Gauge,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -391,13 +392,22 @@ export function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
         </button>
 
         {opportunity.page && (
-          <Link
-            href={`/content-refresh?url=${encodeURIComponent(opportunity.page)}`}
-            className="w-full flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all border bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:border-indigo-700 dark:text-indigo-400 dark:hover:bg-indigo-900/30"
-          >
-            <ArrowRight className="w-3.5 h-3.5" />
-            Fix this page
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              href={`/content-refresh?url=${encodeURIComponent(opportunity.page)}`}
+              className="flex-1 flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all border bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:border-indigo-700 dark:text-indigo-400 dark:hover:bg-indigo-900/30"
+            >
+              <ArrowRight className="w-3.5 h-3.5" />
+              Fix this page
+            </Link>
+            <Link
+              href={`/page-grader?url=${encodeURIComponent(opportunity.page)}`}
+              title="Grade this page"
+              className="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all border bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-600"
+            >
+              <Gauge className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         )}
       </CardContent>
     </Card>

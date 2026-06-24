@@ -136,6 +136,29 @@ export interface ContentRefreshResult {
   contentAdditions: string[];
 }
 
+// ---------- Page Grader ----------
+
+export type GradeStatus = "great" | "good" | "needs-work" | "missing";
+export type GradeFixType = "content-refresh" | "rank-tracking" | "internal-links" | "manual";
+
+export interface GradeCategory {
+  id: string;
+  name: string;
+  emoji: string;
+  score: number;
+  maxScore: number;
+  status: GradeStatus;
+  finding: string;
+  fix: string | null;
+  fixType?: GradeFixType | null;
+}
+
+export interface GradeResult {
+  url: string;
+  totalScore: number;
+  categories: GradeCategory[];
+}
+
 // ---------- Daily tasks ----------
 
 export interface SeoTask {

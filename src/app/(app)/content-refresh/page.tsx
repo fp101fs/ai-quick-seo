@@ -2,6 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   RefreshCw,
@@ -18,6 +19,7 @@ import {
   ClipboardList,
   Check,
   Clock,
+  Gauge,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -329,7 +331,16 @@ function ContentRefreshInner() {
         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
           {/* Action bar */}
           <div className="flex items-center justify-between flex-wrap gap-3">
-            <CopyAllButton url={result.url || url} result={result} />
+            <div className="flex items-center gap-2 flex-wrap">
+              <CopyAllButton url={result.url || url} result={result} />
+              <Link
+                href={`/page-grader?url=${encodeURIComponent(result.url || url)}`}
+                className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all border bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-600"
+              >
+                <Gauge className="w-4 h-4" />
+                Grade this page
+              </Link>
+            </div>
             {cachedAt && (
               <span className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
                 <Clock className="w-3.5 h-3.5" />
