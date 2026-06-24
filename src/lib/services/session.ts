@@ -54,7 +54,9 @@ export async function getUserId(): Promise<number | null> {
   const expected = createHmac("sha256", HMAC_SECRET())
     .update(idPart)
     .digest("hex");
-  if (!timingSafeEqual(Buffer.from(sigPart), Buffer.from(expected))) return null;
+  const sigBuf = Buffer.from(sigPart);
+  const expBuf = Buffer.from(expected);
+  if (sigBuf.length !== expBuf.length || !timingSafeEqual(sigBuf, expBuf)) return null;
   return id;
 }
 

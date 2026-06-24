@@ -42,6 +42,12 @@ export default function BlogIndex() {
           </Link>
           <span className="text-slate-300">/</span>
           <span className="text-sm text-slate-500">Blog</span>
+          <Link
+            href="/dashboard"
+            className="ml-auto text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-full transition-colors"
+          >
+            Dashboard →
+          </Link>
         </div>
       </header>
 

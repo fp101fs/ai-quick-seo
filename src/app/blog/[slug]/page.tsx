@@ -57,6 +57,12 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           </Link>
           <span className="text-slate-300">/</span>
           <Link href="/blog" className="text-sm text-slate-500 hover:text-slate-700">Blog</Link>
+          <Link
+            href="/dashboard"
+            className="ml-auto text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-full transition-colors"
+          >
+            Dashboard →
+          </Link>
         </div>
       </header>
 

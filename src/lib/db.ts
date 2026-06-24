@@ -428,6 +428,7 @@ export async function getLatestAnalysis(
       SELECT tasks, opportunities, snapshot, crawl
       FROM dashboard_analyses
       WHERE user_id = ${userId} AND property = ${property}
+        AND created_at > NOW() - INTERVAL '6 hours'
       ORDER BY created_at DESC LIMIT 1
     `;
     return result.rows[0] ?? null;

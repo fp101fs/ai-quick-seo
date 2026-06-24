@@ -246,9 +246,12 @@ export default function DashboardPage() {
 
   const hardRefresh = useCallback(() => {
     setLoading(true);
-    setHistory(null); // invalidate history so it reloads next open
-    fetchData({ forceRefresh: true });
-  }, [fetchData]);
+    setHistory(null);
+    getDashboardData({ forceRefresh: true })
+      .then((data) => { setData(data); toast.success("Refreshed from Search Console"); })
+      .catch((err: Error) => toast.error(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -391,7 +394,7 @@ export default function DashboardPage() {
       )}
 
       {/* Action plan: compact ranked list with copy buttons */}
-      {tasks.length > 0 && (
+      {tasks.length > 0 ? (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
@@ -404,6 +407,56 @@ export default function DashboardPage() {
               tasks={tasks}
               site={data.status.property?.replace(/^sc-domain:/, "").replace(/^https?:\/\//, "").replace(/\/$/, "")}
             />
+          </CardContent>
+        </Card>
+      ) : data.status.connected && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <ListChecks className="w-4 h-4 text-indigo-500" />
+              Getting started
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-4">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Search Console doesn&apos;t have enough data yet. It needs a few days to start reporting.
+              Here&apos;s what to do right now:
+            </p>
+
+            <ul className="space-y-2.5">
+              {[
+                { label: "Write your first 5 articles", href: "/article-ideas", note: "no GSC data needed" },
+                { label: "Grade your homepage for SEO issues", href: "/page-grader", note: null },
+                { label: "Confirm your sitemap is submitted in Search Console", href: "https://search.google.com/search-console/sitemaps", note: "external", external: true },
+                { label: "Set up Google Analytics 4", href: "https://analytics.google.com/", note: "external", external: true },
+              ].map(({ label, href, note, external }) => (
+                <li key={label} className="flex items-start gap-3">
+                  <span className="mt-0.5 w-4 h-4 rounded border-2 border-slate-200 dark:border-slate-600 shrink-0" />
+                  <span className="flex-1 text-sm text-slate-700 dark:text-slate-300">
+                    {external ? (
+                      <a href={href} target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 dark:hover:text-indigo-400 underline underline-offset-2 decoration-slate-300">
+                        {label}
+                      </a>
+                    ) : (
+                      <Link href={href} className="hover:text-indigo-600 dark:hover:text-indigo-400 underline underline-offset-2 decoration-slate-300">
+                        {label}
+                      </Link>
+                    )}
+                    {note && note !== "external" && (
+                      <span className="ml-1.5 text-xs text-slate-400">({note})</span>
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <Link
+              href="/article-ideas"
+              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
+            >
+              Start with article ideas — no GSC data needed
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </CardContent>
         </Card>
       )}

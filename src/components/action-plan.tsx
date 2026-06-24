@@ -55,7 +55,7 @@ export function ActionPlan({ tasks, site }: { tasks: SeoTask[]; site?: string })
     <div>
       <button
         onClick={copyAll}
-        className="w-full mb-4 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm"
+        className="w-full mb-4 text-orange-500 hover:text-orange-600 active:text-orange-700 font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm border border-orange-200 hover:border-orange-300 dark:border-orange-900 dark:hover:border-orange-800"
       >
         {copiedAll ? "✓ Copied mega prompt!" : `Copy all ${top10.length} tasks as one Claude prompt`}
       </button>
@@ -71,7 +71,7 @@ export function ActionPlan({ tasks, site }: { tasks: SeoTask[]; site?: string })
             </span>
             <button
               onClick={() => copyOne(task, i)}
-              className="shrink-0 text-xs bg-orange-500 hover:bg-orange-600 text-white px-2.5 py-1 rounded-full transition-colors font-medium"
+              className="shrink-0 text-xs text-orange-500 hover:text-orange-600 px-2.5 py-1 rounded-full transition-colors font-medium"
             >
               {copiedIdx === i ? "✓" : "Copy"}
             </button>
