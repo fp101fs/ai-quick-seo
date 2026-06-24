@@ -192,12 +192,12 @@ export default function LandingPage() {
             Powered by your real Search Console data
           </Badge>
           <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6">
-            Know exactly what to fix.
+            One click.
             <br className="hidden sm:block" />{" "}
-            <span className="text-indigo-600">Every single day.</span>
+            <span className="text-indigo-600">Claude boosts your SEO.</span>
           </h1>
           <p className="text-lg text-slate-600 mb-10 max-w-xl mx-auto">
-            Your Search Console data, decoded. One prioritized SEO action — every day.
+            Connect Search Console. Get a paste-ready Claude prompt for your #1 SEO win.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button
