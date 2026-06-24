@@ -376,6 +376,20 @@ export default function DashboardPage() {
 
       {errorBanner}
 
+      {/* Pro upgrade success banner */}
+      {searchParams.get("upgraded") === "1" && (
+        <div className="flex items-center gap-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl px-6 py-5 shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30">
+          <Crown className="w-8 h-8 text-amber-300 shrink-0" />
+          <div className="flex-1">
+            <p className="font-bold text-lg leading-tight">You&apos;re now Pro!</p>
+            <p className="text-indigo-100 text-sm mt-0.5">Unlimited AI usage is active. Enjoy every feature with no caps.</p>
+          </div>
+          <a href="/dashboard" className="shrink-0 text-indigo-200 hover:text-white text-sm underline transition-colors">
+            Dismiss
+          </a>
+        </div>
+      )}
+
       {/* Action plan: compact ranked list with copy buttons */}
       {tasks.length > 0 && (
         <Card>
