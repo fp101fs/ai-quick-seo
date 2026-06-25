@@ -9,6 +9,14 @@ function pathLabel(url: string) {
   try { return new URL(url).pathname || "/"; } catch { return url; }
 }
 
+function leafLabel(url: string, group: string) {
+  const full = pathLabel(url);
+  if (group === "/") return full;
+  // Strip the group prefix so /blog/my-post shows as my-post under /blog/
+  const prefix = group.endsWith("/") ? group.slice(0, -1) : group;
+  return full.startsWith(prefix) ? full.slice(prefix.length) || "/" : full;
+}
+
 function groupBySegment(pages: PagePerformance[]): Map<string, PagePerformance[]> {
   const groups = new Map<string, PagePerformance[]>();
   for (const page of pages) {
@@ -72,14 +80,14 @@ export function SitemapTree({ pages }: { pages: PagePerformance[] }) {
                 {groupPages.map((page) => (
                   <div
                     key={page.url}
-                    className="flex items-center gap-2 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700/30"
+                    className="flex items-center gap-2 pl-8 pr-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700/30"
                   >
                     <FileText className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 shrink-0" />
                     <span
                       className="flex-1 text-sm text-slate-600 dark:text-slate-400 font-mono truncate"
                       title={page.url}
                     >
-                      {pathLabel(page.url)}
+                      {leafLabel(page.url, group)}
                     </span>
                     <div className="flex items-center gap-1.5 shrink-0">
                       <Link

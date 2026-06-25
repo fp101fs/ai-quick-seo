@@ -598,7 +598,7 @@ export default function DashboardPage() {
             )}
             <Link
               href="/opportunities"
-              className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 mt-3"
+              className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 mt-3"
             >
               View all opportunities <ArrowRight className="w-3.5 h-3.5" />
             </Link>
@@ -622,7 +622,7 @@ export default function DashboardPage() {
             )}
             <Link
               href="/opportunities"
-              className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 mt-3"
+              className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 mt-3"
             >
               View all opportunities <ArrowRight className="w-3.5 h-3.5" />
             </Link>
@@ -659,7 +659,7 @@ export default function DashboardPage() {
             )}
             <Link
               href="/internal-links"
-              className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 mt-3"
+              className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 mt-3"
             >
               {crawl ? "View link suggestions" : "Crawl your sitemap"}{" "}
               <ArrowRight className="w-3.5 h-3.5" />
@@ -683,7 +683,7 @@ export default function DashboardPage() {
             <div className="flex flex-wrap gap-3 mt-3">
               <Link
                 href="/content-refresh"
-                className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
               >
                 Refresh a page <ArrowRight className="w-3.5 h-3.5" />
               </Link>

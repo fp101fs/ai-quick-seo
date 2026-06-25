@@ -33,6 +33,7 @@ import {
   getPropertyBaseUrl,
   getSuggestedRefreshPages,
   getContentRefreshCache,
+  getRefreshedPages,
 } from "@/app/actions/seo";
 import type { ContentRefreshResult } from "@/lib/types";
 import { SitemapPagePicker } from "@/components/sitemap-page-picker";
@@ -192,6 +193,7 @@ function ContentRefreshInner() {
   const [url, setUrl] = useState(prefill ?? "");
   const [baseUrl, setBaseUrl] = useState<string | null>(null);
   const [suggestedPages, setSuggestedPages] = useState<string[]>([]);
+  const [history, setHistory] = useState<{ url: string; generated_at: string }[]>([]);
   const [result, setResult] = useState<ContentRefreshResult | null>(null);
   const [loading, setLoading] = useState(Boolean(prefill));
   const [cachedAt, setCachedAt] = useState<string | null>(null);
@@ -200,6 +202,7 @@ function ContentRefreshInner() {
   useEffect(() => {
     getPropertyBaseUrl().then(setBaseUrl).catch(() => {});
     getSuggestedRefreshPages().then(setSuggestedPages).catch(() => {});
+    getRefreshedPages().then(setHistory).catch(() => {});
   }, []);
 
   const doRefresh = useCallback(
@@ -216,6 +219,18 @@ function ContentRefreshInner() {
         .finally(() => setLoading(false)),
     []
   );
+
+  const loadHistoryItem = useCallback(async (item: { url: string; generated_at: string }) => {
+    setUrl(item.url);
+    setLoading(true);
+    setResult(null);
+    setCachedAt(null);
+    try {
+      const cached = await getContentRefreshCache(item.url);
+      if (cached) { setResult(cached.result); setCachedAt(cached.generatedAt); setLoading(false); }
+      else doRefresh(item.url);
+    } catch { doRefresh(item.url); }
+  }, [doRefresh]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -313,13 +328,36 @@ function ContentRefreshInner() {
         </div>
       )}
 
+      {!result && !loading && history.length > 0 && (
+        <div className="mb-8">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+            Previously refreshed
+          </p>
+          <div className="bg-white dark:bg-slate-800 rounded-xl ring-1 ring-slate-200 dark:ring-slate-700 divide-y divide-slate-100 dark:divide-slate-700">
+            {history.map((item) => {
+              const label = (() => { try { return new URL(item.url).pathname; } catch { return item.url; } })();
+              return (
+                <button
+                  key={item.url}
+                  onClick={() => loadHistoryItem(item)}
+                  className="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group"
+                >
+                  <span className="text-sm font-mono text-slate-600 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 truncate">{label}</span>
+                  <span className="text-xs text-slate-400 shrink-0 ml-3">{new Date(item.generated_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {loading && (
         <div className="bg-white dark:bg-slate-800 rounded-2xl ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm">
           <AiLoading message="Drafting content improvements…" size="lg" className="py-20" />
         </div>
       )}
 
-      {!loading && !result && (
+      {!loading && !result && history.length === 0 && (
         <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
           <div className="mx-auto w-16 h-16 bg-slate-50 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
             <RefreshCw className="w-8 h-8 text-slate-300 dark:text-slate-500" />

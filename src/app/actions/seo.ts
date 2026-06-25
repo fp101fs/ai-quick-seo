@@ -320,7 +320,7 @@ export async function getNavCounts(): Promise<Record<string, number>> {
       getLatestAnalysis, getLatestArticleIdeas, getTrackedKeywords,
       getPageGradeCount, getContentRefreshCount,
     } = await import("@/lib/db");
-    const [analysis, ideas, keywords, gradeCount, refreshCount, crawl] = await Promise.all([
+    const [analysis, ideas, keywords, gradeCount, refreshCount, inMemoryCrawl] = await Promise.all([
       getLatestAnalysis(userId, property).catch(() => null),
       getLatestArticleIdeas(userId, property).catch(() => null),
       getTrackedKeywords(userId).catch(() => []),
@@ -328,11 +328,19 @@ export async function getNavCounts(): Promise<Record<string, number>> {
       getContentRefreshCount(userId).catch(() => 0),
       getCachedCrawl().catch(() => null),
     ]);
+    // Fall back to DB for crawl when in-memory cache is cold
+    const { getCrawlResult } = await import("@/lib/db");
+    const crawl = inMemoryCrawl ?? await getCrawlResult(userId).catch(() => null);
     const snap = analysis?.snapshot as { queries?: { query: string }[]; pages?: unknown[] } | null;
     const uniqueKeywords = snap?.queries ? new Set(snap.queries.map((q) => q.query.toLowerCase())).size : 0;
     const sitemapPages = snap?.pages?.length ?? 0;
     const counts: Record<string, number> = {};
-    const opps = (analysis?.opportunities as unknown[] | null)?.length ?? 0;
+    let opps = (analysis?.opportunities as unknown[] | null)?.length ?? 0;
+    // If no cached analysis, fall back to live opportunities from snapshot
+    if (!opps) {
+      const { opportunities } = await getCurrentOpportunities().catch(() => ({ opportunities: [] }));
+      opps = opportunities.length;
+    }
     const tasks = (analysis?.tasks as unknown[] | null)?.length ?? 0;
     const ideaCount = ((ideas as { ideas?: unknown[] } | null)?.ideas)?.length ?? 0;
     const suggestions = (crawl as { suggestions?: unknown[] } | null)?.suggestions?.length ?? 0;
@@ -349,6 +357,13 @@ export async function getNavCounts(): Promise<Record<string, number>> {
   } catch {
     return {};
   }
+}
+
+export async function getRefreshedPages(): Promise<{ url: string; generated_at: string }[]> {
+  const userId = await getUserId().catch(() => null);
+  if (!userId) return [];
+  const { getAllContentRefreshUrls } = await import("@/lib/db");
+  return getAllContentRefreshUrls(userId).catch(() => []);
 }
 
 export async function saveCompetitor(url: string, report: unknown): Promise<void> {

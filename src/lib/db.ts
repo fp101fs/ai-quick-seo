@@ -204,7 +204,8 @@ export async function upsertKeywordPosition(
   await sql`
     INSERT INTO keyword_positions (user_id, keyword, date, position)
     VALUES (${userId}, ${keyword}, ${date}, ${position})
-    ON CONFLICT (user_id, keyword, date) DO NOTHING
+    ON CONFLICT (user_id, keyword, date) DO UPDATE
+    SET position = COALESCE(EXCLUDED.position, keyword_positions.position)
   `;
 }
 
@@ -613,6 +614,32 @@ export async function getLatestArticleIdeas(
   } catch {
     return null;
   }
+}
+
+// ---------- Content Refresh History ----------
+
+export async function getAllContentRefreshUrls(userId: number): Promise<{ url: string; generated_at: string }[]> {
+  try {
+    await sql`CREATE TABLE IF NOT EXISTS content_refresh_cache (user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, url TEXT NOT NULL, result JSONB NOT NULL, generated_at TIMESTAMPTZ DEFAULT NOW(), PRIMARY KEY (user_id, url))`;
+    const r = await sql<{ url: string; generated_at: string }>`
+      SELECT url, generated_at::text FROM content_refresh_cache
+      WHERE user_id = ${userId} ORDER BY generated_at DESC
+    `;
+    return r.rows;
+  } catch { return []; }
+}
+
+// ---------- Page Grade History ----------
+
+export async function getAllPageGradeUrls(userId: number): Promise<{ url: string; score: number; generated_at: string }[]> {
+  try {
+    await sql`CREATE TABLE IF NOT EXISTS page_grade_cache (user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, url TEXT NOT NULL, result JSONB NOT NULL, generated_at TIMESTAMPTZ DEFAULT NOW(), PRIMARY KEY (user_id, url))`;
+    const r = await sql<{ url: string; score: number; generated_at: string }>`
+      SELECT url, (result->>'totalScore')::int AS score, generated_at::text FROM page_grade_cache
+      WHERE user_id = ${userId} ORDER BY generated_at DESC
+    `;
+    return r.rows;
+  } catch { return []; }
 }
 
 // ---------- Crawl Results (Internal Links) ----------

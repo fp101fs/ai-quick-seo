@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/page-header";
 import { AiLoading } from "@/components/ai-loading";
 import { toast } from "sonner";
-import { gradePage, getPageGradeCache } from "@/app/actions/page-grader";
+import { gradePage, getPageGradeCache, getGradedPagesList } from "@/app/actions/page-grader";
 import type { GradeResult, GradeCategory, GradeStatus } from "@/lib/types";
 import { SitemapPagePicker } from "@/components/sitemap-page-picker";
 
@@ -197,10 +197,15 @@ function ImprovementPlan({ result }: { result: GradeResult }) {
 function PageGraderInner() {
   const prefill = useSearchParams().get("url");
   const [url, setUrl] = useState(prefill ?? "");
+  const [history, setHistory] = useState<{ url: string; score: number; generated_at: string }[]>([]);
   const [result, setResult] = useState<GradeResult | null>(null);
   const [loading, setLoading] = useState(Boolean(prefill));
   const [cachedAt, setCachedAt] = useState<string | null>(null);
   const ranPrefill = useRef(false);
+
+  useEffect(() => {
+    getGradedPagesList().then(setHistory).catch(() => {});
+  }, []);
 
   const doGrade = useCallback(
     (target: string) =>
@@ -275,7 +280,43 @@ function PageGraderInner() {
         </div>
       )}
 
-      {!loading && !result && (
+      {!loading && !result && history.length > 0 && (
+        <div className="mb-8">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+            Previously graded
+          </p>
+          <div className="bg-white dark:bg-slate-800 rounded-xl ring-1 ring-slate-200 dark:ring-slate-700 divide-y divide-slate-100 dark:divide-slate-700">
+            {history.map((item) => {
+              const label = (() => { try { return new URL(item.url).pathname; } catch { return item.url; } })();
+              const { letter, textColor } = gradeInfo(item.score);
+              return (
+                <button
+                  key={item.url}
+                  onClick={() => {
+                    setUrl(item.url);
+                    setLoading(true);
+                    getPageGradeCache(item.url)
+                      .then((cached) => {
+                        if (cached) { setResult(cached.result); setCachedAt(cached.generatedAt); setLoading(false); }
+                        else doGrade(item.url);
+                      })
+                      .catch(() => doGrade(item.url));
+                  }}
+                  className="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group"
+                >
+                  <span className="text-sm font-mono text-slate-600 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 truncate">{label}</span>
+                  <div className="flex items-center gap-3 shrink-0 ml-3">
+                    <span className={`text-sm font-bold ${textColor}`}>{item.score} <span className="text-xs">{letter}</span></span>
+                    <span className="text-xs text-slate-400">{new Date(item.generated_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {!loading && !result && history.length === 0 && (
         <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
           <div className="mx-auto w-16 h-16 bg-slate-50 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
             <Gauge className="w-8 h-8 text-slate-300 dark:text-slate-500" />

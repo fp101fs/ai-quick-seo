@@ -50,3 +50,10 @@ export async function getPageGradeCache(
   if (!row) return null;
   return { result: row.result as GradeResult, generatedAt: row.generated_at };
 }
+
+export async function getGradedPagesList(): Promise<{ url: string; score: number; generated_at: string }[]> {
+  const userId = await getUserId();
+  if (!userId) return [];
+  const { getAllPageGradeUrls } = await import("@/lib/db");
+  return getAllPageGradeUrls(userId).catch(() => []);
+}
