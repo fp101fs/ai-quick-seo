@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTheme } from "next-themes";
 import { X, Crown } from "lucide-react";
 import { BillingPortalButton } from "@/components/billing-portal-button";
 import Link from "next/link";
@@ -12,10 +13,10 @@ const ARC = {
 
 type ArcSize = keyof typeof ARC;
 
-function arcColor(usedPct: number) {
-  if (usedPct >= 0.95) return "#ef4444";
-  if (usedPct >= 0.8) return "#f59e0b";
-  return "#6366f1"; // indigo to match app theme
+function arcColor(usedPct: number, dark = false) {
+  if (usedPct >= 0.95) return dark ? "#fca5a5" : "#ef4444";
+  if (usedPct >= 0.8)  return dark ? "#fcd34d" : "#f59e0b";
+  return dark ? "#a5b4fc" : "#6366f1";
 }
 
 function daysUntilReset() {
@@ -166,10 +167,12 @@ export interface UsageMeterProps {
 
 export function UsageMeter({ spentUsd, capUsd, isPro }: UsageMeterProps) {
   const [showModal, setShowModal] = useState(false);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   const usedPct = capUsd > 0 && capUsd !== Infinity ? spentUsd / capUsd : 0;
   const remainPct = Math.round((1 - Math.min(usedPct, 1)) * 100);
-  const color = arcColor(usedPct);
+  const color = arcColor(usedPct, isDark);
 
   return (
     <>
