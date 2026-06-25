@@ -153,6 +153,14 @@ function PlanUsageModal({
               <BillingPortalButton />
             </div>
           )}
+
+          <Link
+            href="/usage"
+            onClick={onClose}
+            className="mt-3 text-xs text-slate-400 hover:text-slate-600 transition-colors underline underline-offset-2"
+          >
+            View full usage details →
+          </Link>
         </div>
       </div>
     </div>
