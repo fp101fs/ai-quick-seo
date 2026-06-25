@@ -16,7 +16,7 @@ type ArcSize = keyof typeof ARC;
 function arcColor(usedPct: number, dark = false) {
   if (usedPct >= 0.95) return dark ? "#fca5a5" : "#ef4444";
   if (usedPct >= 0.8)  return dark ? "#fcd34d" : "#f59e0b";
-  return dark ? "#a5b4fc" : "#6366f1";
+  return dark ? "#c7d2fe" : "#818cf8"; // indigo-200 / indigo-400
 }
 
 function daysUntilReset() {

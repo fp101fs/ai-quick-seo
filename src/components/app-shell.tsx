@@ -211,7 +211,7 @@ export function AppShell({
               {!isPro && (
                 <Link
                   href="/pricing"
-                  className="flex items-center gap-1 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
+                  className="flex items-center gap-1 text-xs font-medium text-indigo-400 dark:text-indigo-300 hover:text-indigo-500 dark:hover:text-indigo-200 transition-colors"
                 >
                   <Crown className="w-3 h-3" />
                   Upgrade
