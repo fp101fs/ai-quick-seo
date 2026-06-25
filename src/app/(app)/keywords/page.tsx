@@ -9,6 +9,40 @@ import { toast } from "sonner";
 
 // ponytail: industry-average CTR by position 1-4; pos 0 unused
 const EXPECTED_CTR = [0, 0.28, 0.15, 0.11, 0.08];
+
+const BANDS = [
+  { label: "#1–3",   color: "#10b981", test: (p: number) => p <= 3 },
+  { label: "#4–10",  color: "#6366f1", test: (p: number) => p > 3 && p <= 10 },
+  { label: "#11–20", color: "#f59e0b", test: (p: number) => p > 10 && p <= 20 },
+  { label: "#21–50", color: "#f97316", test: (p: number) => p > 20 && p <= 50 },
+  { label: "#51+",   color: "#ef4444", test: (p: number) => p > 50 },
+];
+
+function PositionHistogram({ rows }: { rows: GscQueryRow[] }) {
+  const bands = BANDS.map((b) => ({ ...b, count: rows.filter((r) => b.test(r.position)).length }));
+  const max = Math.max(...bands.map((b) => b.count), 1);
+  const W = 560, BAR_H = 26, GAP = 8, PAD = { l: 54, r: 44, t: 6, b: 6 };
+  const H = bands.length * (BAR_H + GAP) - GAP + PAD.t + PAD.b;
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl ring-1 ring-slate-200 dark:ring-slate-700 p-4 mb-6">
+      <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Position Distribution — {rows.length} queries</p>
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: H }}>
+        {bands.map((b, i) => {
+          const y = PAD.t + i * (BAR_H + GAP);
+          const barW = b.count === 0 ? 2 : Math.max(4, (b.count / max) * (W - PAD.l - PAD.r));
+          return (
+            <g key={b.label}>
+              <text x={PAD.l - 8} y={y + BAR_H / 2 + 4} textAnchor="end" fontSize={11} fill="#94a3b8">{b.label}</text>
+              <rect x={PAD.l} y={y} width={W - PAD.l - PAD.r} height={BAR_H} rx={4} fill="#f1f5f9" />
+              <rect x={PAD.l} y={y} width={barW} height={BAR_H} rx={4} fill={b.color} opacity={0.85} />
+              <text x={PAD.l + barW + 6} y={y + BAR_H / 2 + 4} fontSize={11} fill="#64748b">{b.count}</text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
 function expectedCtr(position: number): number {
   return EXPECTED_CTR[Math.min(Math.round(position), 4)] ?? 0.06;
 }
@@ -84,6 +118,8 @@ export default function KeywordsPage() {
         title="Keywords"
         description="Top queries from Google Search Console (28-day average)."
       />
+
+      {!loading && rows.length > 0 && <PositionHistogram rows={rows} />}
 
       {/* Tabs */}
       <div className="flex gap-1 mb-4 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 w-fit">

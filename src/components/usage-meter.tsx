@@ -58,7 +58,7 @@ function Arc({
       </svg>
       {children && (
         <span
-          className="absolute text-slate-700 font-semibold pointer-events-none select-none"
+          className="absolute text-slate-700 dark:text-slate-200 font-semibold pointer-events-none select-none"
           style={{ fontSize: Math.max(7, size * 0.19) }}
         >
           {children}
@@ -180,7 +180,7 @@ export function UsageMeter({ spentUsd, capUsd, isPro }: UsageMeterProps) {
         title="View plan usage"
       >
         <Arc cfg={ARC.inline} usedPct={usedPct} />
-        <span className="text-slate-500 text-xs">
+        <span className="text-slate-500 dark:text-slate-400 text-xs">
           <span style={{ color }} className="font-semibold">
             {remainPct}%
           </span>{" "}

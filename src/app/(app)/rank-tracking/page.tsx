@@ -71,6 +71,25 @@ function PositionChart({ data }: { data: ChartPoint[] }) {
   );
 }
 
+function MiniSparkline({ data }: { data: ChartPoint[] }) {
+  const valid = data.filter((d) => d.position != null) as { date: string; position: number }[];
+  if (valid.length < 2) return <span className="text-slate-300 text-xs">—</span>;
+  const W = 80, H = 24;
+  const maxPos = Math.max(...valid.map((d) => d.position));
+  const minPos = Math.min(...valid.map((d) => d.position));
+  const range = maxPos - minPos || 1;
+  const xs = valid.map((_, i) => (i / (valid.length - 1)) * W);
+  const ys = valid.map((d) => ((d.position - minPos) / range) * H); // higher pos = lower rank = higher y
+  const path = xs.map((x, i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(" ");
+  const improving = valid[valid.length - 1].position < valid[0].position;
+  const color = improving ? "#10b981" : "#ef4444";
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} className="inline-block">
+      <path d={path} fill="none" stroke={color} strokeWidth={1.5} strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function Change({ today, yesterday }: { today: number | null; yesterday: number | null }) {
   if (today == null) return <span className="text-slate-400 text-xs">—</span>;
   if (yesterday == null) return <span className="text-slate-400 text-xs">new</span>;
@@ -94,6 +113,9 @@ export default function RankTrackingPage() {
   async function load() {
     const data = await getTrackingData();
     setRows(data);
+    // pre-load sparkline data for all keywords in parallel
+    const entries = await Promise.all(data.map(async (r) => [r.keyword, await getKeywordChartData(r.keyword)] as const));
+    setChartData(Object.fromEntries(entries));
   }
 
   useEffect(() => { load(); }, []);
@@ -174,6 +196,7 @@ export default function RankTrackingPage() {
                 <th className="px-5 py-3">Keyword</th>
                 <th className="px-5 py-3 text-right">Position</th>
                 <th className="px-5 py-3 text-right">vs Yesterday</th>
+                <th className="px-5 py-3 text-right">Trend</th>
                 <th className="px-5 py-3 w-10" />
               </tr>
             </thead>
@@ -203,6 +226,9 @@ export default function RankTrackingPage() {
                       <Change today={r.today} yesterday={r.yesterday} />
                     </td>
                     <td className="px-5 py-3 text-right">
+                      <MiniSparkline data={chartData[r.keyword] ?? []} />
+                    </td>
+                    <td className="px-5 py-3 text-right">
                       <button
                         onClick={(e) => { e.stopPropagation(); handleRemove(r.keyword); }}
                         className="text-slate-300 hover:text-rose-500 transition-colors"
@@ -213,7 +239,7 @@ export default function RankTrackingPage() {
                   </tr>
                   {expanded === r.keyword && (
                     <tr key={`${r.keyword}-chart`} className="bg-slate-50 dark:bg-slate-700/20">
-                      <td colSpan={4} className="px-5 py-4">
+                      <td colSpan={5} className="px-5 py-4">
                         <div className="flex items-center justify-between mb-2">
                           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Position over time</p>
                           <button onClick={() => setExpanded(null)} className="text-slate-400 hover:text-slate-600">
