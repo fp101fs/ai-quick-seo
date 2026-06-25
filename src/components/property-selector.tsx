@@ -60,7 +60,7 @@ export function PropertySelector({ status }: { status: ConnectionStatus }) {
         ) : (
           <Globe className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
         )}
-        <span className="flex-1 text-xs font-medium text-slate-700 dark:text-slate-300 truncate min-w-0">
+        <span className="flex-1 text-sm font-medium text-slate-700 dark:text-slate-300 truncate min-w-0">
           {isPending ? "Switching…" : currentLabel ?? "Select property"}
         </span>
         {isPending ? (
@@ -75,7 +75,7 @@ export function PropertySelector({ status }: { status: ConnectionStatus }) {
           {/* Backdrop */}
           <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
 
-          <div className="absolute left-0 right-0 mt-1 z-40 bg-white dark:bg-slate-800 rounded-xl shadow-lg ring-1 ring-slate-200 dark:ring-slate-700 overflow-hidden">
+          <div className="absolute left-0 right-0 mt-1 z-40 bg-white dark:bg-slate-800 rounded-xl shadow-lg border-2 border-slate-300 dark:border-slate-500 overflow-hidden">
             <div className="flex items-center justify-between px-3 py-2 border-b border-slate-100 dark:border-slate-700">
               <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 Switch property
@@ -103,7 +103,7 @@ export function PropertySelector({ status }: { status: ConnectionStatus }) {
                   <button
                     key={p.siteUrl}
                     onClick={() => handleSelect(p.siteUrl)}
-                    className={`w-full flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs transition-colors ${
+                    className={`w-full flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
                       isActive
                         ? "bg-indigo-50 text-indigo-700 font-semibold dark:bg-indigo-900/20 dark:text-indigo-400"
                         : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
@@ -118,7 +118,7 @@ export function PropertySelector({ status }: { status: ConnectionStatus }) {
 
               <button
                 onClick={handleDemo}
-                className={`w-full flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs transition-colors ${
+                className={`w-full flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
                   status.demo
                     ? "bg-amber-50 text-amber-700 font-semibold dark:bg-amber-900/20 dark:text-amber-400"
                     : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700"
