@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import {
   Search,
@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { AiLoading } from "@/components/ai-loading";
 import { analyzeCompetitor, suggestCompetitors } from "@/app/actions/analyze";
+import { saveCompetitor, getLastCompetitor } from "@/app/actions/seo";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
@@ -40,6 +41,15 @@ export default function CompetitorPage() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [suggesting, setSuggesting] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    getLastCompetitor().then((saved) => {
+      if (saved) {
+        setUrl(saved.url);
+        setReport(saved.report as CompetitorReport);
+      }
+    }).catch(() => {});
+  }, []);
 
   const handleSuggest = async () => {
     setSuggesting(true);
@@ -68,6 +78,7 @@ export default function CompetitorPage() {
     try {
       const data = await analyzeCompetitor(url);
       setReport(data);
+      saveCompetitor(url, data).catch(() => {});
       toast.success("Analysis complete!");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");

@@ -26,7 +26,6 @@ import {
   ListChecks,
   Layers,
 } from "lucide-react";
-import { InfoTooltip } from "@/components/info-tooltip";
 import { cn } from "@/lib/utils";
 import type { ConnectionStatus } from "@/lib/types";
 import type { DbUser } from "@/lib/db";
@@ -35,18 +34,18 @@ import { PropertySelector } from "@/components/property-selector";
 import { getNavCounts } from "@/app/actions/seo";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, tooltip: "Daily SEO briefing: traffic overview, quick wins, and your AI-prioritized task list." },
-  { href: "/opportunities", label: "Opportunities", icon: Target, tooltip: "Pages losing clicks, queries near page 1, low CTR issues — ranked by impact." },
-  { href: "/article-ideas", label: "Article Ideas", icon: Lightbulb, tooltip: "AI-generated article titles for keyword gaps your site isn't covering yet." },
-  { href: "/internal-links", label: "Internal Links", icon: Link2, tooltip: "Crawls your sitemap to find orphan pages and suggest where to add internal links." },
-  { href: "/content-refresh", label: "Content Refresh", icon: RefreshCw, tooltip: "AI-drafted title, meta description, new H2 sections, and FAQs for any existing page." },
-  { href: "/coach", label: "AI Coach", icon: MessageSquare, tooltip: "Chat with an AI that knows your site's data — ask why traffic dropped, what to fix, etc." },
-  { href: "/keywords", label: "Keywords", icon: Hash, tooltip: "Top queries from Google Search Console with clicks, impressions, CTR, and average position." },
-  { href: "/rank-tracking", label: "Rank Tracking", icon: Activity, tooltip: "Track keyword positions over time using your GSC data. Click any keyword to see its trend." },
-  { href: "/page-grader", label: "Page Grader", icon: Gauge, tooltip: "Grade any page out of 100 for SEO and AI search readiness. Get a step-by-step plan to reach 100." },
-  { href: "/action-plan", label: "Action Plan", icon: ListChecks, tooltip: "Top 10 ranked SEO tasks with copy-ready Claude prompts. One click to copy them all." },
-  { href: "/sitemap-explorer", label: "Sitemap Explorer", icon: Layers, tooltip: "Browse all your pages in a tree view. Click Grade or Improve to take action on any page." },
-  { href: "/competitor", label: "Competitor Spy", icon: Search, tooltip: "Enter a competitor URL to extract their target keywords, content gaps, and blog ideas.", dim: true },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, iconColor: "text-indigo-500", tooltip: "Daily SEO briefing: traffic overview, quick wins, and your AI-prioritized task list." },
+  { href: "/opportunities", label: "Opportunities", icon: Target, iconColor: "text-rose-500", tooltip: "Pages losing clicks, queries near page 1, low CTR issues — ranked by impact." },
+  { href: "/action-plan", label: "Action Plan", icon: ListChecks, iconColor: "text-emerald-500", tooltip: "Top 10 ranked SEO tasks with copy-ready Claude prompts. One click to copy them all." },
+  { href: "/article-ideas", label: "Article Ideas", icon: Lightbulb, iconColor: "text-amber-500", tooltip: "AI-generated article titles for keyword gaps your site isn't covering yet." },
+  { href: "/content-refresh", label: "Content Refresh", icon: RefreshCw, iconColor: "text-cyan-500", tooltip: "AI-drafted title, meta description, new H2 sections, and FAQs for any existing page." },
+  { href: "/page-grader", label: "Page Grader", icon: Gauge, iconColor: "text-violet-500", tooltip: "Grade any page out of 100 for SEO and AI search readiness. Get a step-by-step plan to reach 100." },
+  { href: "/internal-links", label: "Internal Links", icon: Link2, iconColor: "text-blue-500", tooltip: "Crawls your sitemap to find orphan pages and suggest where to add internal links." },
+  { href: "/coach", label: "AI Coach", icon: MessageSquare, iconColor: "text-purple-500", tooltip: "Chat with an AI that knows your site's data — ask why traffic dropped, what to fix, etc." },
+  { href: "/keywords", label: "Keywords", icon: Hash, iconColor: "text-teal-500", tooltip: "Top queries from Google Search Console with clicks, impressions, CTR, and average position." },
+  { href: "/rank-tracking", label: "Rank Tracking", icon: Activity, iconColor: "text-orange-500", tooltip: "Track keyword positions over time using your GSC data. Click any keyword to see its trend." },
+  { href: "/sitemap-explorer", label: "Sitemap Explorer", icon: Layers, iconColor: "text-sky-500", tooltip: "Browse all your pages in a tree view. Click Grade or Improve to take action on any page." },
+  { href: "/competitor", label: "Competitor Spy", icon: Search, iconColor: "text-slate-400", tooltip: "Enter a competitor URL to extract their target keywords, content gaps, and blog ideas.", dim: true },
 ] as const;
 
 function ConnectionChip({ status }: { status: ConnectionStatus }) {
@@ -126,6 +125,7 @@ export function AppShell({
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [counts, setCounts] = useState<Record<string, number>>({});
+  const [tooltip, setTooltip] = useState<{ text: string; y: number } | null>(null);
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { getNavCounts().then(setCounts).catch(() => {}); }, []);
 
@@ -142,7 +142,7 @@ export function AppShell({
         const Icon = item.icon;
         const dim = "dim" in item && item.dim;
         return (
-          <div key={item.href} className={cn("flex items-center gap-1 group/nav", dim && "opacity-50")}>
+          <div key={item.href} className={cn("flex items-center", dim && "opacity-50")}>
             <Link
               href={item.href}
               className={cn(
@@ -151,22 +151,22 @@ export function AppShell({
                   ? "bg-indigo-50 dark:bg-white/10 text-indigo-700 dark:text-white"
                   : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100"
               )}
+              onMouseEnter={orientation === "vertical" && item.tooltip ? (e) => {
+                const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                setTooltip({ text: item.tooltip, y: rect.top + rect.height / 2 });
+              } : undefined}
+              onMouseLeave={orientation === "vertical" ? () => setTooltip(null) : undefined}
             >
               <Icon
-                className={cn("w-4 h-4 shrink-0", active ? "text-indigo-600" : "text-slate-400")}
+                className={cn("w-4 h-4 shrink-0", active ? "text-indigo-600" : item.iconColor)}
               />
               {item.label}
               {orientation === "vertical" && counts[item.href] ? (
-                <span className="ml-auto text-xs font-medium tabular-nums text-slate-400 dark:text-slate-500">
+                <span className="ml-auto text-sm font-semibold tabular-nums text-slate-500 dark:text-slate-400">
                   {counts[item.href]}
                 </span>
               ) : null}
             </Link>
-            {orientation === "vertical" && item.tooltip && (
-              <span className="opacity-0 group-hover/nav:opacity-100 transition-opacity pr-1">
-                <InfoTooltip text={item.tooltip} side="right" />
-              </span>
-            )}
           </div>
         );
       })}
@@ -175,6 +175,16 @@ export function AppShell({
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+      {/* Fixed tooltip — rendered outside sidebar to escape overflow:auto */}
+      {tooltip && (
+        <div
+          className="fixed left-[264px] z-50 ml-2 px-3 py-1.5 bg-slate-900 dark:bg-slate-700 text-white text-xs rounded-lg shadow-lg max-w-xs pointer-events-none"
+          style={{ top: tooltip.y, transform: "translateY(-50%)" }}
+        >
+          {tooltip.text}
+        </div>
+      )}
+
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex fixed inset-y-0 left-0 w-64 flex-col bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 z-20">
         <Link
@@ -182,9 +192,9 @@ export function AppShell({
           className="flex items-center gap-2.5 px-5 h-16 border-b border-slate-100 dark:border-slate-700"
         >
           <img src="/icon-512.png" className="w-8 h-8 rounded-lg" alt="SerpDo" />
-          <div className="flex flex-col leading-none">
+          <div className="flex-1 flex flex-col leading-none">
             <span className="font-bold tracking-tight">SerpDo</span>
-            <span className="text-[11px] text-slate-400 tracking-wide mt-1.5" style={{ fontFamily: "var(--font-michroma)" }}>by BravioLabs</span>
+            <span className="text-[11px] text-slate-400 tracking-wide mt-1.5 text-right" style={{ fontFamily: "var(--font-michroma)" }}>by BravioLabs</span>
           </div>
         </Link>
 
@@ -228,15 +238,10 @@ export function AppShell({
                   </span>
                 </div>
               )}
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate">
-                  {user?.name ?? user?.email ?? "Signed in"}
-                </p>
-                {isPro && (
-                  <p className="text-xs text-indigo-500 font-medium">Pro plan</p>
-                )}
-              </div>
-              <form action="/api/auth/logout" method="POST">
+              {isPro && (
+                <p className="text-xs text-indigo-500 font-medium">Pro</p>
+              )}
+              <form action="/api/auth/logout" method="POST" className="ml-auto">
                 <button
                   type="submit"
                   title="Sign out"

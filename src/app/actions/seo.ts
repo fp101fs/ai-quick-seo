@@ -205,6 +205,12 @@ export async function runCrawl(sitemapUrl: string): Promise<CrawlResult> {
     maxAge: 60 * 60 * 24 * 30,
   });
 
+  // Persist to DB so results survive cold serverless instances
+  if (crawlUserId) {
+    const { saveCrawlResult } = await import("@/lib/db");
+    await saveCrawlResult(crawlUserId, result).catch(() => {});
+  }
+
   return result;
 }
 
@@ -218,7 +224,17 @@ export async function getPropertyBaseUrl(): Promise<string | null> {
 }
 
 export async function getLastCrawl(): Promise<CrawlResult | null> {
-  return getCachedCrawl();
+  const cached = await getCachedCrawl();
+  if (cached) return cached;
+  // Fall back to DB when in-memory cache is cold
+  const userId = await getUserId().catch(() => null);
+  if (!userId) return null;
+  try {
+    const { getCrawlResult } = await import("@/lib/db");
+    return (await getCrawlResult(userId)) as CrawlResult | null;
+  } catch {
+    return null;
+  }
 }
 
 export async function clearSnapshotCache(): Promise<void> {
@@ -332,6 +348,24 @@ export async function getNavCounts(): Promise<Record<string, number>> {
     return counts;
   } catch {
     return {};
+  }
+}
+
+export async function saveCompetitor(url: string, report: unknown): Promise<void> {
+  const userId = await getUserId().catch(() => null);
+  if (!userId) return;
+  const { saveCompetitorReport } = await import("@/lib/db");
+  await saveCompetitorReport(userId, url, report).catch(() => {});
+}
+
+export async function getLastCompetitor(): Promise<{ url: string; report: unknown } | null> {
+  const userId = await getUserId().catch(() => null);
+  if (!userId) return null;
+  try {
+    const { getCompetitorReport } = await import("@/lib/db");
+    return await getCompetitorReport(userId);
+  } catch {
+    return null;
   }
 }
 

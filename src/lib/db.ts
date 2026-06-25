@@ -614,3 +614,71 @@ export async function getLatestArticleIdeas(
     return null;
   }
 }
+
+// ---------- Crawl Results (Internal Links) ----------
+
+export async function saveCrawlResult(userId: number, result: unknown): Promise<void> {
+  await sql`
+    CREATE TABLE IF NOT EXISTS crawl_results (
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE PRIMARY KEY,
+      result JSONB NOT NULL,
+      saved_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+  await sql`
+    INSERT INTO crawl_results (user_id, result, saved_at)
+    VALUES (${userId}, ${JSON.stringify(result)}, NOW())
+    ON CONFLICT (user_id) DO UPDATE SET result = EXCLUDED.result, saved_at = NOW()
+  `;
+}
+
+export async function getCrawlResult(userId: number): Promise<unknown | null> {
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS crawl_results (
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE PRIMARY KEY,
+        result JSONB NOT NULL,
+        saved_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
+    const r = await sql`SELECT result FROM crawl_results WHERE user_id = ${userId}`;
+    return r.rows[0]?.result ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// ---------- Competitor Reports ----------
+
+export async function saveCompetitorReport(userId: number, url: string, report: unknown): Promise<void> {
+  await sql`
+    CREATE TABLE IF NOT EXISTS competitor_reports (
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE PRIMARY KEY,
+      url TEXT NOT NULL,
+      report JSONB NOT NULL,
+      saved_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+  await sql`
+    INSERT INTO competitor_reports (user_id, url, report, saved_at)
+    VALUES (${userId}, ${url}, ${JSON.stringify(report)}, NOW())
+    ON CONFLICT (user_id) DO UPDATE SET url = EXCLUDED.url, report = EXCLUDED.report, saved_at = NOW()
+  `;
+}
+
+export async function getCompetitorReport(userId: number): Promise<{ url: string; report: unknown } | null> {
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS competitor_reports (
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE PRIMARY KEY,
+        url TEXT NOT NULL,
+        report JSONB NOT NULL,
+        saved_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
+    const r = await sql<{ url: string; report: unknown }>`SELECT url, report FROM competitor_reports WHERE user_id = ${userId}`;
+    return r.rows[0] ?? null;
+  } catch {
+    return null;
+  }
+}
