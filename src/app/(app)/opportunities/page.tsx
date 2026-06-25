@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { RefreshCw, Target } from "lucide-react";
+import { RefreshCw, Target, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -11,6 +11,24 @@ import { PageHeader } from "@/components/page-header";
 import { getOpportunities } from "@/app/actions/seo";
 import type { ConnectionStatus, Opportunity, OpportunityType } from "@/lib/types";
 import { cn } from "@/lib/utils";
+
+function buildOpportunitiesPrompt(opps: Opportunity[]): string {
+  const lines = [
+    `You are an expert SEO consultant.`,
+    `Here are my top ${opps.length} SEO opportunities ranked by impact. Please give me a specific action plan for each, starting with the highest-impact items.`,
+    ``,
+    ...opps.map((o, i) => [
+      `### ${i + 1}. [${o.impact.toUpperCase()}] ${o.type.replace(/-/g, " ")}${o.page ? ` — ${o.page}` : ""}${o.query ? ` (query: "${o.query}")` : ""}`,
+      `Issue: ${o.issue}`,
+      `Why it matters: ${o.whyItMatters}`,
+      `Recommended action: ${o.recommendedAction}`,
+      `Estimated impact: ${o.estimatedImpact}`,
+      ``,
+    ].join("\n")),
+    `For each opportunity, give me a step-by-step implementation plan I can act on today.`,
+  ];
+  return lines.join("\n");
+}
 
 const filters: { value: OpportunityType | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -119,10 +137,22 @@ export default function OpportunitiesPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filtered.map((o) => (
-                <OpportunityCard key={o.id} opportunity={o} />
-              ))}
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filtered.map((o) => (
+                  <OpportunityCard key={o.id} opportunity={o} />
+                ))}
+              </div>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(buildOpportunitiesPrompt(opportunities));
+                  toast.success("Mega prompt copied — paste into ChatGPT or Claude!");
+                }}
+                className="w-full flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold text-base py-4 px-6 rounded-2xl transition-colors shadow-sm"
+              >
+                <Copy className="w-5 h-5 shrink-0" />
+                Copy Mega Prompt — paste into ChatGPT or Claude
+              </button>
             </div>
           )}
         </>

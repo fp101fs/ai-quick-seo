@@ -14,6 +14,7 @@ import {
   AlertCircle,
   AlertTriangle,
   XCircle,
+  Copy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -192,6 +193,31 @@ function ImprovementPlan({ result }: { result: GradeResult }) {
   );
 }
 
+function buildPageGraderPrompt(result: GradeResult): string {
+  const { letter, label } = gradeInfo(result.totalScore);
+  const lines = [
+    `You are an expert SEO and GEO (generative engine optimization) consultant.`,
+    `I have graded a page and need your help fixing the issues below.`,
+    ``,
+    `Page URL: ${result.url}`,
+    `Overall Score: ${result.totalScore}/100 — ${letter} (${label})`,
+    ``,
+    `## Issues by category`,
+    ``,
+    ...result.categories.map((c) => [
+      `### ${c.emoji} ${c.name} — ${c.score}/${c.maxScore} (${c.status})`,
+      `Finding: ${c.finding}`,
+      c.fix ? `Fix needed: ${c.fix}` : `Status: No fix needed.`,
+      ``,
+    ].join("\n")),
+    `## Your task`,
+    ``,
+    `Provide specific, actionable fixes for each issue above, prioritised by biggest score gain.`,
+    `Where relevant, write exact copy (title tags, meta descriptions, heading rewrites, paragraph additions) I can paste directly into my CMS.`,
+  ];
+  return lines.join("\n");
+}
+
 // ── Main page ──────────────────────────────────────────────────────────────
 
 function PageGraderInner() {
@@ -365,6 +391,18 @@ function PageGraderInner() {
 
           {/* Improvement plan */}
           <ImprovementPlan result={result} />
+
+          {/* Mega prompt */}
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(buildPageGraderPrompt(result));
+              toast.success("Mega prompt copied — paste into ChatGPT or Claude!");
+            }}
+            className="w-full flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold text-base py-4 px-6 rounded-2xl transition-colors shadow-sm"
+          >
+            <Copy className="w-5 h-5 shrink-0" />
+            Copy Mega Prompt — paste into ChatGPT or Claude
+          </button>
         </div>
       )}
     </div>

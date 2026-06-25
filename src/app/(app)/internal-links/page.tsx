@@ -9,6 +9,7 @@ import {
   Unlink,
   AlertTriangle,
   FileSearch,
+  Copy,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,42 @@ import { PageHeader } from "@/components/page-header";
 import { AiLoading } from "@/components/ai-loading";
 import { getLastCrawl, runCrawl, getPropertyBaseUrl } from "@/app/actions/seo";
 import type { CrawlResult } from "@/lib/types";
+
+function buildInternalLinksPrompt(result: CrawlResult): string {
+  const lines = [
+    `You are an expert SEO consultant specialising in internal linking.`,
+    `I've crawled my website sitemap and found internal linking issues. Help me fix them.`,
+    ``,
+    `Site: ${result.origin}`,
+    `Pages crawled: ${result.pages.filter((p) => p.ok).length}`,
+    `Orphan pages (zero internal links): ${result.orphanPages.length}`,
+    `Weakly linked pages (only 1 link): ${result.weakPages.length}`,
+    ``,
+  ];
+  if (result.orphanPages.length) {
+    lines.push(`## Orphan pages`, ``);
+    result.orphanPages.forEach((u) => lines.push(`- ${u}`));
+    lines.push(``);
+  }
+  if (result.suggestions.length) {
+    lines.push(`## Suggested link placements (${result.suggestions.length} total)`, ``);
+    result.suggestions.forEach((s, i) => {
+      lines.push(
+        `### ${i + 1}. ${s.sourceUrl} → ${s.targetUrl}`,
+        `Anchor text: "${s.anchorText}"`,
+        `Reason: ${s.reasoning}`,
+        ``
+      );
+    });
+  }
+  lines.push(
+    `## Your task`,
+    ``,
+    `For each suggested link placement above, write a natural sentence or short paragraph I can insert into the source page to add the link organically. Use the suggested anchor text.`,
+    `Also suggest 1-2 additional ways to link to each orphan page from existing content.`
+  );
+  return lines.join("\n");
+}
 
 const pagePath = (url: string) => {
   try {
@@ -295,6 +332,17 @@ export default function InternalLinksPage() {
               </div>
             </Card>
           </section>
+
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(buildInternalLinksPrompt(result));
+              toast.success("Mega prompt copied — paste into ChatGPT or Claude!");
+            }}
+            className="w-full flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold text-base py-4 px-6 rounded-2xl transition-colors shadow-sm"
+          >
+            <Copy className="w-5 h-5 shrink-0" />
+            Copy Mega Prompt — paste into ChatGPT or Claude
+          </button>
         </div>
       )}
     </div>
