@@ -92,6 +92,7 @@ export interface Opportunity {
     clicksDelta?: number;
     impressionsDelta?: number;
   };
+  queries?: QueryPerformance[];
 }
 
 // ---------- Sitemap crawl / internal links ----------
@@ -169,6 +170,7 @@ export interface SeoTask {
   impact: number; // 1-10
   difficulty: number; // 1-10
   explanation: string;
+  prompt?: string;
 }
 
 // ---------- Coach ----------

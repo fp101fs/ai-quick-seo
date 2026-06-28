@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { SeoTask } from "@/lib/types";
 
 function buildTaskPrompt(task: SeoTask): string {
-  return [
+  return task.prompt ?? [
     "You are an SEO expert. Help me fix this issue on my website.",
     "",
     `Task: ${task.title}`,

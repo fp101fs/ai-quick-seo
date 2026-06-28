@@ -55,17 +55,15 @@ export function TaskCard({ task }: { task: SeoTask }) {
   const Icon = config.icon;
 
   const copyPrompt = () => {
-    const prompt = [
+    const text = task.prompt ?? [
       "You are an SEO expert. Help me fix this issue on my website.",
       "",
       `Task: ${task.title}`,
       task.page ? `Page: ${task.page}` : "",
       "",
       task.explanation,
-    ]
-      .filter(Boolean)
-      .join("\n");
-    navigator.clipboard.writeText(prompt).then(() =>
+    ].filter(Boolean).join("\n");
+    navigator.clipboard.writeText(text).then(() =>
       toast.success("Prompt copied — paste into Claude")
     );
   };

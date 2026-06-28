@@ -17,14 +17,19 @@ function buildOpportunitiesPrompt(opps: Opportunity[]): string {
     `You are an expert SEO consultant.`,
     `Here are my top ${opps.length} SEO opportunities ranked by impact. Please give me a specific action plan for each, starting with the highest-impact items.`,
     ``,
-    ...opps.map((o, i) => [
-      `### ${i + 1}. [${o.impact.toUpperCase()}] ${o.type.replace(/-/g, " ")}${o.page ? ` — ${o.page}` : ""}${o.query ? ` (query: "${o.query}")` : ""}`,
-      `Issue: ${o.issue}`,
-      `Why it matters: ${o.whyItMatters}`,
-      `Recommended action: ${o.recommendedAction}`,
-      `Estimated impact: ${o.estimatedImpact}`,
-      ``,
-    ].join("\n")),
+    ...opps.map((o, i) => {
+      const queryData = o.queries?.length
+        ? `\nKey queries: ${o.queries.slice(0, 5).map((q) => `"${q.query}" (pos ${q.position.toFixed(1)}, ${q.impressions.toLocaleString()} impr, ${q.clicks} clicks, ${(q.ctr * 100).toFixed(1)}% CTR)`).join("; ")}`
+        : "";
+      return [
+        `### ${i + 1}. [${o.impact.toUpperCase()}] ${o.type.replace(/-/g, " ")}${o.page ? ` — ${o.page}` : ""}${o.query ? ` (query: "${o.query}")` : ""}`,
+        `Issue: ${o.issue}`,
+        `Why it matters: ${o.whyItMatters}`,
+        `Recommended action: ${o.recommendedAction}${queryData}`,
+        `Estimated impact: ${o.estimatedImpact}`,
+        ``,
+      ].join("\n");
+    }),
     `For each opportunity, give me a step-by-step implementation plan I can act on today.`,
   ];
   return lines.join("\n");

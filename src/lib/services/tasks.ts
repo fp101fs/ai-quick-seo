@@ -74,6 +74,7 @@ export async function generateDailyTasks(
           )
             ? t.category
             : "content",
+          prompt: typeof t.prompt === "string" && t.prompt ? t.prompt : undefined,
         }))
         .sort((a, b) => b.impact - a.impact);
       if (tasks.length === 0) throw new Error("AI returned no tasks");

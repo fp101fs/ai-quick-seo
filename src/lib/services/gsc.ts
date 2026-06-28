@@ -176,6 +176,16 @@ const pagePath = (url: string) => {
 export function detectOpportunities(snapshot: GscSnapshot): Opportunity[] {
   const opportunities: Opportunity[] = [];
 
+  // Build page → queries index for enriching each opportunity with real data.
+  const queriesByPage = new Map<string, QueryPerformance[]>();
+  for (const q of snapshot.queries) {
+    if (!q.page) continue;
+    if (!queriesByPage.has(q.page)) queriesByPage.set(q.page, []);
+    queriesByPage.get(q.page)!.push(q);
+  }
+  const topQueries = (url: string, sortBy: "clicks" | "impressions", n = 5) =>
+    (queriesByPage.get(url) ?? []).sort((a, b) => b[sortBy] - a[sortBy]).slice(0, n);
+
   // Pages losing clicks (>=20% drop with meaningful volume).
   const decliningClicks = snapshot.pages
     .filter((p) => p.prevClicks >= 20 && p.clicksDelta / p.prevClicks <= -0.2)
@@ -195,6 +205,7 @@ export function detectOpportunities(snapshot: GscSnapshot): Opportunity[] {
         "Refresh the content: update facts and dates, expand thin sections, and re-check that the title still matches search intent. Use the Content Refresh tool on this URL.",
       estimatedImpact: `Recovering previous performance is worth ~${Math.abs(p.clicksDelta)} clicks per ${snapshot.rangeDays} days.`,
       metrics: { clicks: p.clicks, clicksDelta: p.clicksDelta, position: p.position },
+      queries: topQueries(p.url, "clicks"),
     });
   }
 
@@ -222,6 +233,7 @@ export function detectOpportunities(snapshot: GscSnapshot): Opportunity[] {
         "Check which queries dropped, then broaden the page's topical coverage with new sections targeting those queries. Add internal links from related pages to reinforce relevance.",
       estimatedImpact: `Restoring visibility protects ~${Math.round((Math.abs(p.impressionsDelta) * snapshot.summary.ctr))} clicks per period.`,
       metrics: { impressions: p.impressions, impressionsDelta: p.impressionsDelta, position: p.position },
+      queries: topQueries(p.url, "impressions"),
     });
   }
 
@@ -247,6 +259,7 @@ export function detectOpportunities(snapshot: GscSnapshot): Opportunity[] {
         : "Identify the ranking page and strengthen it for this query with on-page mentions and internal links.",
       estimatedImpact: `Moving to position ~3 could add ~${Math.round(q.impressions * 0.08)} clicks per ${snapshot.rangeDays} days.`,
       metrics: { impressions: q.impressions, position: q.position, ctr: q.ctr },
+      queries: [q],
     });
   }
 
@@ -268,6 +281,7 @@ export function detectOpportunities(snapshot: GscSnapshot): Opportunity[] {
         "Rewrite the title tag and meta description: lead with the benefit, include the year or a number, and match the dominant search intent. The Content Refresh tool will draft these for you.",
       estimatedImpact: `Lifting CTR to 3% would add ~${Math.round(p.impressions * (0.03 - p.ctr))} clicks per ${snapshot.rangeDays} days.`,
       metrics: { impressions: p.impressions, ctr: p.ctr, position: p.position },
+      queries: topQueries(p.url, "impressions"),
     });
   }
 
