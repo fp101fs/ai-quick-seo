@@ -31,6 +31,7 @@ import type { ConnectionStatus } from "@/lib/types";
 import type { DbUser } from "@/lib/db";
 import { UsageMeter } from "@/components/usage-meter";
 import { PropertySelector } from "@/components/property-selector";
+import { OnboardingChecklist } from "@/components/onboarding-checklist";
 import { getNavCounts } from "@/app/actions/seo";
 
 const navItems = [
@@ -396,6 +397,8 @@ export function AppShell({
       <main className="lg:pl-64">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">{children}</div>
       </main>
+
+      <OnboardingChecklist />
     </div>
   );
 }
