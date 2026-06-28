@@ -84,46 +84,22 @@ const features = [
 
 const testimonials = [
   {
-    name: "Marcus Webb",
-    role: "Founder, TravelHacks.io",
-    initials: "MW",
-    quote:
-      "I went from spending Sunday nights guessing what to write to having a prioritized list ready Monday morning. Traffic up 31% in six weeks.",
+    name: "Sarah C.",
+    role: "",
+    initials: "SC",
+    quote: "Our organic traffic jumped 47% in 2 mos. This tool is incredible.",
   },
   {
-    name: "Priya Sharma",
-    role: "Content Strategist",
-    initials: "PS",
-    quote:
-      "The internal link finder surfaced 47 missing connections on a client site. Would have taken me a full day manually.",
+    name: "Marcus R.",
+    role: "",
+    initials: "MR",
+    quote: "saves me hours every week!  finally easy seo prompts for claude",
   },
   {
-    name: "Tom Auclair",
-    role: "SaaS Founder",
-    initials: "TA",
-    quote:
-      "Finally an SEO tool that doesn't make me feel dumb. It reads my actual data and tells me exactly what to fix, in plain English.",
-  },
-  {
-    name: "Jake Mullen",
-    role: "Indie Blogger",
-    initials: "JM",
-    quote:
-      "I spent two years writing content that went nowhere. First week using this I found three pages stuck at position 11. Fixed them. Two are on page one now.",
-  },
-  {
-    name: "Rachel Osei",
-    role: "E-commerce Founder",
-    initials: "RO",
-    quote:
-      "The Content Refresh tool rewrote my product category pages in minutes. I couldn't have done it better myself, and I've been doing SEO for eight years.",
-  },
-  {
-    name: "Dan Kowalski",
-    role: "Agency Owner",
-    initials: "DK",
-    quote:
-      "I run a Page Grader report for every new client in the first call. Instant credibility. Shows exactly what's broken, no jargon.",
+    name: "Rachel P.",
+    role: "",
+    initials: "RP",
+    quote: "The prompts for writing content are great.. game changer.",
   },
 ];
 
@@ -307,7 +283,7 @@ export default function LandingPage() {
                   </span>
                   <div>
                     <p className="text-sm font-semibold text-slate-900">{t.name}</p>
-                    <p className="text-xs text-slate-400">{t.role}</p>
+                    {t.role && <p className="text-xs text-slate-400">{t.role}</p>}
                   </div>
                 </div>
               </div>
