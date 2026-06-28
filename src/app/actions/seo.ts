@@ -140,6 +140,16 @@ export async function getDashboardData(opts?: { forceRefresh?: boolean }): Promi
     getUserId().catch(() => null),
   ]);
 
+  // Warm homepage metadata cache so article ideas don't need an extra fetch
+  if (!status.demo && status.property) {
+    const metaUrl = status.property.startsWith("sc-domain:")
+      ? `https://${status.property.replace("sc-domain:", "")}`
+      : status.property.replace(/\/$/, "");
+    import("@/lib/services/site-metadata")
+      .then(({ fetchSiteMetadata }) => fetchSiteMetadata(metaUrl))
+      .catch(() => {});
+  }
+
   const tasks = await generateDailyTasks(
     status.property ?? "default",
     opportunities,

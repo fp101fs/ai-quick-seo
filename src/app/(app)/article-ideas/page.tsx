@@ -11,7 +11,10 @@ import {
   Crown,
   TrendingUp,
   ArrowRight,
+  Pencil,
+  X,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -89,6 +92,8 @@ export default function ArticleIdeasPage() {
   const [checking, setChecking] = useState(true);
   const [copied, setCopied] = useState(false);
   const [blockedByPlan, setBlockedByPlan] = useState(false);
+  const [nicheEdit, setNicheEdit] = useState(false);
+  const [nicheInput, setNicheInput] = useState("");
 
   useEffect(() => {
     loadArticleIdeas()
@@ -97,11 +102,12 @@ export default function ArticleIdeasPage() {
       .finally(() => setChecking(false));
   }, []);
 
-  const generate = async () => {
+  const generate = async (nicheOverride?: string) => {
     setLoading(true);
     setBlockedByPlan(false);
+    setNicheEdit(false);
     try {
-      const data = await generateArticleIdeas();
+      const data = await generateArticleIdeas(nicheOverride ? { nicheOverride } : undefined);
       setResult(data);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
@@ -132,7 +138,7 @@ export default function ArticleIdeasPage() {
           result && (
             <Button
               variant="outline"
-              onClick={generate}
+              onClick={() => generate()}
               disabled={loading}
               className="border-slate-200"
             >
@@ -209,7 +215,7 @@ export default function ArticleIdeasPage() {
             topics your site is missing.
           </p>
           <Button
-            onClick={generate}
+            onClick={() => generate()}
             className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl"
           >
             <Sparkles className="w-4 h-4" />
@@ -252,9 +258,41 @@ export default function ArticleIdeasPage() {
               <div className="flex items-center gap-2 mb-1">
                 <TrendingUp className="w-4 h-4 text-indigo-500" />
                 <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">Niche identified</p>
+                {!nicheEdit && (
+                  <button
+                    onClick={() => { setNicheInput(result.niche); setNicheEdit(true); }}
+                    className="ml-1 text-slate-400 hover:text-indigo-500 transition-colors"
+                    title="Wrong niche? Edit and re-generate"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
-              <p className="text-slate-900 dark:text-slate-100 font-medium">{result.niche}</p>
-              {result.existingTopics.length > 0 && (
+              {nicheEdit ? (
+                <div className="flex items-center gap-2 mt-1">
+                  <Input
+                    value={nicheInput}
+                    onChange={(e) => setNicheInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter" && nicheInput.trim()) generate(nicheInput.trim()); }}
+                    className="text-sm h-8"
+                    autoFocus
+                  />
+                  <Button
+                    size="sm"
+                    onClick={() => generate(nicheInput.trim())}
+                    disabled={!nicheInput.trim() || loading}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white shrink-0 h-8"
+                  >
+                    Re-generate
+                  </Button>
+                  <button onClick={() => setNicheEdit(false)} className="text-slate-400 hover:text-slate-600 shrink-0">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <p className="text-slate-900 dark:text-slate-100 font-medium">{result.niche}</p>
+              )}
+              {!nicheEdit && result.existingTopics.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   {result.existingTopics.map((t) => (
                     <span key={t} className="text-xs bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-full px-2.5 py-0.5">

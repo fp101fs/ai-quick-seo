@@ -8,6 +8,7 @@ import { getDemoSnapshot } from "@/lib/demo-data";
 import type { ArticleIdeasResult } from "@/lib/types";
 import { getCachedSnapshot, saveArticleIdeas, getLatestArticleIdeas } from "@/lib/db";
 import type { GscSnapshot } from "@/lib/types";
+import { fetchSiteMetadata } from "@/lib/services/site-metadata";
 
 export async function loadArticleIdeas(): Promise<ArticleIdeasResult | null> {
   const [userId, status] = await Promise.all([getUserId(), getConnectionStatus()]);
@@ -17,7 +18,7 @@ export async function loadArticleIdeas(): Promise<ArticleIdeasResult | null> {
   return saved ? (saved as ArticleIdeasResult) : null;
 }
 
-export async function generateArticleIdeas(): Promise<ArticleIdeasResult> {
+export async function generateArticleIdeas(opts?: { nicheOverride?: string }): Promise<ArticleIdeasResult> {
   const [status, usage] = await Promise.all([
     getConnectionStatus(),
     getUsageStatus(),
@@ -32,6 +33,7 @@ export async function generateArticleIdeas(): Promise<ArticleIdeasResult> {
   const userId = await getUserId();
   let snapshot: GscSnapshot;
   let isDemo = false;
+  let domain: string | undefined;
 
   if (status.demo) {
     snapshot = getDemoSnapshot();
@@ -44,13 +46,19 @@ export async function generateArticleIdeas(): Promise<ArticleIdeasResult> {
       );
     }
     snapshot = cached as GscSnapshot;
+    domain = status.property.startsWith("sc-domain:")
+      ? `https://${status.property.replace("sc-domain:", "")}`
+      : status.property.replace(/\/$/, "");
   } else {
     throw new Error(
       "Connect Google Search Console first to generate article ideas for your site."
     );
   }
+
+  const metadata = domain ? await fetchSiteMetadata(domain).catch(() => null) : null;
+
   const result = await jsonCompletion<Omit<ArticleIdeasResult, "generatedAt" | "demo">>(
-    buildArticleIdeasPrompt(snapshot),
+    buildArticleIdeasPrompt(snapshot, { domain, metadata, nicheOverride: opts?.nicheOverride }),
     { userId: userId ?? undefined, feature: "article-ideas" }
   );
 

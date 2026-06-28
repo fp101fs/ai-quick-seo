@@ -1,7 +1,15 @@
 import type { AiMessage } from "@/lib/services/openrouter";
 import type { GscSnapshot } from "@/lib/types";
+import type { SiteMetadata } from "@/lib/services/site-metadata";
 
-export function buildArticleIdeasPrompt(snapshot: GscSnapshot): AiMessage[] {
+export function buildArticleIdeasPrompt(
+  snapshot: GscSnapshot,
+  opts?: {
+    domain?: string;
+    metadata?: SiteMetadata | null;
+    nicheOverride?: string;
+  }
+): AiMessage[] {
   const topQueries = snapshot.queries
     .sort((a, b) => b.impressions - a.impressions)
     .slice(0, 40)
@@ -16,6 +24,17 @@ export function buildArticleIdeasPrompt(snapshot: GscSnapshot): AiMessage[] {
       return `- ${path} (${p.clicks} clicks)`;
     })
     .join("\n");
+
+  const siteLines: string[] = [];
+  if (opts?.domain) siteLines.push(`Domain: ${opts.domain}`);
+  if (opts?.metadata?.title) siteLines.push(`Site title: ${opts.metadata.title}`);
+  if (opts?.metadata?.description) siteLines.push(`Site description: ${opts.metadata.description}`);
+  if (opts?.metadata?.h1) siteLines.push(`Homepage H1: ${opts.metadata.h1}`);
+  const siteContext = siteLines.length ? `\nSITE INFO:\n${siteLines.join("\n")}\n` : "";
+
+  const nicheInstruction = opts?.nicheOverride
+    ? `1. The site's niche is: "${opts.nicheOverride}" — use this as the niche, do NOT infer a different one`
+    : "1. Infer the site's niche from the site info above and the queries/pages";
 
   return [
     {
@@ -41,8 +60,8 @@ Return ONLY a valid JSON object matching this exact schema:
     },
     {
       role: "user",
-      content: `Analyze this site's Search Console data and generate 15 article ideas for topics NOT yet covered.
-
+      content: `Analyze this site's data and generate 15 article ideas for topics NOT yet covered.
+${siteContext}
 TOP QUERIES THIS SITE ALREADY RANKS FOR:
 ${topQueries}
 
@@ -50,7 +69,7 @@ TOP PAGES BY CLICKS:
 ${topPages}
 
 Instructions:
-1. Infer the site's niche from the queries and pages
+${nicheInstruction}
 2. Identify topic clusters already covered
 3. Find keyword gaps — related topics with search demand that are NOT covered
 4. Generate 15 article ideas targeting those gaps
