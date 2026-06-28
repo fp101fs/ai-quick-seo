@@ -1,22 +1,24 @@
 import type { MetadataRoute } from "next";
-import { readdirSync } from "fs";
+import { readdirSync, statSync } from "fs";
 import { join } from "path";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://serpdo.com";
+const CONTENT_DIR = join(process.cwd(), "content");
 
-function getBlogSlugs(): string[] {
+function getBlogEntries(): { slug: string; mtime: Date }[] {
   try {
-    return readdirSync(join(process.cwd(), "content"))
+    return readdirSync(CONTENT_DIR)
       .filter((f) => f.endsWith(".md"))
-      .map((f) => f.replace(".md", ""));
+      .map((f) => ({ slug: f.replace(".md", ""), mtime: statSync(join(CONTENT_DIR, f)).mtime }));
   } catch {
     return [];
   }
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const blogEntries: MetadataRoute.Sitemap = getBlogSlugs().map((slug) => ({
+  const blogEntries: MetadataRoute.Sitemap = getBlogEntries().map(({ slug, mtime }) => ({
     url: `${BASE}/blog/${slug}`,
+    lastModified: mtime,
     changeFrequency: "monthly",
     priority: 0.7,
   }));

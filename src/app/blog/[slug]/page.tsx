@@ -6,6 +6,24 @@ import { marked } from "marked";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://serpdo.com";
+
+// Slug → which app feature to promote inline
+const FEATURE_LINKS: Record<string, { label: string; href: string; cta: string }> = {
+  "seo-checker":     { label: "Page Grader", href: "/page-grader", cta: "Grade your page free →" },
+  "seo-101":         { label: "SEO Opportunities", href: "/opportunities", cta: "See your opportunities →" },
+  "ai-seo":         { label: "AI Coach", href: "/coach", cta: "Ask your AI SEO coach →" },
+  "seo-for-ai":     { label: "Page Grader", href: "/page-grader", cta: "Check your GEO score →" },
+  "seo-geo":        { label: "Page Grader", href: "/page-grader", cta: "Check your GEO score →" },
+  "seo-geo-aeo":    { label: "Page Grader", href: "/page-grader", cta: "Check your GEO score →" },
+  "seo-tools":      { label: "Dashboard", href: "/dashboard", cta: "Try SerpDo free →" },
+  "seo-marketing":  { label: "Opportunities", href: "/opportunities", cta: "Find your top opportunity →" },
+  "seo-optimization":{ label: "Page Grader", href: "/page-grader", cta: "Grade a page now →" },
+  "seo-questions":  { label: "AI Coach", href: "/coach", cta: "Ask your AI SEO coach →" },
+  "seo-for-website":{ label: "Internal Links", href: "/internal-links", cta: "Find orphan pages →" },
+  "seo-website":    { label: "Content Refresh", href: "/content-refresh", cta: "Refresh your content →" },
+};
+
 const CONTENT_DIR = join(process.cwd(), "content");
 
 function getPost(slug: string) {
@@ -37,6 +55,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: frontmatter.title,
     description: frontmatter.description,
     keywords: frontmatter.keywords,
+    alternates: { canonical: `${SITE_URL}/blog/${slug}` },
   };
 }
 
@@ -46,9 +65,20 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   if (!post) notFound();
 
   const html = await marked(post.content);
+  const feature = FEATURE_LINKS[slug] ?? null;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.frontmatter.title,
+    description: post.frontmatter.description,
+    url: `${SITE_URL}/blog/${slug}`,
+    publisher: { "@type": "Organization", name: "SerpDo", url: SITE_URL },
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2">
@@ -81,6 +111,18 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             prose-blockquote:border-indigo-400 prose-blockquote:text-slate-600"
           dangerouslySetInnerHTML={{ __html: html }}
         />
+
+        {feature && (
+          <div className="mt-12 rounded-xl border border-indigo-100 bg-indigo-50 px-6 py-5 flex items-center justify-between gap-4">
+            <p className="text-sm text-indigo-800 font-medium">Try it in SerpDo: <span className="font-semibold">{feature.label}</span></p>
+            <Link
+              href={feature.href}
+              className="shrink-0 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-full transition-colors"
+            >
+              {feature.cta}
+            </Link>
+          </div>
+        )}
 
         <div className="mt-16 rounded-2xl bg-indigo-600 text-white px-8 py-8 text-center">
           <p className="font-bold text-lg mb-2">Put this into practice</p>
