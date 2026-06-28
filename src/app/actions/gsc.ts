@@ -1,9 +1,11 @@
 "use server";
 
+import { cookies } from "next/headers";
 import type { ConnectionStatus, GscProperty } from "@/lib/types";
 import { getValidAccessToken } from "@/lib/services/google-auth";
 import { listProperties } from "@/lib/services/gsc";
 import { cacheDelete } from "@/lib/services/store";
+import { SITEMAP_COOKIE } from "@/lib/services/context";
 import {
   clearSession,
   getConnectionStatus,
@@ -36,6 +38,14 @@ export async function selectProperty(siteUrl: string): Promise<ConnectionStatus>
   if (prev) cacheDelete(`gsc:${prev}`);
   cacheDelete(`gsc:${siteUrl}`);
 
+  // Clear sitemap cookie + crawl cache — they're property-specific
+  const cookieStore = await cookies();
+  const oldSitemap = cookieStore.get(SITEMAP_COOKIE)?.value;
+  if (oldSitemap) {
+    cacheDelete(`crawl:${oldSitemap}`);
+    cookieStore.delete(SITEMAP_COOKIE);
+  }
+
   // Clear DB-backed snapshot cache so next fetch is fresh from GSC API
   try {
     const [{ deleteCachedSnapshot }, userId] = await Promise.all([import("@/lib/db"), getUserId()]);
@@ -54,6 +64,12 @@ export async function selectProperty(siteUrl: string): Promise<ConnectionStatus>
 }
 
 export async function enableDemoMode(): Promise<ConnectionStatus> {
+  const cookieStore = await cookies();
+  const oldSitemap = cookieStore.get(SITEMAP_COOKIE)?.value;
+  if (oldSitemap) {
+    cacheDelete(`crawl:${oldSitemap}`);
+    cookieStore.delete(SITEMAP_COOKIE);
+  }
   await setDemoMode(true);
   return getConnectionStatus();
 }

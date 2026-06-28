@@ -34,7 +34,7 @@ export function PropertySelector({ status }: { status: ConnectionStatus }) {
     setOpen(false);
     startTransition(async () => {
       await selectProperty(siteUrl);
-      window.location.reload();
+      window.location.href = window.location.pathname;
     });
   };
 
@@ -42,7 +42,7 @@ export function PropertySelector({ status }: { status: ConnectionStatus }) {
     setOpen(false);
     startTransition(async () => {
       await enableDemoMode();
-      window.location.reload();
+      window.location.href = window.location.pathname;
     });
   };
 
