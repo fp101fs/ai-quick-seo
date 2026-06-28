@@ -5,7 +5,7 @@ import { buildCoachSystemPrompt } from "@/lib/prompts/coach";
 import { chatCompletion } from "@/lib/services/openrouter";
 import { getCachedCrawl, getCurrentOpportunities } from "@/lib/services/context";
 import { getUsageStatus } from "@/lib/services/usage";
-import { getUserId } from "@/lib/services/session";
+import { getUserId, getSelectedProperty } from "@/lib/services/session";
 
 const MAX_HISTORY = 12;
 
@@ -38,23 +38,23 @@ export async function askCoach(messages: ChatMessage[]): Promise<string> {
 }
 
 export async function loadChatHistory(): Promise<ChatMessage[]> {
-  const userId = await getUserId();
+  const [userId, property] = await Promise.all([getUserId(), getSelectedProperty()]);
   if (!userId) return [];
   const { getChatMessages } = await import("@/lib/db");
-  const rows = await getChatMessages(userId);
+  const rows = await getChatMessages(userId, property ?? "");
   return rows as ChatMessage[];
 }
 
 export async function persistChatMessage(role: "user" | "assistant", content: string): Promise<void> {
-  const userId = await getUserId();
+  const [userId, property] = await Promise.all([getUserId(), getSelectedProperty()]);
   if (!userId) return;
   const { appendChatMessage } = await import("@/lib/db");
-  await appendChatMessage(userId, role, content);
+  await appendChatMessage(userId, role, content, property ?? "");
 }
 
 export async function clearChatHistory(): Promise<void> {
-  const userId = await getUserId();
+  const [userId, property] = await Promise.all([getUserId(), getSelectedProperty()]);
   if (!userId) return;
   const { clearChatMessages } = await import("@/lib/db");
-  await clearChatMessages(userId);
+  await clearChatMessages(userId, property ?? "");
 }

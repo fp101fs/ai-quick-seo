@@ -227,11 +227,18 @@ export async function getLastCrawl(): Promise<CrawlResult | null> {
   const cached = await getCachedCrawl();
   if (cached) return cached;
   // Fall back to DB when in-memory cache is cold
-  const userId = await getUserId().catch(() => null);
+  const [userId, baseUrl] = await Promise.all([
+    getUserId().catch(() => null),
+    getPropertyBaseUrl().catch(() => null),
+  ]);
   if (!userId) return null;
   try {
     const { getCrawlResult } = await import("@/lib/db");
-    return (await getCrawlResult(userId)) as CrawlResult | null;
+    const result = (await getCrawlResult(userId)) as CrawlResult | null;
+    if (!result || !baseUrl) return result;
+    // Verify crawl belongs to current property
+    if (result.origin && !result.origin.startsWith(baseUrl) && !baseUrl.startsWith(result.origin)) return null;
+    return result;
   } catch {
     return null;
   }
@@ -323,7 +330,7 @@ export async function getNavCounts(): Promise<Record<string, number>> {
     const [analysis, ideas, keywords, gradeCount, refreshCount, inMemoryCrawl] = await Promise.all([
       getLatestAnalysis(userId, property).catch(() => null),
       getLatestArticleIdeas(userId, property).catch(() => null),
-      getTrackedKeywords(userId).catch(() => []),
+      getTrackedKeywords(userId, status.demo ? "demo" : (property ?? "")).catch(() => []),
       getPageGradeCount(userId).catch(() => 0),
       getContentRefreshCount(userId).catch(() => 0),
       getCachedCrawl().catch(() => null),
@@ -360,10 +367,13 @@ export async function getNavCounts(): Promise<Record<string, number>> {
 }
 
 export async function getRefreshedPages(): Promise<{ url: string; generated_at: string }[]> {
-  const userId = await getUserId().catch(() => null);
+  const [userId, baseUrl] = await Promise.all([
+    getUserId().catch(() => null),
+    getPropertyBaseUrl().catch(() => null),
+  ]);
   if (!userId) return [];
   const { getAllContentRefreshUrls } = await import("@/lib/db");
-  return getAllContentRefreshUrls(userId).catch(() => []);
+  return getAllContentRefreshUrls(userId, baseUrl ?? undefined).catch(() => []);
 }
 
 export async function saveCompetitor(url: string, report: unknown): Promise<void> {

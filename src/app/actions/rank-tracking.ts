@@ -1,6 +1,6 @@
 "use server";
 
-import { getUserId } from "@/lib/services/session";
+import { getUserId, getSelectedProperty } from "@/lib/services/session";
 import { getCurrentSnapshot } from "@/lib/services/context";
 import {
   addTrackedKeyword,
@@ -28,9 +28,10 @@ async function positionFromSnapshot(keyword: string): Promise<number | null> {
 }
 
 export async function getTrackingData() {
-  const userId = await getUserId();
+  const [userId, property] = await Promise.all([getUserId(), getSelectedProperty()]);
   if (!userId) return [];
-  const rows = await getKeywordsWithLatestPositions(userId);
+  const prop = property ?? "";
+  const rows = await getKeywordsWithLatestPositions(userId, prop);
   // ponytail: auto-capture today on every visit so "vs yesterday" works next day
   const missing = rows.filter((r) => r.today == null);
   if (missing.length) {
@@ -41,31 +42,31 @@ export async function getTrackingData() {
         await upsertKeywordPosition(userId, r.keyword, today, pos);
       })
     );
-    return getKeywordsWithLatestPositions(userId);
+    return getKeywordsWithLatestPositions(userId, prop);
   }
   return rows;
 }
 
 export async function addKeyword(keyword: string) {
-  const userId = await getUserId();
+  const [userId, property] = await Promise.all([getUserId(), getSelectedProperty()]);
   if (!userId) return;
   const kw = keyword.trim().toLowerCase();
   if (!kw) return;
-  await addTrackedKeyword(userId, kw);
+  await addTrackedKeyword(userId, kw, property ?? "");
   const position = await positionFromSnapshot(kw);
   await upsertKeywordPosition(userId, kw, await todayStr(), position);
 }
 
 export async function removeKeyword(keyword: string) {
-  const userId = await getUserId();
+  const [userId, property] = await Promise.all([getUserId(), getSelectedProperty()]);
   if (!userId) return;
-  await removeTrackedKeyword(userId, keyword);
+  await removeTrackedKeyword(userId, keyword, property ?? "");
 }
 
 export async function refreshPositions() {
-  const userId = await getUserId();
+  const [userId, property] = await Promise.all([getUserId(), getSelectedProperty()]);
   if (!userId) return;
-  const rows = await getKeywordsWithLatestPositions(userId);
+  const rows = await getKeywordsWithLatestPositions(userId, property ?? "");
   const today = await todayStr();
   await Promise.all(
     rows.map(async (r) => {

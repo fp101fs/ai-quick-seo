@@ -55,5 +55,7 @@ export async function getGradedPagesList(): Promise<{ url: string; score: number
   const userId = await getUserId();
   if (!userId) return [];
   const { getAllPageGradeUrls } = await import("@/lib/db");
-  return getAllPageGradeUrls(userId).catch(() => []);
+  const { getPropertyBaseUrl } = await import("@/app/actions/seo");
+  const baseUrl = await getPropertyBaseUrl().catch(() => null);
+  return getAllPageGradeUrls(userId, baseUrl ?? undefined).catch(() => []);
 }

@@ -101,11 +101,19 @@ export async function runMigrations() {
       PRIMARY KEY (user_id, keyword, date)
     )
   `;
+
+  // Migrate tracked_keywords to be property-scoped
+  await sql`ALTER TABLE tracked_keywords ADD COLUMN IF NOT EXISTS property TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE tracked_keywords DROP CONSTRAINT IF EXISTS tracked_keywords_pkey`;
+  await sql`ALTER TABLE tracked_keywords ADD PRIMARY KEY (user_id, property, keyword)`;
+
+  // Migrate coach_messages to be property-scoped
+  await sql`ALTER TABLE coach_messages ADD COLUMN IF NOT EXISTS property TEXT NOT NULL DEFAULT ''`;
 }
 
 // ---------- Coach Chat ----------
 
-export async function getChatMessages(userId: number): Promise<Array<{ role: string; content: string }>> {
+export async function getChatMessages(userId: number, property: string): Promise<Array<{ role: string; content: string }>> {
   try {
     await sql`
       CREATE TABLE IF NOT EXISTS coach_messages (
@@ -116,9 +124,10 @@ export async function getChatMessages(userId: number): Promise<Array<{ role: str
         created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `;
+    await sql`ALTER TABLE coach_messages ADD COLUMN IF NOT EXISTS property TEXT NOT NULL DEFAULT ''`;
     const r = await sql<{ role: string; content: string }>`
       SELECT role, content FROM coach_messages
-      WHERE user_id = ${userId}
+      WHERE user_id = ${userId} AND property = ${property}
       ORDER BY created_at ASC
       LIMIT 100
     `;
@@ -126,7 +135,7 @@ export async function getChatMessages(userId: number): Promise<Array<{ role: str
   } catch { return []; }
 }
 
-export async function appendChatMessage(userId: number, role: string, content: string): Promise<void> {
+export async function appendChatMessage(userId: number, role: string, content: string, property: string): Promise<void> {
   await sql`
     CREATE TABLE IF NOT EXISTS coach_messages (
       id SERIAL PRIMARY KEY,
@@ -136,15 +145,16 @@ export async function appendChatMessage(userId: number, role: string, content: s
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `;
-  await sql`INSERT INTO coach_messages (user_id, role, content) VALUES (${userId}, ${role}, ${content})`;
+  await sql`ALTER TABLE coach_messages ADD COLUMN IF NOT EXISTS property TEXT NOT NULL DEFAULT ''`;
+  await sql`INSERT INTO coach_messages (user_id, role, content, property) VALUES (${userId}, ${role}, ${content}, ${property})`;
   await sql`
-    DELETE FROM coach_messages WHERE user_id = ${userId} AND id NOT IN (
-      SELECT id FROM coach_messages WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 100
+    DELETE FROM coach_messages WHERE user_id = ${userId} AND property = ${property} AND id NOT IN (
+      SELECT id FROM coach_messages WHERE user_id = ${userId} AND property = ${property} ORDER BY created_at DESC LIMIT 100
     )
   `;
 }
 
-export async function clearChatMessages(userId: number): Promise<void> {
+export async function clearChatMessages(userId: number, property: string): Promise<void> {
   try {
     await sql`
       CREATE TABLE IF NOT EXISTS coach_messages (
@@ -155,22 +165,23 @@ export async function clearChatMessages(userId: number): Promise<void> {
         created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `;
-    await sql`DELETE FROM coach_messages WHERE user_id = ${userId}`;
+    await sql`ALTER TABLE coach_messages ADD COLUMN IF NOT EXISTS property TEXT NOT NULL DEFAULT ''`;
+    await sql`DELETE FROM coach_messages WHERE user_id = ${userId} AND property = ${property}`;
   } catch {}
 }
 
 // ---------- Rank Tracking ----------
 
-export async function getTrackedKeywords(userId: number): Promise<string[]> {
+export async function getTrackedKeywords(userId: number, property: string): Promise<string[]> {
   try {
     const r = await sql<{ keyword: string }>`
-      SELECT keyword FROM tracked_keywords WHERE user_id = ${userId} ORDER BY created_at DESC
+      SELECT keyword FROM tracked_keywords WHERE user_id = ${userId} AND property = ${property} ORDER BY created_at DESC
     `;
     return r.rows.map((row) => row.keyword);
   } catch { return []; }
 }
 
-export async function addTrackedKeyword(userId: number, keyword: string): Promise<void> {
+export async function addTrackedKeyword(userId: number, keyword: string, property: string): Promise<void> {
   await sql`
     CREATE TABLE IF NOT EXISTS tracked_keywords (
       user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -188,14 +199,15 @@ export async function addTrackedKeyword(userId: number, keyword: string): Promis
       PRIMARY KEY (user_id, keyword, date)
     )
   `;
+  await sql`ALTER TABLE tracked_keywords ADD COLUMN IF NOT EXISTS property TEXT NOT NULL DEFAULT ''`;
   await sql`
-    INSERT INTO tracked_keywords (user_id, keyword) VALUES (${userId}, ${keyword})
-    ON CONFLICT DO NOTHING
+    INSERT INTO tracked_keywords (user_id, keyword, property) VALUES (${userId}, ${keyword}, ${property})
+    ON CONFLICT (user_id, property, keyword) DO NOTHING
   `;
 }
 
-export async function removeTrackedKeyword(userId: number, keyword: string): Promise<void> {
-  await sql`DELETE FROM tracked_keywords WHERE user_id = ${userId} AND keyword = ${keyword}`;
+export async function removeTrackedKeyword(userId: number, keyword: string, property: string): Promise<void> {
+  await sql`DELETE FROM tracked_keywords WHERE user_id = ${userId} AND keyword = ${keyword} AND property = ${property}`;
 }
 
 export async function upsertKeywordPosition(
@@ -209,7 +221,7 @@ export async function upsertKeywordPosition(
   `;
 }
 
-export async function getKeywordsWithLatestPositions(userId: number): Promise<
+export async function getKeywordsWithLatestPositions(userId: number, property: string): Promise<
   { keyword: string; today: number | null; yesterday: number | null }[]
 > {
   try {
@@ -223,7 +235,7 @@ export async function getKeywordsWithLatestPositions(userId: number): Promise<
         ON t.user_id = tk.user_id AND t.keyword = tk.keyword AND t.date = CURRENT_DATE
       LEFT JOIN keyword_positions y
         ON y.user_id = tk.user_id AND y.keyword = tk.keyword AND y.date = CURRENT_DATE - INTERVAL '1 day'
-      WHERE tk.user_id = ${userId}
+      WHERE tk.user_id = ${userId} AND tk.property = ${property}
       ORDER BY tk.created_at DESC
     `;
     return r.rows;
@@ -618,9 +630,17 @@ export async function getLatestArticleIdeas(
 
 // ---------- Content Refresh History ----------
 
-export async function getAllContentRefreshUrls(userId: number): Promise<{ url: string; generated_at: string }[]> {
+export async function getAllContentRefreshUrls(userId: number, baseUrl?: string): Promise<{ url: string; generated_at: string }[]> {
   try {
     await sql`CREATE TABLE IF NOT EXISTS content_refresh_cache (user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, url TEXT NOT NULL, result JSONB NOT NULL, generated_at TIMESTAMPTZ DEFAULT NOW(), PRIMARY KEY (user_id, url))`;
+    if (baseUrl) {
+      const prefix = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+      const r = await sql<{ url: string; generated_at: string }>`
+        SELECT url, generated_at::text FROM content_refresh_cache
+        WHERE user_id = ${userId} AND (url = ${baseUrl} OR url LIKE ${prefix + "%"}) ORDER BY generated_at DESC
+      `;
+      return r.rows;
+    }
     const r = await sql<{ url: string; generated_at: string }>`
       SELECT url, generated_at::text FROM content_refresh_cache
       WHERE user_id = ${userId} ORDER BY generated_at DESC
@@ -631,9 +651,17 @@ export async function getAllContentRefreshUrls(userId: number): Promise<{ url: s
 
 // ---------- Page Grade History ----------
 
-export async function getAllPageGradeUrls(userId: number): Promise<{ url: string; score: number; generated_at: string }[]> {
+export async function getAllPageGradeUrls(userId: number, baseUrl?: string): Promise<{ url: string; score: number; generated_at: string }[]> {
   try {
     await sql`CREATE TABLE IF NOT EXISTS page_grade_cache (user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, url TEXT NOT NULL, result JSONB NOT NULL, generated_at TIMESTAMPTZ DEFAULT NOW(), PRIMARY KEY (user_id, url))`;
+    if (baseUrl) {
+      const prefix = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+      const r = await sql<{ url: string; score: number; generated_at: string }>`
+        SELECT url, (result->>'totalScore')::int AS score, generated_at::text FROM page_grade_cache
+        WHERE user_id = ${userId} AND (url = ${baseUrl} OR url LIKE ${prefix + "%"}) ORDER BY generated_at DESC
+      `;
+      return r.rows;
+    }
     const r = await sql<{ url: string; score: number; generated_at: string }>`
       SELECT url, (result->>'totalScore')::int AS score, generated_at::text FROM page_grade_cache
       WHERE user_id = ${userId} ORDER BY generated_at DESC
