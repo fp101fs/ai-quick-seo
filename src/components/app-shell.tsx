@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { NavigationProgress } from "@/components/navigation-progress";
 import {
   LayoutDashboard,
   Target,
@@ -25,6 +26,7 @@ import {
   Gauge,
   ListChecks,
   Layers,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ConnectionStatus } from "@/lib/types";
@@ -127,8 +129,23 @@ export function AppShell({
   const [menuOpen, setMenuOpen] = useState(false);
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [tooltip, setTooltip] = useState<{ text: string; y: number } | null>(null);
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { getNavCounts().then(setCounts).catch(() => {}); }, []);
+  // Clear pending indicator when navigation completes
+  useEffect(() => { setPendingHref(null); }, [pathname]);
+  // Detect clicks on internal nav links
+  useEffect(() => {
+    const handle = (e: MouseEvent) => {
+      const a = (e.target as Element).closest("a[href]");
+      if (!a) return;
+      const href = a.getAttribute("href") ?? "";
+      if (!href || /^(https?:|mailto:|tel:|#)/.test(href)) return;
+      setPendingHref(href);
+    };
+    document.addEventListener("click", handle);
+    return () => document.removeEventListener("click", handle);
+  }, []);
 
   const nav = (orientation: "vertical" | "horizontal") => (
     <nav
@@ -140,6 +157,7 @@ export function AppShell({
     >
       {navItems.map((item) => {
         const active = pathname.startsWith(item.href);
+        const isPending = pendingHref === item.href;
         const Icon = item.icon;
         const dim = "dim" in item && item.dim;
         return (
@@ -158,11 +176,13 @@ export function AppShell({
               } : undefined}
               onMouseLeave={orientation === "vertical" ? () => setTooltip(null) : undefined}
             >
-              <Icon
-                className={cn("w-4 h-4 shrink-0", active ? "text-indigo-600" : item.iconColor)}
-              />
+              {isPending ? (
+                <Loader2 className="w-4 h-4 shrink-0 animate-spin text-indigo-500" />
+              ) : (
+                <Icon className={cn("w-4 h-4 shrink-0", active ? "text-indigo-600" : item.iconColor)} />
+              )}
               {item.label}
-              {orientation === "vertical" && counts[item.href] ? (
+              {orientation === "vertical" && !isPending && counts[item.href] ? (
                 <span className="ml-auto text-sm font-semibold tabular-nums text-slate-500 dark:text-slate-400">
                   {counts[item.href]}
                 </span>
@@ -171,11 +191,13 @@ export function AppShell({
           </div>
         );
       })}
+
     </nav>
   );
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+      <NavigationProgress pending={pendingHref !== null} />
       {/* Fixed tooltip — rendered outside sidebar to escape overflow:auto */}
       {tooltip && (
         <div
