@@ -34,7 +34,6 @@ import { AiLoading } from "@/components/ai-loading";
 import { TaskCard } from "@/components/task-card";
 import { getDashboardData, getAnalysisHistory, type DashboardData } from "@/app/actions/seo";
 import type { AnalysisSummary } from "@/lib/db";
-import { DashboardUserChip } from "@/components/dashboard-user-chip";
 import type { Opportunity } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ActionPlan } from "@/components/action-plan";
@@ -269,10 +268,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-10 w-64 rounded-lg" />
-          <DashboardUserChip />
-        </div>
+        <Skeleton className="h-10 w-64 rounded-lg" />
         {/* Big, visible AI loading animation in the main area */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm">
           <AiLoading
@@ -325,7 +321,6 @@ export default function DashboardPage() {
         <PageHeader
           title="Dashboard"
           description="Your AI employee's daily SEO briefing."
-          action={<DashboardUserChip />}
         />
         {errorBanner}
         <ConnectGate status={data.status} onReady={load} />
@@ -372,7 +367,6 @@ export default function DashboardPage() {
               <RefreshCw className="w-4 h-4" />
               <span className="hidden sm:inline">Refresh</span>
             </Button>
-            <DashboardUserChip />
           </div>
         }
       />
