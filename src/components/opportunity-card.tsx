@@ -56,9 +56,17 @@ const impactConfig = {
   low: "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300",
 };
 
+function formatQueryBlock(o: Opportunity): string {
+  if (!o.queries?.length) return "";
+  const lines = o.queries
+    .map((q) => `- "${q.query}": position ${q.position.toFixed(1)}, ${q.impressions.toLocaleString()} impressions, ${q.clicks} clicks, ${(q.ctr * 100).toFixed(1)}% CTR`)
+    .join("\n");
+  return `\n\n**Queries currently ranking for this page:**\n${lines}`;
+}
+
 function buildCtrPrompt(o: Opportunity): string {
   const metricLines = [
-    o.metrics.impressions !== undefined ? `- Impressions: ${o.metrics.impressions}` : "",
+    o.metrics.impressions !== undefined ? `- Impressions: ${o.metrics.impressions.toLocaleString()}` : "",
     o.metrics.ctr !== undefined ? `- CTR: ${(o.metrics.ctr * 100).toFixed(2)}%` : "",
     o.metrics.position !== undefined ? `- Avg position: ${o.metrics.position.toFixed(1)}` : "",
   ].filter(Boolean).join("\n");
@@ -72,7 +80,7 @@ ${o.page ? `**Page:** ${o.page}` : ""}
 **Issue:** The page receives significant impressions but CTR is far below expected for its average position.
 
 **Current metrics:**
-${metricLines}
+${metricLines}${formatQueryBlock(o)}
 
 **Goal:** Improve CTR without changing rankings.
 
@@ -93,12 +101,11 @@ Understand:
 
 ## Step 2: Analyze search demand
 
-Using available query and SERP data, identify:
+Using the query data provided in Context above, identify:
 
 - Highest-impression queries driving traffic to this page
 - Dominant search intent (informational, commercial, navigational)
-- Commercial vs informational intent split
-- Keywords appearing in top-ranking titles
+- Which queries have the worst CTR (prioritize these for snippet rewrites)
 - Common title patterns used by competing results
 
 ## Step 3: Analyze the SERP
@@ -192,6 +199,7 @@ function buildClaudePrompt(o: Opportunity): string {
     `**Issue:** ${o.issue}`,
     `**Why it matters:** ${o.whyItMatters}`,
     metricsLines.length ? `**Current metrics:**\n${metricsLines.join("\n")}` : "",
+    formatQueryBlock(o) ? `**Queries currently ranking for this page:**\n${(o.queries ?? []).map((q) => `- "${q.query}": position ${q.position.toFixed(1)}, ${q.impressions.toLocaleString()} impressions, ${q.clicks} clicks, ${(q.ctr * 100).toFixed(1)}% CTR`).join("\n")}` : "",
     `**Goal:** ${o.recommendedAction}`,
     `**Expected impact:** ${o.estimatedImpact}`,
   ].filter(Boolean).join("\n\n");
@@ -215,20 +223,18 @@ Read the page in full and understand:
 - Topics currently covered
 - Existing headings and sections
 
-## Step 2: Analyze query losses
+## Step 2: Analyze query themes
 
-Use the provided GSC data.
+Use the query data provided in Context above (these are queries currently ranking for this page).
 
 Identify:
 
-- Queries with the largest impression losses
-- Queries with the largest click losses
-- Queries with declining average position
-- Query themes that lost visibility
+- Which queries have the weakest positions (most room to improve)
+- Which queries have high impressions but low CTR
+- Query themes and topic clusters
+- Gaps — topics adjacent to these queries that the page may not cover
 
 Group findings into themes and rank them by opportunity.
-
-If query-level data is unavailable, infer likely gaps from competitor analysis and current rankings.
 
 ## Step 3: Research
 

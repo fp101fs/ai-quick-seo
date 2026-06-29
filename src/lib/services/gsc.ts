@@ -172,6 +172,10 @@ const pagePath = (url: string) => {
     return url;
   }
 };
+// Normalize URL for matching: strip trailing slash and www prefix so
+// https://www.example.com/x and https://example.com/x resolve to the same key.
+const normalizePageUrl = (url: string) =>
+  url.replace(/\/$/, "").replace(/^(https?:\/\/)www\./, "$1");
 
 export function detectOpportunities(snapshot: GscSnapshot): Opportunity[] {
   const opportunities: Opportunity[] = [];
@@ -180,11 +184,12 @@ export function detectOpportunities(snapshot: GscSnapshot): Opportunity[] {
   const queriesByPage = new Map<string, QueryPerformance[]>();
   for (const q of snapshot.queries) {
     if (!q.page) continue;
-    if (!queriesByPage.has(q.page)) queriesByPage.set(q.page, []);
-    queriesByPage.get(q.page)!.push(q);
+    const key = normalizePageUrl(q.page);
+    if (!queriesByPage.has(key)) queriesByPage.set(key, []);
+    queriesByPage.get(key)!.push(q);
   }
   const topQueries = (url: string, sortBy: "clicks" | "impressions", n = 5) =>
-    (queriesByPage.get(url) ?? []).sort((a, b) => b[sortBy] - a[sortBy]).slice(0, n);
+    (queriesByPage.get(normalizePageUrl(url)) ?? []).sort((a, b) => b[sortBy] - a[sortBy]).slice(0, n);
 
   // Pages losing clicks (>=20% drop with meaningful volume).
   const decliningClicks = snapshot.pages

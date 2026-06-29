@@ -28,9 +28,10 @@ export async function analyzeContentRefresh(
 ): Promise<ContentRefreshResult> {
   const content = await fetchPageContent(url);
 
-  const normalizedTarget = url.replace(/\/$/, "");
+  const normalizeUrl = (u: string) => u.replace(/\/$/, "").replace(/^(https?:\/\/)www\./, "$1");
+  const normalizedTarget = normalizeUrl(url);
   const pageQueries = (snapshot?.queries ?? [])
-    .filter((q) => q.page && q.page.replace(/\/$/, "") === normalizedTarget)
+    .filter((q) => q.page && normalizeUrl(q.page) === normalizedTarget)
     .slice(0, 12);
 
   const result = await jsonCompletion<Omit<ContentRefreshResult, "url">>(
