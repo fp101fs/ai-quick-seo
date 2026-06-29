@@ -72,6 +72,20 @@ function IdeaRow({ idea, index }: { idea: ArticleIdea; index: number }) {
           <Badge className={cn("text-xs border-none capitalize", opportunityColors[idea.estimatedOpportunity])}>
             {idea.estimatedOpportunity} opp.
           </Badge>
+          {idea.coverage && (
+            <Badge
+              variant="outline"
+              className={cn("text-xs border", {
+                "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800": idea.coverage.status === "gap",
+                "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800": idea.coverage.status === "covered",
+                "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800": idea.coverage.status === "weak",
+              })}
+            >
+              {idea.coverage.status === "gap" && "↗ Gap"}
+              {idea.coverage.status === "covered" && `Ranking #${idea.coverage.position}`}
+              {idea.coverage.status === "weak" && `Weak #${idea.coverage.position}`}
+            </Badge>
+          )}
         </div>
         <p className="text-xs text-slate-500 leading-relaxed">{idea.reasoning}</p>
       </div>

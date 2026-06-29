@@ -191,6 +191,21 @@ export interface ArticleIdea {
   intent: SearchIntent;
   reasoning: string;
   estimatedOpportunity: "high" | "medium" | "low";
+  coverage?: { status: "covered" | "weak" | "gap"; position?: number };
+}
+
+export interface KeywordCluster {
+  name: string;
+  queries: string[];
+  topQueries: Array<{ query: string; impressions: number; position: number; clicks: number }>;
+  totalImpressions: number;
+  avgPosition: number;
+}
+
+export interface KeywordClustersResult {
+  clusters: KeywordCluster[];
+  generatedAt: number;
+  demo?: boolean;
 }
 
 export interface ArticleIdeasResult {

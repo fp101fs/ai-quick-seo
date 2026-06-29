@@ -5,9 +5,26 @@ import { getUsageStatus } from "@/lib/services/usage";
 import { jsonCompletion } from "@/lib/services/openrouter";
 import { buildArticleIdeasPrompt } from "@/lib/prompts/article-ideas";
 import { getDemoSnapshot } from "@/lib/demo-data";
-import type { ArticleIdeasResult } from "@/lib/types";
+import type { ArticleIdeasResult, ArticleIdea, QueryPerformance } from "@/lib/types";
 import { getCachedSnapshot, saveArticleIdeas, getLatestArticleIdeas } from "@/lib/db";
 import type { GscSnapshot } from "@/lib/types";
+
+function computeCoverage(
+  targetKeyword: string,
+  queries: QueryPerformance[]
+): ArticleIdea["coverage"] {
+  const kw = targetKeyword.toLowerCase();
+  const words = kw.split(/\s+/).filter((w) => w.length > 3);
+  const matches = queries.filter((q) => {
+    const qt = q.query.toLowerCase();
+    return qt.includes(kw) || kw.includes(qt) || words.some((w) => qt.includes(w));
+  });
+  if (!matches.length) return { status: "gap" };
+  const best = matches.reduce((a, b) => (a.position < b.position ? a : b));
+  if (best.position <= 20) return { status: "covered", position: Math.round(best.position) };
+  if (best.position <= 50) return { status: "weak", position: Math.round(best.position) };
+  return { status: "gap" };
+}
 import { fetchSiteMetadata } from "@/lib/services/site-metadata";
 
 export async function loadArticleIdeas(): Promise<ArticleIdeasResult | null> {
@@ -69,6 +86,7 @@ export async function generateArticleIdeas(opts?: { nicheOverride?: string }): P
       rank: i + 1,
       estimatedOpportunity: idea.estimatedOpportunity ?? "medium",
       intent: idea.intent ?? "informational",
+      coverage: computeCoverage(idea.targetKeyword, snapshot.queries),
     })),
     generatedAt: Date.now(),
     demo: isDemo,

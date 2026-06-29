@@ -27,6 +27,7 @@ import {
   ListChecks,
   Layers,
   Loader2,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ConnectionStatus } from "@/lib/types";
@@ -46,6 +47,7 @@ const navItems = [
   { href: "/internal-links", label: "Internal Links", icon: Link2, iconColor: "text-blue-500", tooltip: "Crawls your sitemap to find orphan pages and suggest where to add internal links." },
   { href: "/coach", label: "AI Coach", icon: MessageSquare, iconColor: "text-purple-500", tooltip: "Chat with an AI that knows your site's data — ask why traffic dropped, what to fix, etc." },
   { href: "/keywords", label: "Keywords", icon: Hash, iconColor: "text-teal-500", tooltip: "Top queries from Google Search Console with clicks, impressions, CTR, and average position." },
+  { href: "/keyword-gaps", label: "Keyword Gaps", icon: TrendingUp, iconColor: "text-lime-500", tooltip: "Topic clusters from your GSC data — see where you're strong, weak, or missing entirely." },
   { href: "/rank-tracking", label: "Rank Tracking", icon: Activity, iconColor: "text-orange-500", tooltip: "Track keyword positions over time using your GSC data. Click any keyword to see its trend." },
   { href: "/sitemap-explorer", label: "Sitemap Explorer", icon: Layers, iconColor: "text-sky-500", tooltip: "Browse all your pages in a tree view. Click Grade or Improve to take action on any page." },
   { href: "/competitor", label: "Competitor Spy", icon: Search, iconColor: "text-slate-400", tooltip: "Enter a competitor URL to extract their target keywords, content gaps, and blog ideas.", dim: true },
