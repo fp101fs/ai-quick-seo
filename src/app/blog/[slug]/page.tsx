@@ -22,6 +22,18 @@ const FEATURE_LINKS: Record<string, { label: string; href: string; cta: string }
   "seo-questions":  { label: "AI Coach", href: "/coach", cta: "Ask your AI SEO coach →" },
   "seo-for-website":{ label: "Internal Links", href: "/internal-links", cta: "Find orphan pages →" },
   "seo-website":    { label: "Content Refresh", href: "/content-refresh", cta: "Refresh your content →" },
+  // Article series
+  "article-1-ai-seo-strategy-search-console": { label: "Opportunities", href: "/opportunities", cta: "Find your low-CTR pages →" },
+  "article-2-ai-overviews-seo-2024":          { label: "Page Grader", href: "/page-grader", cta: "Check your AI readiness score →" },
+  "article-3-voice-search-seo":               { label: "Keywords", href: "/keywords", cta: "Find your voice search queries →" },
+  "article-4-ai-content-gap-analysis":        { label: "Opportunities", href: "/opportunities", cta: "See your content gaps →" },
+  "article-5-real-time-on-page-seo":          { label: "Content Refresh", href: "/content-refresh", cta: "Refresh a page with AI →" },
+  "article-6-ai-generated-content-2026":      { label: "Content Refresh", href: "/content-refresh", cta: "Improve your AI content →" },
+  "article-6-ai-generated-content":           { label: "Content Refresh", href: "/content-refresh", cta: "Improve your AI content →" },
+  "article-7-technical-seo-ai":               { label: "Page Grader", href: "/page-grader", cta: "Grade your technical SEO →" },
+  "article-8-ai-seo-case-studies":            { label: "Dashboard", href: "/dashboard", cta: "See your personalized tasks →" },
+  "article-9-ai-trends-2026":                 { label: "Keyword Gaps", href: "/keyword-gaps", cta: "See your topic clusters →" },
+  "article-10-predictive-seo":                { label: "Rank Tracking", href: "/rank-tracking", cta: "Track your rising keywords →" },
 };
 
 const CONTENT_DIR = join(process.cwd(), "content");
